@@ -1,0 +1,115 @@
+.chart-container {
+    padding: 1rem 0;
+    width: 100%;
+    height: 250px;
+    display: flex;
+    align-items: flex-end;
+}
+
+.bars-wrapper {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    width: 100%;
+    height: 100%;
+    gap: 12px;
+}
+
+.bar-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+    height: 100%;
+    justify-content: flex-end;
+}
+
+.bar-bg {
+    width: 100%;
+    max-width: 48px;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 6px;
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    overflow: hidden;
+}
+
+.bar-fill {
+    width: 100%;
+    background: var(--accent-gradient);
+    border-radius: 6px;
+    position: relative;
+    transition: height 1s cubic-bezier(0.1, 0.8, 0.2, 1);
+}
+
+.bar-glow {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 20px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0) 100%);
+    border-radius: 6px 6px 0 0;
+}
+
+.bar-label {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+/* Distribution Chart */
+.distribution-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    width: 100%;
+}
+
+.dist-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.dist-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.dist-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+}
+
+.dist-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.dist-value {
+    font-weight: 700;
+    font-size: 1rem;
+}
+
+.dist-bar-bg {
+    width: 100%;
+    height: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.dist-bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 1s cubic-bezier(0.1, 0.8, 0.2, 1);
+}

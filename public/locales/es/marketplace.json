@@ -1,0 +1,16 @@
+{
+    "mkt_title": "Descubrir",
+    "mkt_title_highlight": "Mejores Canciones",
+    "mkt_subtitle": "Encuentra las pistas perfectas para apoyar y aumentar tus regalías",
+    "filter_trending": "En Tendencia",
+    "filter_new": "Nuevos Lanzamientos",
+    "filter_all": "Todas las Canciones",
+    "loading_catalog": "Cargando catálogo musical...",
+    "empty_state_title": "No se encontraron canciones",
+    "empty_state_desc": "Intenta ajustar tus filtros para descubrir más música.",
+    "tag_trending": "Tendencia",
+    "tag_popular": "Popular",
+    "token_price": "Precio por Participación",
+    "proj_roi": "ROI Est.",
+    "btn_invest": "Participar"
+}

@@ -1,0 +1,17 @@
+{
+    "title": "Sua participação nesta música",
+    "subtitle": "Selecione com quanto gostaria de participar.",
+    "row_amount": "Valor da participação",
+    "row_share": "Participação estimada",
+    "row_estimated": "Royalties mensais estimados",
+    "context_info": "A cada 100.000 streams, sua participação poderia gerar aproximadamente ${{amount}}.",
+    "social_proof": "{{count}} fãs já se juntaram a esta música",
+    "micro_fomo": "Os primeiros participantes capturam a maior parte dos royalties.",
+    "break_even_title": "Estimativa de recuperação",
+    "break_even_value": "~8–12 meses",
+    "benefits_title": "O que você recebe",
+    "benefit_1": "Parte dos royalties de streaming",
+    "benefit_2": "Participar no desempenho da música",
+    "benefit_3": "Acompanhar seu crescimento nas plataformas",
+    "benefits_disclaimer": "Inclui pagamentos de streaming e plataformas. Não inclui licenças de sincronização."
+}

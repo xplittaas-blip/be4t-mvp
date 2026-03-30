@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>You're now part of the music</title>
+    <style>
+        /* Base Reset */
+        body,
+        p,
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: #0d0907;
+            /* Deep, warm dark UI */
+            color: #ffffff;
+            -webkit-font-smoothing: antialiased;
+            -ms-text-size-adjust: 100%;
+            -webkit-text-size-adjust: 100%;
+        }
+
+        /* Container & Structure */
+        .wrapper {
+            width: 100%;
+            table-layout: fixed;
+            background-color: #0d0907;
+            padding: 40px 0;
+        }
+
+        .main {
+            background-color: #17100b;
+            /* Slightly lighter card for contrast */
+            margin: 0 auto;
+            width: 100%;
+            max-width: 600px;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        /* Typography */
+        h1 {
+            font-size: 28px;
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: 24px;
+            letter-spacing: -0.5px;
+        }
+
+        p {
+            font-size: 16px;
+            line-height: 1.6;
+            color: #d1cfcd;
+            /* Soft, warm grey */
+            margin-bottom: 20px;
+        }
+
+        /* Brand Accent */
+        .brand-text {
+            font-size: 24px;
+            font-weight: 800;
+            letter-spacing: -1px;
+            margin-bottom: 32px;
+            color: #ffffff;
+            display: inline-block;
+        }
+
+        .brand-x {
+            font-size: 32px;
+            line-height: 1;
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: -2px;
+            background: linear-gradient(135deg, #FF5722 0%, #FFC107 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Sections */
+        .expectation-section,
+        .referral-section {
+            background-color: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            padding: 24px;
+            margin-top: 32px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .referral-section {
+            border-color: rgba(255, 87, 34, 0.2);
+            /* Subtle orange border */
+        }
+
+        /* CTA Button */
+        .btn-wrapper {
+            margin: 32px 0;
+            text-align: center;
+        }
+
+        .btn {
+            display: inline-block;
+            background: linear-gradient(135deg, #FF5722 0%, #FFC107 100%);
+            color: #000000;
+            /* Dark text on bright button */
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 16px;
+            padding: 16px 32px;
+            border-radius: 30px;
+            transition: opacity 0.2s ease;
+        }
+
+        /* Helper Text & Link Backup */
+        .helper-text {
+            font-size: 14px;
+            color: #8c8886;
+            text-align: center;
+            margin-top: 16px;
+        }
+
+        .referral-link-text {
+            display: block;
+            margin-top: 8px;
+            color: #FFC107;
+            word-break: break-all;
+        }
+
+        /* Footer */
+        .footer {
+            padding: 32px 40px;
+            text-align: left;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .footer p {
+            font-size: 14px;
+            color: #8c8886;
+            margin-bottom: 8px;
+        }
+
+        .footer-signature {
+            margin-top: 24px;
+        }
+
+        .footer-signature strong {
+            color: #ffffff;
+            display: block;
+            font-size: 16px;
+            margin-bottom: 4px;
+        }
+
+        @media screen and (max-width: 600px) {
+            .wrapper {
+                padding: 20px 10px;
+            }
+
+            .content {
+                padding: 30px 20px;
+            }
+
+            .footer {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
+            p {
+                font-size: 15px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <center class="wrapper">
+        <div class="main">
+            <div class="content">
+                <!-- XPLIT Logo -->
+                <div class="brand-text">
+                    <span class="brand-x">X</span>plit
+                </div>
+
+                <!-- Hero -->
+                <h1>You're now part of the music</h1>
+
+                <!-- Body Copy -->
+                <p>Hi {{first_name}},</p>
+                <p>Thanks for joining the XPLIT waiting list.</p>
+                <p>We're building a new way for fans to be part of the music they love — not just by listening, but by
+                    sharing in the royalties songs generate.</p>
+                <p>Soon you'll be able to support artists and participate in the success of their music.</p>
+                <p>You're now officially part of the early XPLIT community.</p>
+
+                <!-- Expectation Section -->
+                <div class="expectation-section">
+                    <p style="margin-bottom: 12px; color: #ffffff; font-weight: 600;">What's next?</p>
+                    <p style="margin-bottom: 12px;">Over the next few weeks we'll start opening access to early members.
+                    </p>
+                    <p style="margin-bottom: 0;">As someone on the waiting list, you'll be among the first invited to
+                        explore the platform and the first songs available.</p>
+                </div>
+
+                <!-- Referral Section -->
+                <div class="referral-section">
+                    <p style="margin-bottom: 16px; color: #ffffff; font-weight: 600;">Music grows through people.</p>
+                    <p style="margin-bottom: 0;">If you know friends who love discovering artists and supporting music,
+                        invite them to join the waiting list too.</p>
+
+                    <div class="btn-wrapper">
+                        <!-- Replace href with actual sharing intent or placeholder link -->
+                        <a href="{{referral_link}}" class="btn">Invite friends</a>
+                    </div>
+
+                    <p class="helper-text">
+                        Share your invite link:
+                        <span class="referral-link-text">{{referral_link}}</span>
+                    </p>
+
+                    <p class="helper-text" style="margin-top: 12px; line-height: 1.4;">
+                        When your friends join, they become part of the same early community helping shape XPLIT.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="footer">
+                <p>Thanks for being early.<br>The music community starts with you.</p>
+
+                <div class="footer-signature">
+                    <strong>XPLIT</strong>
+                    <p style="margin-bottom: 0;">Own a part of the music.</p>
+                </div>
+            </div>
+        </div>
+    </center>
+</body>
+
+</html>

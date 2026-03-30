@@ -1,0 +1,17 @@
+{
+    "title": "Your share of this song",
+    "subtitle": "Select how much you'd like to participate.",
+    "row_amount": "Participation amount",
+    "row_share": "Estimated song share",
+    "row_estimated": "Estimated monthly royalties",
+    "context_info": "For every 100,000 streams, your share could generate approximately ${{amount}}.",
+    "social_proof": "{{count}} fans already joined this song",
+    "micro_fomo": "Early participants capture the largest share of royalties.",
+    "break_even_title": "Break-even estimate",
+    "break_even_value": "~8–12 months",
+    "benefits_title": "What you receive",
+    "benefit_1": "Share in streaming royalties",
+    "benefit_2": "Participate in the song's performance",
+    "benefit_3": "Track growth across platforms",
+    "benefits_disclaimer": "Includes streaming and platform payouts. Does not include sync licensing."
+}

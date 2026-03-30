@@ -1,0 +1,121 @@
+.uploader-container {
+    width: 100%;
+    max-width: 800px;
+    margin: 4rem auto;
+    padding: 2rem;
+    border-radius: 20px;
+    background: rgba(13, 9, 7, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(20px);
+}
+
+.uploader-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.uploader-header h1 {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    color: var(--text-primary);
+}
+
+.uploader-header p {
+    color: var(--text-secondary);
+}
+
+.uploader-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.form-group label {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+.form-input {
+    width: 100%;
+    padding: 14px 16px;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(0,0,0,0.3);
+    color: var(--text-primary);
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: rgba(144, 19, 254, 0.5);
+    background: rgba(0,0,0,0.5);
+}
+
+.dropzone {
+    border: 2px dashed rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    padding: 3rem 2rem;
+    text-align: center;
+    cursor: pointer;
+    background: rgba(0,0,0,0.2);
+    transition: all 0.3s ease;
+}
+
+.dropzone:hover {
+    border-color: rgba(144, 19, 254, 0.5);
+    background: rgba(144, 19, 254, 0.05);
+}
+
+.dropzone-icon {
+    color: var(--text-secondary);
+    margin-bottom: 1rem;
+    display: flex;
+    justify-content: center;
+}
+
+.dynamic-fields-card {
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 12px;
+    padding: 1.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.flex-row {
+    display: flex;
+    gap: 1rem;
+}
+
+.flex-1 {
+    flex: 1;
+}
+
+.btn-remove {
+    background: rgba(255, 0, 0, 0.1);
+    color: #ff4444;
+    border: none;
+    border-radius: 8px;
+    padding: 0 1rem;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.2s;
+}
+
+.btn-remove:hover {
+    background: rgba(255, 0, 0, 0.2);
+}
+
+.uploader-footer {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+    padding-top: 2rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}

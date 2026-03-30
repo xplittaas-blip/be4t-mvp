@@ -1,0 +1,17 @@
+{
+    "title": "Tu participación en esta canción",
+    "subtitle": "Selecciona con cuánto te gustaría participar.",
+    "row_amount": "Monto de participación",
+    "row_share": "Participación estimada",
+    "row_estimated": "Regalías mensuales estimadas",
+    "context_info": "Por cada 100,000 streams, tu participación podría generar aproximadamente ${{amount}}.",
+    "social_proof": "{{count}} fans ya se unieron a esta canción",
+    "micro_fomo": "Los primeros participantes capturan la mayor parte de las regalías.",
+    "break_even_title": "Estimación de recuperación",
+    "break_even_value": "~8–12 meses",
+    "benefits_title": "Qué recibes",
+    "benefit_1": "Parte de las regalías de streaming",
+    "benefit_2": "Participar en el desempeño de la canción",
+    "benefit_3": "Seguir su crecimiento en plataformas",
+    "benefits_disclaimer": "Incluye pagos de streaming y plataformas. No incluye licencias de sincronización."
+}

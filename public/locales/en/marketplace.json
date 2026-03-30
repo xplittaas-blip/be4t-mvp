@@ -1,0 +1,16 @@
+{
+    "mkt_title": "Discover",
+    "mkt_title_highlight": "Top Songs",
+    "mkt_subtitle": "Find the perfect tracks to back and grow your royalties",
+    "filter_trending": "Trending Now",
+    "filter_new": "New Releases",
+    "filter_all": "All Songs",
+    "loading_catalog": "Loading musical catalog...",
+    "empty_state_title": "No songs found",
+    "empty_state_desc": "Try adjusting your filters to discover more music.",
+    "tag_trending": "Trending",
+    "tag_popular": "Popular",
+    "token_price": "Share Price",
+    "proj_roi": "Est. ROI",
+    "btn_invest": "Participate"
+}
