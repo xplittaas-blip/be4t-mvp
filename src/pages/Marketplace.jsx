@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import MarketplaceHeader from '../components/be4t/MarketplaceHeader';
+
 import HeroBanner from '../components/be4t/HeroBanner';
 import SongCard, { normalizeSong, SongCardSkeleton } from '../components/be4t/SongCard';
 import AssetDetailView from '../components/be4t/AssetDetailView';
@@ -176,18 +176,8 @@ const Marketplace = ({ session }) => {
     );
 
     return (
-        <div style={{ minHeight: '100vh', background: '#0a0a0f', color: 'white' }}>
+        <div style={{ minHeight: '100vh', color: 'white' }}>
             <style>{globalStyles}</style>
-
-            {/* ── Sticky Header ── */}
-            <MarketplaceHeader
-                activeTab={activeTab}
-                onTabChange={setActiveTab}
-                userMode={userMode}
-                onModeChange={setUserMode}
-                searchQuery={searchQuery}
-                onSearchChange={setSearchQuery}
-            />
 
             <main style={{ maxWidth: '1280px', margin: '0 auto', paddingBottom: '5rem' }}>
                 {/* ── Hero Banner ── */}
