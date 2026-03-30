@@ -1,12 +1,9 @@
 import React, { useState, useEffect, useMemo } from 'react';
-
 import HeroBanner from '../components/be4t/HeroBanner';
 import SongCard, { normalizeSong, SongCardSkeleton } from '../components/be4t/SongCard';
 import AssetDetailView from '../components/be4t/AssetDetailView';
 import TokenizationModal from '../components/be4t/TokenizationModal';
-import { supabase } from '../core/xplit/supabaseClient';
-import { assetsData } from '../core/be4t/data/assetsData';
-import { fetchTop20Reggaeton } from '../services/spotifyService';
+import { fetchDemoSongs20 } from '../services/spotifyService';
 import './Marketplace.css';
 
 // ── Global styles needed ──────────────────────────────────────────────────────
@@ -39,77 +36,37 @@ const SELECT_STYLE = {
 
 // ── Marketplace ───────────────────────────────────────────────────────────────
 const Marketplace = ({ session }) => {
-    const [activeTab, setActiveTab]       = useState('explorar');
     const [userMode, setUserMode]         = useState('fan');
     const [searchQuery, setSearchQuery]   = useState('');
     const [sortBy, setSortBy]             = useState('roi');
-    const [typeFilter, setTypeFilter]     = useState('all');
+    const [genreFilter, setGenreFilter]   = useState('all'); // 'all' | 'reggaeton' | 'rock'
     const [rawAssets, setRawAssets]       = useState([]);
     const [isLoading, setIsLoading]       = useState(true);
-    const [spotifyStatus, setSpotifyStatus] = useState('idle'); // 'idle'|'loading'|'done'|'error'
+    const [spotifyStatus, setSpotifyStatus] = useState('loading');
     const [detailAsset, setDetailAsset]   = useState(null);
     const [tokenizingAsset, setTokenizingAsset] = useState(null);
 
-    // ── Step 1: Load from Supabase (fast) ─────────────────────────────────
+    // ── Load 20 songs directly from Spotify (no Supabase for demo) ────────
     useEffect(() => {
-        const loadFromSupabase = async () => {
+        const load = async () => {
             setIsLoading(true);
+            setSpotifyStatus('loading');
             try {
-                const { data, error } = await supabase
-                    .from('assets')
-                    .select('*')
-                    .order('created_at', { ascending: false });
-
-                if (error) throw error;
-
-                if (data && data.length > 0) {
-                    console.log('✅ Supabase assets loaded:', data.length);
-                    setRawAssets(data.map(normalizeSong));
-                    setIsLoading(false);
-                    return;
-                }
-                // DB empty → try Spotify ingestion
-                throw new Error('EMPTY');
+                const tracks = await fetchDemoSongs20();
+                setRawAssets(tracks.map(normalizeSong));
+                setSpotifyStatus('done');
+                console.log(`🎵 Demo loaded: ${tracks.length} songs (10 Reggaetón + 10 Rock)`);
             } catch (err) {
-                console.warn('Supabase empty or failed, trying Spotify…', err.message);
-                loadFromSpotify();
+                console.error('Demo load failed:', err);
+                setSpotifyStatus('error');
+            } finally {
+                setIsLoading(false);
             }
         };
-
-        loadFromSupabase();
+        load();
     }, []);
 
-    // ── Step 2: Spotify ingestion (runs if Supabase empty) ────────────────
-    const loadFromSpotify = async () => {
-        setSpotifyStatus('loading');
-        try {
-            const tracks = await fetchTop20Reggaeton();
-            // Mark top 3 as trending for FOMO badges
-            const markedTracks = tracks.map((t, i) => ({
-                ...t,
-                metadata: { ...t.metadata, is_trending: i < 3 },
-                is_trending: i < 3,
-            }));
-            setRawAssets(markedTracks.map(normalizeSong));
-            setSpotifyStatus('done');
-
-            // Background upsert (non-blocking)
-            supabase.from('assets').upsert(markedTracks, { onConflict: 'id' })
-                .then(({ error }) => {
-                    if (!error) console.log('✅ Spotify tracks saved to Supabase');
-                    else console.warn('Supabase upsert non-critical warn:', error.message);
-                });
-        } catch (err) {
-            console.error('Spotify fetch failed:', err);
-            setSpotifyStatus('error');
-            // Final fallback: enriched seed data
-            setRawAssets(assetsData.map(t => normalizeSong({ ...t, is_trending: false })));
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    // ── Filter + Sort (Lovable's useMemo pattern) ─────────────────────────
+    // ── Filter + Sort ────────────────────────────────────────────────────
     const filteredSongs = useMemo(() => {
         let list = [...rawAssets];
 
@@ -121,17 +78,18 @@ const Marketplace = ({ session }) => {
             );
         }
 
-        if (typeFilter !== 'all') {
-            list = list.filter(s =>
-                typeFilter === 'music' ? s.asset_type === 'MUSIC' : s.asset_type === 'RWA'
-            );
+        if (genreFilter !== 'all') {
+            list = list.filter(s => {
+                const tag = s._raw?.metadata?.genre_tag || '';
+                return tag === genreFilter;
+            });
         }
 
         const sortFn = SORT_FNS[sortBy] || SORT_FNS.roi;
         list.sort(sortFn);
 
         return list;
-    }, [rawAssets, searchQuery, sortBy, typeFilter]);
+    }, [rawAssets, searchQuery, sortBy, genreFilter]);
 
     // ── Detail View navigation ────────────────────────────────────────────
     if (detailAsset) {
@@ -230,10 +188,10 @@ const Marketplace = ({ session }) => {
                             </p>
                         </div>
                         <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-                            <select value={typeFilter} onChange={e => setTypeFilter(e.target.value)} style={SELECT_STYLE}>
-                                <option value="all">Todos</option>
-                                <option value="music">MUSIC</option>
-                                <option value="rwa">RWA</option>
+                            <select value={genreFilter} onChange={e => setGenreFilter(e.target.value)} style={SELECT_STYLE}>
+                                <option value="all">🎵 Todos los géneros</option>
+                                <option value="reggaeton">🔥 Reggaetón</option>
+                                <option value="rock">🎸 Rock</option>
                             </select>
                             <select value={sortBy} onChange={e => setSortBy(e.target.value)} style={SELECT_STYLE}>
                                 <option value="roi">Mayor ROI</option>

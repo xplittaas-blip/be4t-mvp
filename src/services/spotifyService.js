@@ -1,175 +1,221 @@
 /**
- * BE4T Spotify Service
- * Client Credentials Flow — no user login required.
- * Reads SPOTIFY_CLIENT_ID / SPOTIFY_CLIENT_SECRET from env (Node) or
- * VITE_SPOTIFY_CLIENT_ID / VITE_SPOTIFY_CLIENT_SECRET (browser).
- *
- * Main exports:
- *   getSpotifyToken()         → Bearer token
- *   fetchTop20Reggaeton()     → 20 normalized track objects
- *   ingestTracksToSupabase()  → upserts tracks into assets table
+ * BE4T Spotify Demo Service
+ * Fetches Top 10 Reggaetón + Top 10 Rock directly from Spotify API
+ * (Client Credentials Flow — no user login needed)
+ * 
+ * For the investor demo: data is fresh, direct, never cached in Supabase.
  */
 
-import { supabase } from '../core/xplit/supabaseClient';
+const CLIENT_ID     = import.meta.env?.VITE_SPOTIFY_CLIENT_ID     || '489bc7138c044636947cad63e742a0c3';
+const CLIENT_SECRET = import.meta.env?.VITE_SPOTIFY_CLIENT_SECRET || 'f35bbbeb0d204c998b50f00b9e389e08';
 
-const CLIENT_ID =
-    import.meta.env?.VITE_SPOTIFY_CLIENT_ID ||
-    import.meta.env?.SPOTIFY_CLIENT_ID ||
-    '489bc7138c044636947cad63e742a0c3';
-
-const CLIENT_SECRET =
-    import.meta.env?.VITE_SPOTIFY_CLIENT_SECRET ||
-    import.meta.env?.SPOTIFY_CLIENT_SECRET ||
-    'f35bbbeb0d204c998b50f00b9e389e08';
-
-// Top 50 Colombia playlist (official Spotify Editorial)
-const COLOMBIA_TOP50_PLAYLIST = '2XOhHTFtXP9HLwuGKqxT04';
-// Top 50 Global as fallback
-const GLOBAL_TOP50_PLAYLIST = '37i9dQZEVXbMDoHDwVN2tF';
-
-// Reggaeton / Latin Urban artists to prioritize (FOMO triggers)
-const REGGAETON_ARTISTS = new Set([
-    'feid', 'karol g', 'bad bunny', 'j balvin', 'maluma', 'anuel aa',
-    'ozuna', 'daddy yankee', 'rauw alejandro', 'myke towers', 'ryan castro',
-    'peso pluma', 'jhayco', 'sebastián yatra', 'sech', 'nicky jam',
-    'arcángel', 'bryant myers', 'mora', 'jhay cortez', 'don omar',
-    'wisin', 'yandel', 'zion & lennox', 'chencho corleone',
-]);
-
-const isReggaeton = (track) => {
-    const artistNames = (track.artists || []).map(a => a.name.toLowerCase());
-    return artistNames.some(name =>
-        REGGAETON_ARTISTS.has(name) ||
-        [...REGGAETON_ARTISTS].some(r => name.includes(r))
-    );
-};
-
-// ── Token ─────────────────────────────────────────────────────────────────────
-let _tokenCache = null;
-let _tokenExpiry = 0;
+// ── Token cache ────────────────────────────────────────────────────────────────
+let _token = null;
+let _expiry = 0;
 
 export async function getSpotifyToken() {
-    if (_tokenCache && Date.now() < _tokenExpiry) return _tokenCache;
-
-    const creds = btoa(`${CLIENT_ID}:${CLIENT_SECRET}`);
+    if (_token && Date.now() < _expiry) return _token;
     const res = await fetch('https://accounts.spotify.com/api/token', {
         method: 'POST',
         headers: {
-            Authorization: `Basic ${creds}`,
+            Authorization: `Basic ${btoa(`${CLIENT_ID}:${CLIENT_SECRET}`)}`,
             'Content-Type': 'application/x-www-form-urlencoded',
         },
         body: 'grant_type=client_credentials',
     });
-
     if (!res.ok) throw new Error(`Spotify auth failed: ${res.status}`);
     const data = await res.json();
-
-    _tokenCache = data.access_token;
-    _tokenExpiry = Date.now() + (data.expires_in - 60) * 1000; // refresh 1 min early
-    return _tokenCache;
+    _token  = data.access_token;
+    _expiry = Date.now() + (data.expires_in - 60) * 1000;
+    return _token;
 }
 
-// ── Fetch playlist tracks ─────────────────────────────────────────────────────
-async function fetchPlaylistTracks(playlistId, token, limit = 50) {
-    const url = `https://api.spotify.com/v1/playlists/${playlistId}/tracks?limit=${limit}&fields=items(track(id,name,artists,album,preview_url,external_ids,popularity,duration_ms))`;
-    const res = await fetch(url, {
-        headers: { Authorization: `Bearer ${token}` },
-    });
-    if (!res.ok) throw new Error(`Playlist fetch failed: ${res.status}`);
+// ── 20 target tracks for the investor demo ────────────────────────────────────
+const TARGET_TRACKS = [
+    // ── TOP 10 REGGAETÓN ──
+    { q: 'track:"Provenza" artist:"Karol G"',          genre: 'reggaeton', roi: 19.4 },
+    { q: 'track:"Chorrito Pa las Animas" artist:"Feid"', genre: 'reggaeton', roi: 22.1 },
+    { q: 'track:"Monaco" artist:"Bad Bunny"',           genre: 'reggaeton', roi: 21.8 },
+    { q: 'track:"LALA" artist:"Myke Towers"',           genre: 'reggaeton', roi: 17.3 },
+    { q: 'track:"Por Las Noches" artist:"Peso Pluma"',  genre: 'reggaeton', roi: 20.5 },
+    { q: 'track:"Amargura" artist:"Feid"',              genre: 'reggaeton', roi: 18.7 },
+    { q: 'track:"Ojitos Lindos" artist:"Bad Bunny"',    genre: 'reggaeton', roi: 16.9 },
+    { q: 'track:"Con Altura" artist:"Rosalía"',         genre: 'reggaeton', roi: 23.2 },
+    { q: 'track:"Mayor Que Yo 3" artist:"Daddy Yankee"', genre: 'reggaeton', roi: 15.6 },
+    { q: 'track:"x100PRE" artist:"Bad Bunny"',          genre: 'reggaeton', roi: 18.1 },
+    // ── TOP 10 ROCK ──
+    { q: 'track:"Do I Wanna Know" artist:"Arctic Monkeys"', genre: 'rock', roi: 14.8 },
+    { q: 'track:"Bohemian Rhapsody" artist:"Queen"',         genre: 'rock', roi: 16.2 },
+    { q: 'track:"Persiana Americana" artist:"Soda Stereo"',  genre: 'rock', roi: 13.5 },
+    { q: 'track:"Numb" artist:"Linkin Park"',                genre: 'rock', roi: 15.1 },
+    { q: 'track:"Smells Like Teen Spirit" artist:"Nirvana"', genre: 'rock', roi: 12.9 },
+    { q: 'track:"Mr Brightside" artist:"The Killers"',       genre: 'rock', roi: 11.7 },
+    { q: 'track:"Yellow" artist:"Coldplay"',                 genre: 'rock', roi: 13.8 },
+    { q: 'track:"Seven Nation Army" artist:"White Stripes"', genre: 'rock', roi: 12.3 },
+    { q: 'track:"De Musica Ligera" artist:"Soda Stereo"',   genre: 'rock', roi: 14.0 },
+    { q: 'track:"Still Loving You" artist:"Scorpions"',      genre: 'rock', roi: 11.2 },
+];
+
+// ── Search a single track ─────────────────────────────────────────────────────
+async function searchTrack(query, token) {
+    const url = `https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=track&limit=1&market=US`;
+    const res  = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
+    if (!res.ok) return null;
     const data = await res.json();
-    return (data.items || []).map(i => i.track).filter(Boolean);
+    return data?.tracks?.items?.[0] || null;
 }
 
-// ── Normalize a Spotify track → our asset schema ──────────────────────────────
-function normalizeTrack(track, position) {
-    const artist = track.artists?.[0] || {};
-    const album = track.album || {};
-    const cover = album.images?.[0]?.url || null; // highest res (640px)
+// ── Normalize Spotify track → SongCard / AssetDetailView schema ───────────────
+function normalize(track, meta, position) {
+    const { genre, roi } = meta;
+    const artist   = track.artists?.[0] || {};
+    const album    = track.album || {};
+    const cover    = album.images?.[0]?.url || null; // 640×640 high-res
 
-    // Derive streaming estimates from Spotify popularity (0–100)
-    const pop = track.popularity || 50;
-    const spotifyStreams = Math.round(pop * 12_500_000 + Math.random() * 5_000_000);
-    const youtubeViews  = Math.round(spotifyStreams * 0.65);
-    const tiktokCreations = Math.round(spotifyStreams * 0.072);
-
-    const valuationUsd = Math.round(25_000 + pop * 800);
-    const tokenPrice   = 25 + Math.floor(pop / 10) * 5;
-
-    // Funding progress — top tracks are more funded (FOMO)
-    const fundingPct = Math.min(95, 60 + position * -2 + Math.floor(Math.random() * 15));
-
-    const roi = 10 + (pop - 50) * 0.3 + Math.random() * 5;
+    const pop     = track.popularity || 60;
+    const streams = Math.round(pop * 15_000_000 + Math.random() * 8_000_000);
+    const views   = Math.round(streams * 0.62);
+    const tiktok  = Math.round(streams * 0.07);
+    const totalVal= Math.round(20_000 + pop * 750);
+    const price   = 25 + Math.floor(pop / 12) * 5;
+    const funding = Math.min(96, 55 + position * -2 + Math.floor(Math.random() * 18));
 
     return {
-        id: `spotify-${track.id}`,
-        name: track.name,
-        symbol: track.name.replace(/[^A-Z]/gi, '').toUpperCase().slice(0, 4) || 'BEAT',
-        asset_type: 'music',
-        token_price_usd: tokenPrice,
-        total_supply: 1000,
-        valuation_usd: valuationUsd,
-        is_tokenized: false,
+        id:               `sp-${track.id}`,
+        name:             track.name,
+        symbol:           track.name.replace(/[^A-Za-z]/g, '').toUpperCase().slice(0, 4) || 'BEAT',
+        asset_type:       'music',
+        token_price_usd:  price,
+        total_supply:     1000,
+        valuation_usd:    totalVal,
+        is_tokenized:     false,
         contract_address: null,
-        // Spotify-ready image
-        cover_url: cover,
-        image: cover,
-        preview_url: track.preview_url,
+        cover_url:        cover,
+        image:            cover,
+        preview_url:      track.preview_url,
         metadata: {
-            artist:             artist.name || 'Unknown',
-            artist_id:          artist.id,
-            isrc:               track.external_ids?.isrc || '',
-            spotify_track_id:   track.id,
-            spotify_streams:    spotifyStreams,
-            youtube_views:      youtubeViews,
-            tiktok_creations:   tiktokCreations,
-            yield_estimate:     `${roi.toFixed(1)}%`,
-            genre:              'Reggaetón / Urbano',
-            popularity:         pop,
-            duration_ms:        track.duration_ms,
-            album_name:         album.name,
-            release_year:       (album.release_date || '2024').slice(0, 4),
-            preview_url:        track.preview_url,
-            funding_percent:    fundingPct,
-            raised_amount:      Math.round(valuationUsd * fundingPct / 100),
-            is_trending:        position < 3, // top 3 = Trending badge
-            monthly_listeners:  Math.round(spotifyStreams / 12),
-            bio:                `${artist.name} es uno de los nombres más relevantes del urbano latinoamericano actual, con millones de oyentes mensuales en Spotify y una presencia dominante en las listas de éxitos de toda América Latina.`,
-            review:             `"${track.name}" es un hit del urbano latino que ha dominado las listas de reproducción de Colombia y el mundo. Con más de ${(spotifyStreams / 1_000_000).toFixed(1)}M de streams, este activo representa una oportunidad de inversión en uno de los géneros de mayor crecimiento global.`,
+            artist:           artist.name,
+            artist_id:        artist.id,
+            isrc:             track.external_ids?.isrc || '',
+            spotify_track_id: track.id,
+            spotify_streams:  streams,
+            youtube_views:    views,
+            tiktok_creations: tiktok,
+            yield_estimate:   `${roi.toFixed(1)}%`,
+            genre:            genre === 'reggaeton' ? 'Reggaetón / Urbano' : 'Rock',
+            genre_tag:        genre,
+            popularity:       pop,
+            duration_ms:      track.duration_ms,
+            album_name:       album.name,
+            release_year:     (album.release_date || '2023').slice(0, 4),
+            preview_url:      track.preview_url,
+            funding_percent:  funding,
+            raised_amount:    Math.round(totalVal * funding / 100),
+            is_trending:      position < 3,
+            bio: `${artist.name} es uno de los artistas más influyentes del género ${genre === 'reggaeton' ? 'reggaetón/urbano' : 'rock'} a nivel mundial, con millones de oyentes mensuales en Spotify y una presencia consolidada en las principales plataformas de streaming.`,
+            review: `"${track.name}" es un hito de ${artist.name} con más de ${(streams / 1_000_000).toFixed(1)}M de streams. Este activo representa una oportunidad de inversión en regalías de uno de los catálogos más sólidos del mercado musical global.`,
         },
     };
 }
 
-// ── Main export: fetch top 20 reggaetón ──────────────────────────────────────
-export async function fetchTop20Reggaeton() {
-    const token = await getSpotifyToken();
+// ── Fallback: 20 real songs with static metadata ─────────────────────────────
+const FALLBACK_SONGS = [
+    // Reggaetón
+    { name: 'Provenza',                 artist: 'Karol G',        cover: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?q=80&w=600', genre: 'reggaeton', roi: 19.4, pop: 95 },
+    { name: 'Chorrito Pa las Animas',   artist: 'Feid',           cover: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=600', genre: 'reggaeton', roi: 22.1, pop: 92 },
+    { name: 'Monaco',                   artist: 'Bad Bunny',      cover: 'https://images.unsplash.com/photo-1501612780327-45045538702b?q=80&w=600', genre: 'reggaeton', roi: 21.8, pop: 97 },
+    { name: 'LALA',                     artist: 'Myke Towers',    cover: 'https://images.unsplash.com/photo-1459749411175-04bf5292ceea?q=80&w=600', genre: 'reggaeton', roi: 17.3, pop: 88 },
+    { name: 'Por Las Noches',           artist: 'Peso Pluma',     cover: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=600', genre: 'reggaeton', roi: 20.5, pop: 91 },
+    { name: 'Amargura',                 artist: 'Feid',           cover: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?q=80&w=600', genre: 'reggaeton', roi: 18.7, pop: 89 },
+    { name: 'Ojitos Lindos',            artist: 'Bad Bunny',      cover: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=600', genre: 'reggaeton', roi: 16.9, pop: 90 },
+    { name: 'Con Altura',               artist: 'Rosalía',        cover: 'https://images.unsplash.com/photo-1501612780327-45045538702b?q=80&w=600', genre: 'reggaeton', roi: 23.2, pop: 93 },
+    { name: 'Mayor Que Yo 3',           artist: 'Daddy Yankee',   cover: 'https://images.unsplash.com/photo-1459749411175-04bf5292ceea?q=80&w=600', genre: 'reggaeton', roi: 15.6, pop: 82 },
+    { name: 'x100PRE',                  artist: 'Bad Bunny',      cover: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=600', genre: 'reggaeton', roi: 18.1, pop: 86 },
+    // Rock
+    { name: 'Do I Wanna Know?',         artist: 'Arctic Monkeys', cover: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?q=80&w=600', genre: 'rock', roi: 14.8, pop: 88 },
+    { name: 'Bohemian Rhapsody',         artist: 'Queen',          cover: 'https://images.unsplash.com/photo-1512374382149-233c42b6a83b?q=80&w=600', genre: 'rock', roi: 16.2, pop: 94 },
+    { name: 'Persiana Americana',        artist: 'Soda Stereo',    cover: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=600', genre: 'rock', roi: 13.5, pop: 79 },
+    { name: 'Numb',                      artist: 'Linkin Park',    cover: 'https://images.unsplash.com/photo-1501612780327-45045538702b?q=80&w=600', genre: 'rock', roi: 15.1, pop: 91 },
+    { name: 'Smells Like Teen Spirit',   artist: 'Nirvana',        cover: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=600', genre: 'rock', roi: 12.9, pop: 87 },
+    { name: 'Mr. Brightside',            artist: 'The Killers',    cover: 'https://images.unsplash.com/photo-1459749411175-04bf5292ceea?q=80&w=600', genre: 'rock', roi: 11.7, pop: 84 },
+    { name: 'Yellow',                    artist: 'Coldplay',       cover: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?q=80&w=600', genre: 'rock', roi: 13.8, pop: 88 },
+    { name: 'Seven Nation Army',         artist: 'The White Stripes', cover: 'https://images.unsplash.com/photo-1512374382149-233c42b6a83b?q=80&w=600', genre: 'rock', roi: 12.3, pop: 85 },
+    { name: 'De Música Ligera',          artist: 'Soda Stereo',    cover: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=600', genre: 'rock', roi: 14.0, pop: 80 },
+    { name: 'Still Loving You',          artist: 'Scorpions',      cover: 'https://images.unsplash.com/photo-1501612780327-45045538702b?q=80&w=600', genre: 'rock', roi: 11.2, pop: 76 },
+];
 
-    // Try Colombia Top 50 first
-    let tracks = [];
+const buildFallback = () =>
+    FALLBACK_SONGS.map((s, i) => {
+        const streams = Math.round(s.pop * 14_000_000 + Math.random() * 5_000_000);
+        const totalVal = Math.round(20_000 + s.pop * 700);
+        const price    = 25 + Math.floor(s.pop / 12) * 5;
+        const funding  = Math.min(94, 55 + i * -2 + Math.floor(Math.random() * 15));
+        return {
+            id: `fallback-${i}`,
+            name: s.name,
+            symbol: s.name.replace(/[^A-Za-z]/g, '').toUpperCase().slice(0, 4) || 'BEAT',
+            asset_type: 'music',
+            token_price_usd: price,
+            total_supply: 1000,
+            valuation_usd: totalVal,
+            is_tokenized: false,
+            contract_address: null,
+            cover_url: s.cover,
+            image: s.cover,
+            preview_url: null,
+            metadata: {
+                artist: s.artist,
+                spotify_streams: streams,
+                youtube_views:   Math.round(streams * 0.62),
+                tiktok_creations: Math.round(streams * 0.07),
+                yield_estimate:  `${s.roi.toFixed(1)}%`,
+                genre: s.genre === 'reggaeton' ? 'Reggaetón / Urbano' : 'Rock',
+                genre_tag: s.genre,
+                popularity: s.pop,
+                funding_percent: funding,
+                raised_amount: Math.round(totalVal * funding / 100),
+                is_trending: i < 3,
+                bio: `${s.artist} es uno de los artistas más influyentes del género ${s.genre === 'reggaeton' ? 'reggaetón/urbano' : 'rock'} con millones de oyentes mensuales y una presencia global consolidada.`,
+                review: `"${s.name}" es un hito musical con más de ${(streams / 1_000_000).toFixed(1)}M de streams. Representa una oportunidad de inversión en regalías de uno de los catálogos más sólidos del mercado musical global.`,
+            },
+        };
+    });
+
+// ── Main export: fetch 20 demo songs directly (no Supabase) ──────────────────
+export async function fetchDemoSongs20() {
     try {
-        tracks = await fetchPlaylistTracks(COLOMBIA_TOP50_PLAYLIST, token, 50);
-    } catch {
-        console.warn('Colombia playlist failed, trying Global Top 50...');
-        tracks = await fetchPlaylistTracks(GLOBAL_TOP50_PLAYLIST, token, 50);
+        const token = await getSpotifyToken();
+
+        // Fire all 20 searches in parallel for speed
+        const results = await Promise.allSettled(
+            TARGET_TRACKS.map(meta => searchTrack(meta.q, token).then(track => ({ track, meta })))
+        );
+
+        const songs = [];
+        results.forEach((result, i) => {
+            if (result.status === 'fulfilled' && result.value.track) {
+                songs.push(normalize(result.value.track, result.value.meta, i));
+            } else {
+                // Individual track fallback using static data
+                const fb = buildFallback()[i];
+                songs.push(fb);
+            }
+        });
+
+        console.log(`✅ Spotify demo: ${songs.filter(s => !s.id.startsWith('fallback')).length}/20 tracks from API`);
+        return songs;
+    } catch (err) {
+        console.warn('⚠️ Spotify API unavailable, using fallback:', err.message);
+        return buildFallback();
     }
-
-    // Filter to reggaeton artists preferentially, then fill with rest
-    const reggaetonTracks = tracks.filter(isReggaeton);
-    const otherTracks = tracks.filter(t => !isReggaeton(t));
-    const combined = [...reggaetonTracks, ...otherTracks].slice(0, 20);
-
-    return combined.map((track, i) => normalizeTrack(track, i));
 }
 
-// ── Supabase Upsert ───────────────────────────────────────────────────────────
+// ── Legacy exports (kept for backward compatibility) ─────────────────────────
+export { getSpotifyToken as default };
+export const fetchTop20Reggaeton = fetchDemoSongs20;
+
 export async function ingestTracksToSupabase() {
-    const tracks = await fetchTop20Reggaeton();
-
-    const { data, error } = await supabase
-        .from('assets')
-        .upsert(tracks, { onConflict: 'id', ignoreDuplicates: false });
-
-    if (error) throw error;
-
-    console.log(`✅ Ingested ${tracks.length} tracks to Supabase`);
-    return tracks;
+    // No-op for demo mode — data is intentionally not stored
+    console.info('ℹ️ Demo mode: Supabase ingestion skipped. Data is live from Spotify API.');
+    return await fetchDemoSongs20();
 }
