@@ -1,47 +1,66 @@
-export default async function handler(req, res) {
-  // CORS headers
-  res.setHeader('Access-Control-Allow-Credentials', true);
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
-  res.setHeader(
-    'Access-Control-Allow-Headers',
-    'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version'
-  );
+/**
+ * Vercel Serverless Function — Spotify API Proxy
+ * Route: GET /api/spotify?q=<query>&limit=<n>
+ *
+ * Handles Client Credentials auth + track search server-side.
+ * No CORS issues. Token never exposed to the browser.
+ */
 
-  if (req.method === 'OPTIONS') {
-    res.status(200).end();
-    return;
-  }
+const CLIENT_ID     = process.env.SPOTIFY_CLIENT_ID     || '489bc7138c044636947cad63e742a0c3';
+const CLIENT_SECRET = process.env.SPOTIFY_CLIENT_SECRET || 'f35bbbeb0d204c998b50f00b9e389e08';
 
-  const trackId = req.query.track_id;
-  if (!trackId) {
-    return res.status(400).json({ error: 'track_id is required' });
-  }
+// In-memory token cache (survives within the same Lambda warm instance)
+let _token = null;
+let _tokenExpiry = 0;
 
-  try {
-    // Since late 2024, Spotify requires an active Premium subscription attached to the Developer Account to use the standard API.
-    // To bypass this and get the absolute best widget and data, we use the public Spotify oEmbed endpoint!
-    const oEmbedUrl = `https://open.spotify.com/oembed?url=spotify:track:${trackId}`;
-    const spotifyResponse = await fetch(oEmbedUrl);
+async function getToken() {
+    if (_token && Date.now() < _tokenExpiry) return _token;
 
-    if (!spotifyResponse.ok) {
-      console.error("Spotify oEmbed Error", spotifyResponse.status);
-      return res.status(spotifyResponse.status).json({ error: 'Failed to fetch from Spotify' });
-    }
-
-    const data = await spotifyResponse.json();
-
-    // Extract the title and potentially the artist if it's in the title (usually oEmbed title is just the track name)
-    // But the HTML string has the full iframe player which is what we really want!
-    return res.status(200).json({
-      title: data.title,
-      image: data.thumbnail_url,
-      html: data.html, // This is the official Spotify Embed Player!
-      provider: data.provider_name
+    const res = await fetch('https://accounts.spotify.com/api/token', {
+        method: 'POST',
+        headers: {
+            'Authorization': 'Basic ' + Buffer.from(`${CLIENT_ID}:${CLIENT_SECRET}`).toString('base64'),
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: 'grant_type=client_credentials',
     });
 
-  } catch (error) {
-    console.error('Spotify API Error:', error);
-    return res.status(500).json({ error: 'Failed to fetch track data' });
-  }
+    if (!res.ok) {
+        const text = await res.text();
+        throw new Error(`Spotify auth failed ${res.status}: ${text}`);
+    }
+
+    const { access_token, expires_in } = await res.json();
+    _token = access_token;
+    _tokenExpiry = Date.now() + (expires_in - 60) * 1000;
+    return _token;
+}
+
+export default async function handler(req, res) {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+    if (req.method === 'OPTIONS') return res.status(200).end();
+
+    const { q = '', limit = '1', market = 'CO' } = req.query;
+    if (!q) return res.status(400).json({ error: 'Missing ?q= parameter' });
+
+    try {
+        const token = await getToken();
+
+        const searchRes = await fetch(
+            `https://api.spotify.com/v1/search?q=${encodeURIComponent(q)}&type=track&limit=${limit}&market=${market}`,
+            { headers: { 'Authorization': `Bearer ${token}` } }
+        );
+
+        if (!searchRes.ok) {
+            return res.status(searchRes.status).json({ error: `Spotify search failed: ${searchRes.status}` });
+        }
+
+        const data = await searchRes.json();
+        res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate=600');
+        return res.status(200).json(data);
+    } catch (err) {
+        console.error('[/api/spotify] Error:', err.message);
+        return res.status(500).json({ error: err.message });
+    }
 }

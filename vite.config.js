@@ -6,12 +6,19 @@ export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
-      // Proxy Deezer API calls to avoid CORS issues in dev
-      '/deezer-api': {
-        target: 'https://api.deezer.com',
+      // Spotify Client Credentials token endpoint
+      '/spotify-token': {
+        target: 'https://accounts.spotify.com',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/deezer-api/, ''),
         secure: true,
+        rewrite: (path) => path.replace(/^\/spotify-token/, ''),
+      },
+      // Spotify Web API (search, tracks, etc.)
+      '/spotify-api': {
+        target: 'https://api.spotify.com',
+        changeOrigin: true,
+        secure: true,
+        rewrite: (path) => path.replace(/^\/spotify-api/, ''),
       },
     },
   },
