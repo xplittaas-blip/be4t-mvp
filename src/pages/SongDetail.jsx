@@ -340,7 +340,7 @@ const SongDetail = ({ onBack, songId, onRequireAuth, isAuthenticated, onInvest }
                     <div className="related-songs-list">
                         {[1, 2, 3].map(i => (
                             <div key={i} className="related-song-horizontal glass-panel mb-3">
-                                <div className="related-img" style={{ backgroundImage: `url(https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80&sig=${i})` }}></div>
+                                <div className="related-img" style={{ background: `linear-gradient(135deg, hsl(${270 + i * 30},60%,20%) 0%, hsl(${200 + i * 25},50%,15%) 100%)` }}></div>
                                 <div className="related-info">
                                     <h5>Sunset Drive</h5>
                                     <p className="text-secondary text-sm">{song.artist}</p>

@@ -36,8 +36,9 @@ const AssetCard = ({ asset, session, onActionClick, onTokenizeClick }) => {
     const { playTrack, togglePlay, currentTrack, isPlaying } = useGlobalPlayer();
     
     const isMusic = asset.asset_type === 'music';
-    const defaultMusicImage = "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=400&auto=format&fit=crop";
-    const defaultCustomImage = "https://images.unsplash.com/photo-1554224155-6726b3ff858f?q=80&w=400&auto=format&fit=crop";
+    // ✅ REGLA DE ORO: covers come exclusively from Spotify — no stock image fallbacks
+    const defaultMusicImage = null;
+    const defaultCustomImage = null;
 
     const seed = asset.id.toString().split('').reduce((a, b) => a + b.charCodeAt(0), 0);
     const baseValuation = asset.valuation_usd || (asset.token_price_usd * asset.total_supply) || 10000;
@@ -55,8 +56,9 @@ const AssetCard = ({ asset, session, onActionClick, onTokenizeClick }) => {
         id: asset.id,
         name: asset.name,
         artist: asset.metadata?.artist || 'Unknown',
-        cover_image: asset.image || defaultMusicImage,
-        preview_url: asset.metadata?.preview_url || 'https://p.scdn.co/mp3-preview/a9ed56cb6badebd22bb2b474de255e56e4ebdaec?cid=d8a5ed958d274c2e8eebd4b1e569ac99'
+        cover_image: asset.image || asset.cover_url || null,
+        // ✅ REGLA DE ORO: only real Spotify preview_url — no hardcoded fallback
+        preview_url: asset.preview_url || asset.metadata?.preview_url || null,
     };
 
     const handlePlayClick = (e) => {

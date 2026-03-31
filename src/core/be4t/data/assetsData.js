@@ -1,11 +1,10 @@
 /**
  * BE4T Real Artists Seed Data
- * 
- * Este archivo contiene los activos de demostracion con artistas reales.
- * En produccion, estos datos viven en Supabase:
+ *
+ * REGLA DE ORO: Las imágenes y preview_url vienen EXCLUSIVAMENTE de la Spotify Web API.
+ * Este archivo solo define metadatos base para fallback de UI.
+ * En producción, los datos viven en Supabase:
  *   supabase.from('assets').select('*').order('created_at', { ascending: false })
- * 
- * Los campos de streaming se guardan en el campo JSONB `metadata`.
  */
 export const assetsData = [
     {
@@ -18,7 +17,10 @@ export const assetsData = [
         valuation_usd: 25000,
         is_tokenized: false,
         contract_address: null,
-        image: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=800&auto=format&fit=crop',
+        // ✅ Sin imagen de stock — la portada viene de Spotify
+        image: null,
+        cover_url: null,
+        preview_url: null,
         metadata: {
             artist: 'Feid',
             isrc: 'CO-FEI-24-00001',
@@ -45,7 +47,10 @@ export const assetsData = [
         valuation_usd: 30000,
         is_tokenized: false,
         contract_address: null,
-        image: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?q=80&w=800&auto=format&fit=crop',
+        // ✅ Sin imagen de stock — la portada viene de Spotify
+        image: null,
+        cover_url: null,
+        preview_url: null,
         metadata: {
             artist: 'Karol G',
             isrc: 'CO-KRG-22-00003',
@@ -63,57 +68,63 @@ export const assetsData = [
         }
     },
     {
-        id: 'seed-badbunny-un-verano',
-        name: 'Un Verano Sin Ti (Master)',
-        symbol: 'UVST',
-        asset_type: 'music',
-        token_price_usd: 50,
-        total_supply: 1000,
-        valuation_usd: 50000,
-        is_tokenized: false,
-        contract_address: null,
-        image: 'https://images.unsplash.com/photo-1459749411175-04bf5292ceea?q=80&w=800&auto=format&fit=crop',
-        metadata: {
-            artist: 'Bad Bunny',
-            isrc: 'US-BBY-22-01001',
-            yield_estimate: '25%',
-            genre: 'Latin Trap / Reggaeton',
-            label: 'Rimas Entertainment / Sony Music',
-            release_year: 2022,
-            bio: 'Benito Antonio Martínez Ocasio, conocido como Bad Bunny, es el artista más escuchado en la historia de Spotify. Con una propuesta artística única que mezcla el trap latino con el reggaeton y la salsa, ha redefinido la música global desde Puerto Rico.',
-            review: '"Un Verano Sin Ti" es el álbum más escuchado del 2022 con 9.7 billones de streams. El activo representa derechos del master de este catálogo histórico — uno de los activos de música más valiosos de la actualidad.',
-            spotify_streams: 9700000000,
-            youtube_views: 2100000000,
-            tiktok_creations: 45000000,
-            spotify_url: 'https://open.spotify.com/intl-es/artist/4q3ewBCX7sLwd24euuV69X',
-            monthly_listeners: 88000000,
-        }
-    },
-    {
-        id: 'seed-jbalvin-poblado',
-        name: 'El Poblado (Master)',
-        symbol: 'POBL',
+        id: 'seed-danny-ocean-merehuso',
+        name: 'Me Rehúso',
+        symbol: 'MRHS',
         asset_type: 'music',
         token_price_usd: 20,
         total_supply: 1000,
         valuation_usd: 20000,
         is_tokenized: false,
         contract_address: null,
-        image: 'https://images.unsplash.com/photo-1501612780327-45045538702b?q=80&w=800&auto=format&fit=crop',
+        // ✅ Sin imagen de stock — la portada viene de Spotify
+        image: null,
+        cover_url: null,
+        preview_url: null,
         metadata: {
-            artist: 'J Balvin ft. Ryan Castro',
-            isrc: 'CO-JBV-22-00045',
+            artist: 'Danny Ocean',
+            isrc: 'VE-DOC-17-00001',
+            yield_estimate: '17%',
+            genre: 'Latin Pop',
+            label: 'Independiente',
+            release_year: 2017,
+            bio: 'Daniel Alejandro Morales Reyes, conocido como Danny Ocean, es un cantautor venezolano. Con su estilo íntimo y melódico ha conquistado millones de oyentes en toda Latinoamérica.',
+            review: '"Me Rehúso" es el fenómeno global de Danny Ocean. Con más de 1 billón de streams, el track definió el sonido del pop latino de su generación.',
+            spotify_streams: 1100000000,
+            youtube_views: 420000000,
+            tiktok_creations: 3500000,
+            spotify_url: 'https://open.spotify.com/artist/1nGWSCCXdZVyJCkqPqGvMI',
+            monthly_listeners: 12000000,
+        }
+    },
+    {
+        id: 'seed-ryan-castro-patron',
+        name: 'Patrón',
+        symbol: 'PATR',
+        asset_type: 'music',
+        token_price_usd: 20,
+        total_supply: 1000,
+        valuation_usd: 20000,
+        is_tokenized: false,
+        contract_address: null,
+        // ✅ Sin imagen de stock — la portada viene de Spotify
+        image: null,
+        cover_url: null,
+        preview_url: null,
+        metadata: {
+            artist: 'Ryan Castro',
+            isrc: 'CO-RCT-22-00001',
             yield_estimate: '16%',
             genre: 'Reggaeton',
             label: 'Universal Music Colombia',
             release_year: 2022,
-            bio: 'José Álvaro Osorio Balvín, conocido como J Balvin, es uno de los artistas colombianos más influyentes del mundo. Pionero del reggaeton de habla hispana en Estados Unidos, con más de 50 millones de oyentes mensuales en Spotify.',
-            review: '"El Poblado" es un himno a Medellín y al reggaeton colombiano. El feat con Ryan Castro posicionó el tema como uno de los más reproducidos de Colombia, acumulando más de 200 millones de streams y generando un potente flujo de regalías.',
+            bio: 'Ryan Castro es uno de los artistas emergentes más influyentes del reggaeton colombiano. Conocido por su autenticidad y estilo callejero, ha conquistado millones de fans en toda Latinoamérica.',
+            review: '"Patrón" afianzó a Ryan Castro como una de las voces más auténticas del urbano colombiano, acumulando cientos de millones de streams.',
             spotify_streams: 210000000,
             youtube_views: 95000000,
             tiktok_creations: 1500000,
-            spotify_url: 'https://open.spotify.com/intl-es/artist/1vyhD5VmyZ7KMfW5gqLgo5',
-            monthly_listeners: 51000000,
+            spotify_url: 'https://open.spotify.com/artist/2TI7qyDE0QfyOlnbtfDo7L',
+            monthly_listeners: 8000000,
         }
     },
     {
@@ -126,7 +137,9 @@ export const assetsData = [
         valuation_usd: 5000,
         is_tokenized: false,
         contract_address: null,
-        image: 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?q=80&w=800&auto=format&fit=crop',
+        image: null,
+        cover_url: null,
+        preview_url: null,
         metadata: {
             tipo: 'Factoring Institucional',
             vencimiento: '45 días',
