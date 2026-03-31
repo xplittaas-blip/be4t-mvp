@@ -1,30 +1,32 @@
 /**
  * Vercel Serverless Function — Deezer API Proxy
- * Route: /api/deezer?q=...&limit=...
+ * Route: GET /api/deezer?q=...&limit=...
  *
- * Forwards requests to api.deezer.com without CORS restrictions.
- * This replaces the Vite dev proxy for production deployments.
+ * Proxies Deezer search requests server-side to avoid browser CORS restrictions.
+ * Returns real album art URLs + 30-second MP3 preview URLs.
  */
+export const config = {
+    runtime: 'nodejs18.x',
+};
+
 export default async function handler(req, res) {
-    // CORS headers — allow any origin for the demo
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-    if (req.method === 'OPTIONS') {
-        return res.status(200).end();
+    if (req.method === 'OPTIONS') return res.status(200).end();
+
+    const { q = '', limit = '1' } = req.query;
+
+    if (!q) {
+        return res.status(400).json({ error: 'Missing query parameter: q' });
     }
 
-    // Build Deezer URL from query params
-    const params = new URLSearchParams(req.query);
-    const deezerUrl = `https://api.deezer.com/search?${params.toString()}`;
+    const deezerUrl = `https://api.deezer.com/search?q=${encodeURIComponent(q)}&limit=${limit}`;
 
     try {
         const response = await fetch(deezerUrl, {
-            headers: {
-                'User-Agent': 'BE4T-Platform/1.0',
-                'Accept': 'application/json',
-            },
+            headers: { 'User-Agent': 'BE4T-Platform/2.0' },
         });
 
         if (!response.ok) {
@@ -35,7 +37,7 @@ export default async function handler(req, res) {
         res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate=600');
         return res.status(200).json(data);
     } catch (err) {
-        console.error('Deezer proxy error:', err.message);
+        console.error('[/api/deezer] Error:', err.message);
         return res.status(500).json({ error: 'Deezer API unreachable', message: err.message });
     }
 }
