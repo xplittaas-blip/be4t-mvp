@@ -1,18 +1,16 @@
 /**
- * BE4T — Spotify Service
+ * BE4T — Spotify Service (4-Artist Catalog Edition)
  *
- * Fetches 20 tracks exclusively from Spotify Web API.
- * Guarantees preview_url for all tracks via multi-candidate fallback:
- *   - Each slot has 4–5 candidate queries (different songs same artist).
- *   - Searches up to 5 results per query, picks first with preview_url !== null.
- *   - If ALL candidates fail (Spotify withheld previews), uses rich static fallback.
+ * Fetches Top 5 hits per artist from Spotify Web API:
+ *   - Feid, Danny Ocean, Karol G, Ryan Castro
  *
- * Dev:  Vite proxy routes /spotify-token → accounts.spotify.com
- *                                /spotify-api → api.spotify.com
- * Prod: Vercel serverless /api/spotify handles auth + search server-side.
+ * Guarantee logic:
+ *   - Searches up to 20 tracks per artist
+ *   - Filters: preview_url !== null only
+ *   - Takes first 5 that have audio preview available
+ *   - If artist has < 5 previews, fills remaining slots with fallback data
  */
 
-// ── Spotify credentials (Client Credentials — no user auth needed) ─────────────
 const CLIENT_ID     = import.meta.env.VITE_SPOTIFY_CLIENT_ID     || '489bc7138c044636947cad63e742a0c3';
 const CLIENT_SECRET = import.meta.env.VITE_SPOTIFY_CLIENT_SECRET || 'f35bbbeb0d204c998b50f00b9e389e08';
 
@@ -37,17 +35,17 @@ async function getDevToken() {
     return _devToken;
 }
 
-// ── Search Spotify — returns array of tracks (not just first) ──────────────────
-async function searchSpotifyTracks(query, limit = 5) {
+// ── Spotify search — returns N tracks ─────────────────────────────────────────
+async function searchTracks(query, limit = 20, market = 'CO') {
     if (import.meta.env.DEV) {
         const token = await getDevToken();
-        const url = `/spotify-api/v1/search?q=${encodeURIComponent(query)}&type=track&limit=${limit}&market=CO`;
+        const url = `/spotify-api/v1/search?q=${encodeURIComponent(query)}&type=track&limit=${limit}&market=${market}`;
         const res = await fetch(url, { headers: { 'Authorization': `Bearer ${token}` } });
         if (!res.ok) throw new Error(`Spotify search ${res.status}`);
         const data = await res.json();
         return data.tracks?.items || [];
     } else {
-        const url = `/api/spotify?q=${encodeURIComponent(query)}&limit=${limit}&market=CO`;
+        const url = `/api/spotify?q=${encodeURIComponent(query)}&limit=${limit}&market=${market}`;
         const res = await fetch(url);
         if (!res.ok) throw new Error(`Spotify serverless ${res.status}`);
         const data = await res.json();
@@ -55,126 +53,58 @@ async function searchSpotifyTracks(query, limit = 5) {
     }
 }
 
-// ── Find a track with preview_url from a list of candidate queries ─────────────
-async function findTrackWithPreview(candidates) {
-    for (const query of candidates) {
-        try {
-            const tracks = await searchSpotifyTracks(query, 5);
-            const withPreview = tracks.find(t => t.preview_url);
-            if (withPreview) return { track: withPreview, hadPreview: true };
-        } catch (err) {
-            console.warn(`[Spotify] Query failed: "${query}"`, err.message);
-        }
-    }
-    // Fallback: return best match without preview (metadata only)
+// ── Get top N tracks for an artist that HAVE preview_url ──────────────────────
+async function getArtistTracksWithPreview(artistName, count = 5) {
+    // Use Spotify field filter: artist:"name" to target specific artist
+    const query = `artist:"${artistName}"`;
     try {
-        const tracks = await searchSpotifyTracks(candidates[0], 1);
-        if (tracks[0]) return { track: tracks[0], hadPreview: false };
-    } catch { /* ignore */ }
-    return null;
+        // Fetch up to 50 to maximize chance of finding enough with previews
+        const allTracks = await searchTracks(query, 50, 'CO');
+
+        // Filter: must be BY the artist (not just featuring) AND have preview_url
+        const withPreview = allTracks.filter(track => {
+            const isMainArtist = track.artists?.some(
+                a => a.name.toLowerCase().includes(artistName.toLowerCase()) ||
+                     artistName.toLowerCase().includes(a.name.toLowerCase())
+            );
+            return isMainArtist && track.preview_url;
+        });
+
+        console.log(`🎵 ${artistName}: ${withPreview.length} tracks with preview (from ${allTracks.length})`);
+        return withPreview.slice(0, count);
+    } catch (err) {
+        console.warn(`[BE4T] Artist fetch failed for "${artistName}":`, err.message);
+        return [];
+    }
 }
 
-// ── 20 slots — each with multiple candidate queries ordered by preview likelihood ──
-// Older tracks (pre-2023) are more likely to have preview_url available on Spotify.
-// Each slot: primary + 3-4 fallback candidates to guarantee audio.
-const TRACK_SLOTS = [
-    // ── REGGAETÓN (10 slots) ──
-    {
-        genre: 'reggaeton', roi: 19.4,
-        candidates: ['Provenza Karol G', 'Bichota Karol G', 'Tusa Karol G', 'Punto G Karol G'],
-    },
-    {
-        genre: 'reggaeton', roi: 22.1,
-        candidates: ['Chorrito Pa las Animas Feid', 'Normal Feid', 'Porfa Feid', 'Sigues Feid'],
-    },
-    {
-        genre: 'reggaeton', roi: 21.8,
-        candidates: ['Monaco Bad Bunny', 'Titi Me Pregunto Bad Bunny', 'Moscow Mule Bad Bunny', 'Callaita Bad Bunny'],
-    },
-    {
-        genre: 'reggaeton', roi: 17.3,
-        candidates: ['LALA Myke Towers', 'Girl Myke Towers', 'La Playa Myke Towers', 'Bandido Myke Towers'],
-    },
-    {
-        genre: 'reggaeton', roi: 20.5,
-        candidates: ['Por Las Noches Peso Pluma', 'Ella Baila Sola Peso Pluma Eslabon Armado', 'Besame Peso Pluma', 'AMG Peso Pluma Gabito'],
-    },
-    {
-        genre: 'reggaeton', roi: 18.7,
-        candidates: ['Amargura Feid Young Miko', 'Inter Shibuya Feid', 'Luna Feid', 'Castigo Feid'],
-    },
-    {
-        genre: 'reggaeton', roi: 16.9,
-        candidates: ['Ojitos Lindos Bad Bunny Bomba Estereo', 'Un Verano Sin Ti Bad Bunny', 'Efecto Bad Bunny', 'Me Porto Bonito Bad Bunny'],
-    },
-    {
-        genre: 'reggaeton', roi: 23.2,
-        candidates: ['Con Altura Rosalia J Balvin', 'Malamente Rosalia', 'Despecha Rosalia', 'Saoko Rosalia'],
-    },
-    {
-        genre: 'reggaeton', roi: 15.6,
-        candidates: ['Mayor Que Yo Daddy Yankee', 'Gasolina Daddy Yankee', 'Dura Daddy Yankee', 'Con Calma Daddy Yankee'],
-    },
-    {
-        genre: 'reggaeton', roi: 18.1,
-        candidates: ['Titi Me Pregunto Bad Bunny', 'Dakiti Bad Bunny Jhay Cortez', 'Yonaguni Bad Bunny', 'Neverita Bad Bunny'],
-    },
-    // ── ROCK (10 slots) ──
-    {
-        genre: 'rock', roi: 14.8,
-        candidates: ['Do I Wanna Know Arctic Monkeys', 'R U Mine Arctic Monkeys', 'Fluorescent Adolescent Arctic Monkeys', '505 Arctic Monkeys'],
-    },
-    {
-        genre: 'rock', roi: 16.2,
-        candidates: ['Bohemian Rhapsody Queen', 'Don\'t Stop Me Now Queen', 'We Will Rock You Queen', 'Somebody To Love Queen'],
-    },
-    {
-        genre: 'rock', roi: 13.5,
-        candidates: ['Persiana Americana Soda Stereo', 'De Musica Ligera Soda Stereo', 'Ella Uso Mi Cabeza Soda Stereo', 'Nada Personal Soda Stereo'],
-    },
-    {
-        genre: 'rock', roi: 15.1,
-        candidates: ['Numb Linkin Park', 'In The End Linkin Park', 'Crawling Linkin Park', 'Somewhere I Belong Linkin Park'],
-    },
-    {
-        genre: 'rock', roi: 12.9,
-        candidates: ['Smells Like Teen Spirit Nirvana', 'Come As You Are Nirvana', 'Heart Shaped Box Nirvana', 'Lithium Nirvana'],
-    },
-    {
-        genre: 'rock', roi: 11.7,
-        candidates: ['Mr Brightside The Killers', 'Somebody Told Me The Killers', 'Human The Killers', 'All These Things That I Have Done The Killers'],
-    },
-    {
-        genre: 'rock', roi: 13.8,
-        candidates: ['Yellow Coldplay', 'The Scientist Coldplay', 'Fix You Coldplay', 'Clocks Coldplay'],
-    },
-    {
-        genre: 'rock', roi: 12.3,
-        candidates: ['Seven Nation Army White Stripes', 'Fell In Love With A Girl White Stripes', 'Icky Thump White Stripes', 'Ball and Biscuit White Stripes'],
-    },
-    {
-        genre: 'rock', roi: 14.0,
-        candidates: ['De Musica Ligera Soda Stereo', 'Signos Soda Stereo', 'En La Ciudad De La Furia Soda Stereo', 'Cuando Pase El Temblor Soda Stereo'],
-    },
-    {
-        genre: 'rock', roi: 11.2,
-        candidates: ['Still Loving You Scorpions', 'Wind Of Change Scorpions', 'Rock You Like A Hurricane Scorpions', 'Send Me An Angel Scorpions'],
-    },
+// ── Artist catalog definition ──────────────────────────────────────────────────
+const ARTISTS = [
+    { name: 'Feid',         genre: 'reggaeton', accentColor: '#a78bfa', roiBase: 22.0 },
+    { name: 'Danny Ocean',  genre: 'latin_pop', accentColor: '#34d399', roiBase: 18.5 },
+    { name: 'Karol G',      genre: 'reggaeton', accentColor: '#f472b6', roiBase: 20.5 },
+    { name: 'Ryan Castro',  genre: 'reggaeton', accentColor: '#fb923c', roiBase: 19.0 },
 ];
 
-// ── Normalize Spotify track → SongCard / AssetDetailView schema ───────────────
-function normalizeSpotifyTrack(track, slot, position) {
-    const { genre, roi } = slot;
-    const pop      = track.popularity || 75;
+// ── Normalize Spotify track → SongCard schema ──────────────────────────────────
+function normalizeTrack(track, artist, slotIndex) {
+    const { genre, roiBase, accentColor } = artist;
+    const pop      = track.popularity || 78;
+    const roi      = parseFloat((roiBase + (Math.random() * 4 - 2)).toFixed(1));
     const streams  = Math.round(pop * 14_000_000 + Math.random() * 5_000_000);
     const views    = Math.round(streams * 0.62);
     const tiktok   = Math.round(streams * 0.07);
     const totalVal = Math.round(20_000 + pop * 720);
     const price    = 25 + Math.floor(pop / 12) * 5;
-    const funding  = Math.min(94, 58 + position * -2 + Math.floor(Math.random() * 14));
-    const artist   = track.artists?.[0]?.name || '';
-    const album    = track.album || {};
-    const coverUrl = album.images?.[0]?.url || album.images?.[1]?.url || null;
+    const funding  = Math.min(94, 55 + Math.floor(Math.random() * 30));
+    const coverUrl = track.album?.images?.[0]?.url || track.album?.images?.[1]?.url || null;
+    const artistName = track.artists?.map(a => a.name).join(', ') || artist.name;
+
+    const genreLabel = genre === 'reggaeton'
+        ? 'Reggaetón / Urbano'
+        : genre === 'latin_pop'
+        ? 'Latin Pop'
+        : 'Rock';
 
     return {
         id:               `sp-${track.id}`,
@@ -188,55 +118,64 @@ function normalizeSpotifyTrack(track, slot, position) {
         contract_address: null,
         cover_url:        coverUrl,
         image:            coverUrl,
-        preview_url:      track.preview_url || null,
+        preview_url:      track.preview_url,   // Guaranteed non-null by fetchDemoSongs20 filter
         metadata: {
-            artist,
+            artist:           artistName,
             isrc:             track.external_ids?.isrc || '',
             spotify_track_id: track.id,
             spotify_url:      track.external_urls?.spotify || '',
-            album_name:       album.name || '',
-            album_release:    album.release_date || '',
+            album_name:       track.album?.name || '',
+            album_release:    track.album?.release_date || '',
             spotify_streams:  streams,
             youtube_views:    views,
             tiktok_creations: tiktok,
-            yield_estimate:   `${roi.toFixed(1)}%`,
-            genre:            genre === 'reggaeton' ? 'Reggaetón / Urbano' : 'Rock',
+            yield_estimate:   `${roi}%`,
+            genre:            genreLabel,
             genre_tag:        genre,
             popularity:       pop,
             duration_ms:      track.duration_ms || 210_000,
             funding_percent:  funding,
             raised_amount:    Math.round(totalVal * funding / 100),
-            is_trending:      position < 3,
-            preview_url:      track.preview_url || null,
-            bio: `${artist} es uno de los artistas más influyentes del género ${genre === 'reggaeton' ? 'reggaetón/urbano' : 'rock'} con millones de oyentes mensuales en plataformas globales.`,
-            review: `"${track.name}" ha acumulado más de ${(streams / 1_000_000).toFixed(1)}M de streams en Spotify. Este activo representa una oportunidad de inversión en regalías de uno de los catálogos más sólidos del mercado musical.`,
+            is_trending:      slotIndex < 3,
+            preview_url:      track.preview_url,
+            accent_color:     accentColor,
+            bio: `${artistName} es uno de los artistas más influyentes del género ${genreLabel} con millones de oyentes mensuales en plataformas globales.`,
+            review: `"${track.name}" ha acumulado más de ${(streams / 1_000_000).toFixed(1)}M de streams en Spotify. Este activo tokenizado representa una oportunidad premium de inversión en regalías musicales.`,
         },
     };
 }
 
-// ── Static fallback with Unsplash covers (no audio) ───────────────────────────
-const STATIC_FALLBACK = [
-    { name: 'Provenza',                artist: 'Karol G',           genre: 'reggaeton', roi: 19.4, pop: 95 },
-    { name: 'Chorrito Pa Las Animas',  artist: 'Feid',              genre: 'reggaeton', roi: 22.1, pop: 92 },
-    { name: 'Monaco',                  artist: 'Bad Bunny',         genre: 'reggaeton', roi: 21.8, pop: 97 },
-    { name: 'LALA',                    artist: 'Myke Towers',       genre: 'reggaeton', roi: 17.3, pop: 88 },
-    { name: 'Por Las Noches',          artist: 'Peso Pluma',        genre: 'reggaeton', roi: 20.5, pop: 91 },
-    { name: 'Amargura',                artist: 'Feid',              genre: 'reggaeton', roi: 18.7, pop: 89 },
-    { name: 'Ojitos Lindos',           artist: 'Bad Bunny',         genre: 'reggaeton', roi: 16.9, pop: 90 },
-    { name: 'Con Altura',              artist: 'Rosalía',           genre: 'reggaeton', roi: 23.2, pop: 93 },
-    { name: 'Mayor Que Yo',            artist: 'Daddy Yankee',      genre: 'reggaeton', roi: 15.6, pop: 82 },
-    { name: 'Tití Me Preguntó',        artist: 'Bad Bunny',         genre: 'reggaeton', roi: 18.1, pop: 86 },
-    { name: 'Do I Wanna Know?',        artist: 'Arctic Monkeys',    genre: 'rock',      roi: 14.8, pop: 88 },
-    { name: 'Bohemian Rhapsody',       artist: 'Queen',             genre: 'rock',      roi: 16.2, pop: 94 },
-    { name: 'Persiana Americana',      artist: 'Soda Stereo',       genre: 'rock',      roi: 13.5, pop: 79 },
-    { name: 'Numb',                    artist: 'Linkin Park',       genre: 'rock',      roi: 15.1, pop: 91 },
-    { name: 'Smells Like Teen Spirit', artist: 'Nirvana',           genre: 'rock',      roi: 12.9, pop: 87 },
-    { name: 'Mr. Brightside',          artist: 'The Killers',       genre: 'rock',      roi: 11.7, pop: 84 },
-    { name: 'Yellow',                  artist: 'Coldplay',          genre: 'rock',      roi: 13.8, pop: 88 },
-    { name: 'Seven Nation Army',       artist: 'The White Stripes', genre: 'rock',      roi: 12.3, pop: 85 },
-    { name: 'De Música Ligera',        artist: 'Soda Stereo',       genre: 'rock',      roi: 14.0, pop: 80 },
-    { name: 'Still Loving You',        artist: 'Scorpions',         genre: 'rock',      roi: 11.2, pop: 76 },
-];
+// ── Static fallback per artist ─────────────────────────────────────────────────
+const FALLBACK_BY_ARTIST = {
+    'Feid':        [
+        { name: 'Normal',          album: 'Felxxo Dorado' },
+        { name: 'Porfa',           album: 'Por las Noches' },
+        { name: 'Castigo',         album: 'Mor, No Le Temas A La Oscuridad' },
+        { name: 'Luna',            album: 'Mor, No Le Temas A La Oscuridad' },
+        { name: 'Siguelo Bailando', album: 'Vida Próxima' },
+    ],
+    'Danny Ocean': [
+        { name: '54+1',            album: '54+1' },
+        { name: 'Me Rehúso',       album: 'Me Rehúso' },
+        { name: 'Amor en Silencio', album: 'El Dorado' },
+        { name: 'Caminar',         album: 'Vía Crucis' },
+        { name: 'Fuego Lento',     album: 'Fuego Lento' },
+    ],
+    'Karol G':     [
+        { name: 'PROVENZA',        album: 'MAÑANA SERÁ BONITO' },
+        { name: 'BICHOTA',         album: 'KG0516' },
+        { name: 'TQM',             album: 'Ocean' },
+        { name: 'Tusa',            album: 'Ocean' },
+        { name: 'Punto G',         album: 'Ocean' },
+    ],
+    'Ryan Castro': [
+        { name: 'Solo Tú',         album: 'Solo Tú' },
+        { name: 'Patrones',        album: 'Patrones' },
+        { name: 'Feliz Navidad',   album: 'El Niño' },
+        { name: 'Madrugada',       album: 'Madrugada' },
+        { name: 'Tusa Cover',      album: 'Covers' },
+    ],
+};
 const COVER_POOL = [
     'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=600&auto=format&fit=crop',
     'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=600&auto=format&fit=crop',
@@ -244,71 +183,85 @@ const COVER_POOL = [
     'https://images.unsplash.com/photo-1459749411175-04bf5292ceea?q=80&w=600&auto=format&fit=crop',
     'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?q=80&w=600&auto=format&fit=crop',
 ];
-function buildFallback() {
-    return STATIC_FALLBACK.map((s, i) => {
-        const streams  = Math.round(s.pop * 14_000_000);
-        const totalVal = Math.round(20_000 + s.pop * 720);
-        const funding  = Math.min(92, 55 + i * -2 + 12);
-        const price    = 25 + Math.floor(s.pop / 12) * 5;
+function buildArtistFallback(artist, count) {
+    const songs = FALLBACK_BY_ARTIST[artist.name] || [];
+    return Array.from({ length: count }, (_, i) => {
+        const s = songs[i] || { name: `${artist.name} Hit ${i + 1}`, album: 'Album' };
+        const pop = 80 + Math.floor(Math.random() * 15);
+        const roi = parseFloat((artist.roiBase + (Math.random() * 4 - 2)).toFixed(1));
+        const streams  = Math.round(pop * 14_000_000);
+        const totalVal = Math.round(20_000 + pop * 720);
+        const funding  = Math.min(92, 55 + Math.floor(Math.random() * 30));
+        const price    = 25 + Math.floor(pop / 12) * 5;
         return {
-            id: `fb-${i}`,
+            id: `fb-${artist.name.replace(/\s/g, '')}-${i}`,
             name: s.name,
             symbol: s.name.replace(/[^A-Za-z]/g, '').toUpperCase().slice(0, 4) || 'BEAT',
             asset_type: 'music',
             token_price_usd: price,
             total_supply: 1000,
             valuation_usd: totalVal,
-            cover_url: COVER_POOL[i % COVER_POOL.length],
-            image:     COVER_POOL[i % COVER_POOL.length],
+            cover_url: COVER_POOL[(i + ARTISTS.indexOf(artist)) % COVER_POOL.length],
+            image:     COVER_POOL[(i + ARTISTS.indexOf(artist)) % COVER_POOL.length],
             preview_url: null,
             metadata: {
-                artist: s.artist,
-                spotify_streams:  streams,
+                artist: artist.name,
+                album_name: s.album,
+                spotify_streams: streams,
                 youtube_views:    Math.round(streams * 0.62),
                 tiktok_creations: Math.round(streams * 0.07),
-                yield_estimate:   `${s.roi.toFixed(1)}%`,
-                genre: s.genre === 'reggaeton' ? 'Reggaetón / Urbano' : 'Rock',
-                genre_tag: s.genre,
-                popularity: s.pop,
+                yield_estimate: `${roi}%`,
+                genre: artist.genre === 'latin_pop' ? 'Latin Pop' : 'Reggaetón / Urbano',
+                genre_tag: artist.genre,
+                popularity: pop,
                 funding_percent: funding,
                 raised_amount: Math.round(totalVal * funding / 100),
-                is_trending: i < 3,
+                is_trending: i === 0,
                 preview_url: null,
+                accent_color: artist.accentColor,
             },
         };
     });
 }
 
-// ── Main export ───────────────────────────────────────────────────────────────
+// ── Main export ────────────────────────────────────────────────────────────────
 export async function fetchDemoSongs20() {
-    console.log('🎵 [BE4T] Fetching 20 Spotify tracks (prioritizing preview_url availability)...');
-    try {
-        const results = await Promise.allSettled(
-            TRACK_SLOTS.map((slot, i) =>
-                findTrackWithPreview(slot.candidates).then(res => ({ res, slot, i }))
-            )
-        );
+    console.log('🎵 [BE4T] Fetching Top 5 Spotify tracks per artist: Feid, Danny Ocean, Karol G, Ryan Castro');
 
-        let apiHits = 0;
-        let previewHits = 0;
+    const allSongs = [];
+    let totalApiHits = 0;
+    let totalPreviewHits = 0;
 
-        const songs = results.map((result, i) => {
-            if (result.status === 'fulfilled' && result.value?.res?.track) {
-                const { track, hadPreview } = result.value.res;
-                const { slot } = result.value;
-                apiHits++;
-                if (hadPreview) previewHits++;
-                return normalizeSpotifyTrack(track, slot, i);
+    for (const artist of ARTISTS) {
+        try {
+            const tracks = await getArtistTracksWithPreview(artist.name, 5);
+            const artistSongs = tracks.map((track, i) =>
+                normalizeTrack(track, artist, allSongs.length + i)
+            );
+
+            // Fill any missing slots with fallback (no preview but correct metadata)
+            const needed = 5 - artistSongs.length;
+            if (needed > 0) {
+                const fallbackSlots = buildArtistFallback(artist, needed);
+                artistSongs.push(...fallbackSlots);
+                console.warn(`[BE4T] ${artist.name}: only ${5 - needed}/5 with preview, ${needed} fallback slots`);
             }
-            return buildFallback()[i];
-        });
 
-        console.log(`✅ Spotify: ${apiHits}/20 from API | ${previewHits}/20 with 30s preview`);
-        return songs;
-    } catch (err) {
-        console.warn('⚠️ Spotify API unavailable, using fallback:', err.message);
-        return buildFallback();
+            totalApiHits += tracks.length;
+            totalPreviewHits += tracks.length;
+            allSongs.push(...artistSongs.slice(0, 5));
+        } catch (err) {
+            console.warn(`[BE4T] ${artist.name} failed, using full fallback:`, err.message);
+            allSongs.push(...buildArtistFallback(artist, 5));
+        }
     }
+
+    console.log(`✅ Total: ${allSongs.length} songs | ${totalPreviewHits}/20 with 30s Spotify preview`);
+    if (allSongs[0]) {
+        console.log('🖼  Cover[0]:', allSongs[0].cover_url?.slice(0, 60) + '...');
+        console.log('🎵 Preview[0]:', allSongs[0].preview_url?.slice(0, 60) || '(none)');
+    }
+    return allSongs;
 }
 
 // ── Legacy aliases ─────────────────────────────────────────────────────────────

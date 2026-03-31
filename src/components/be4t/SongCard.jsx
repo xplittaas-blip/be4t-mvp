@@ -120,30 +120,16 @@ const SongCard = ({ song, userMode, index = 0, onDetailClick }) => {
         if (audioRef.current) { audioManager.stop(audioRef.current); }
     }, []);
 
-    const isRWA  = song.asset_type === 'RWA' || song.asset_type === 'custom';
-
-    const badgeColor = isRWA
-        ? { bg: 'rgba(20,184,166,0.2)', border: 'rgba(20,184,166,0.5)', text: '#2dd4bf' }
-        : { bg: 'rgba(139,92,246,0.2)', border: 'rgba(139,92,246,0.5)', text: '#c4b5fd' };
-
-    const spotifyTrackId = song._raw?.metadata?.spotify_track_id || null;
-    const embedUrl = spotifyTrackId
-        ? `https://open.spotify.com/embed/track/${spotifyTrackId}?utm_source=generator&theme=0`
-        : null;
 
     const handlePlayClick = useCallback((e) => {
         e.stopPropagation();
         if (!song.preview_url) return;
-
         if (isPlaying && audioRef.current) {
-            // Pause: stop this card's audio directly
             audioManager.stop(audioRef.current);
             audioRef.current = null;
             setIsPlaying(false);
         } else {
-            // Play: audioManager stops any other playing card automatically
             const audio = audioManager.play(song.preview_url, () => {
-                // Called when another card starts OR track ends naturally
                 audioRef.current = null;
                 setIsPlaying(false);
             });
@@ -152,18 +138,25 @@ const SongCard = ({ song, userMode, index = 0, onDetailClick }) => {
         }
     }, [isPlaying, song.preview_url]);
 
+    const isRWA = song.asset_type === 'RWA' || song.asset_type === 'custom';
+    const badgeColor = isRWA
+        ? { bg: 'rgba(20,184,166,0.2)', border: 'rgba(20,184,166,0.5)', text: '#2dd4bf' }
+        : { bg: 'rgba(139,92,246,0.2)', border: 'rgba(139,92,246,0.5)', text: '#c4b5fd' };
+
     return (
         <div
             onMouseEnter={() => setHovered(true)}
             onMouseLeave={() => setHovered(false)}
             style={{
                 background: 'rgba(18,18,30,0.8)',
-                border: `1px solid ${hovered ? 'rgba(139,92,246,0.3)' : 'rgba(255,255,255,0.07)'}`,
+                border: `1px solid ${hovered ? 'rgba(139,92,246,0.35)' : 'rgba(255,255,255,0.07)'}`,
                 borderRadius: '20px', overflow: 'hidden',
                 display: 'flex', flexDirection: 'column',
                 transition: 'all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1)',
                 transform: hovered ? 'translateY(-6px)' : 'translateY(0)',
-                boxShadow: hovered ? '0 16px 40px rgba(139,92,246,0.18)' : '0 4px 20px rgba(0,0,0,0.4)',
+                boxShadow: hovered
+                    ? '0 16px 40px rgba(139,92,246,0.2), 0 0 0 1px rgba(139,92,246,0.1)'
+                    : '0 4px 20px rgba(0,0,0,0.4)',
                 cursor: 'default', position: 'relative',
             }}
         >
@@ -176,14 +169,23 @@ const SongCard = ({ song, userMode, index = 0, onDetailClick }) => {
                     style={{
                         width: '100%', height: '100%', objectFit: 'cover',
                         transition: 'transform 0.5s ease',
-                        transform: hovered ? 'scale(1.05)' : 'scale(1)',
+                        transform: hovered ? 'scale(1.06)' : 'scale(1)',
                     }}
                 />
 
-                {/* Gradient */}
+                {/* Dark hover overlay for play button visibility */}
+                <div style={{
+                    position: 'absolute', inset: 0,
+                    background: 'rgba(10,10,20,0.5)',
+                    opacity: hovered || isPlaying ? 1 : 0,
+                    transition: 'opacity 0.3s ease',
+                    pointerEvents: 'none',
+                }} />
+
+                {/* Bottom gradient */}
                 <div style={{
                     position: 'absolute', bottom: 0, left: 0, right: 0, height: '60%',
-                    background: 'linear-gradient(to top, rgba(10,10,20,0.9) 0%, transparent 100%)',
+                    background: 'linear-gradient(to top, rgba(10,10,20,0.95) 0%, transparent 100%)',
                     pointerEvents: 'none',
                 }} />
 
@@ -194,69 +196,66 @@ const SongCard = ({ song, userMode, index = 0, onDetailClick }) => {
                     borderRadius: '100px', padding: '4px 10px',
                     fontSize: '0.68rem', fontWeight: '700', color: badgeColor.text,
                     letterSpacing: '1px', textTransform: 'uppercase',
+                    zIndex: 2,
                 }}>
                     {song.tag || song.asset_type}
                 </div>
 
-                {/* Trending / Hot badges (top 3 FOMO triggers) */}
+                {/* Trending / Hot badge */}
                 {song.is_trending && (
-                    <div style={{
-                        position: 'absolute', top: '12px', right: '12px',
-                        display: 'flex', gap: '4px',
-                    }}>
+                    <div style={{ position: 'absolute', top: '12px', right: '12px', display: 'flex', gap: '4px', zIndex: 2 }}>
                         <span style={{
-                            background: 'rgba(239,68,68,0.9)',
-                            borderRadius: '100px', padding: '3px 9px',
-                            fontSize: '0.65rem', fontWeight: '800', color: 'white',
-                            letterSpacing: '0.5px',
+                            background: 'rgba(239,68,68,0.9)', borderRadius: '100px', padding: '3px 9px',
+                            fontSize: '0.65rem', fontWeight: '800', color: 'white', letterSpacing: '0.5px',
                         }}>🔥 HOT</span>
                         {index === 0 && (
                             <span style={{
-                                background: 'rgba(234,179,8,0.9)',
-                                borderRadius: '100px', padding: '3px 9px',
+                                background: 'rgba(234,179,8,0.9)', borderRadius: '100px', padding: '3px 9px',
                                 fontSize: '0.65rem', fontWeight: '800', color: 'white',
                             }}>⚡ #1</span>
                         )}
                     </div>
                 )}
 
-                {/* ── Play/Pause button — Spotify 30s preview via audioManager ── */}
+                {/* ── BE4T Neon Play/Pause button ── */}
                 {song.preview_url ? (
                     <button
                         onClick={handlePlayClick}
-                        title={isPlaying ? 'Pausar' : 'Escuchar 30 segundos'}
+                        title={isPlaying ? 'Pausar preview' : 'Reproducir 30s — Spotify'}
                         style={{
-                            position: 'absolute',
-                            top: '50%', left: '50%',
-                            transform: `translate(-50%, -50%) scale(${hovered || isPlaying ? 1 : 0.85})`,
-                            width: '64px', height: '64px', borderRadius: '50%',
+                            position: 'absolute', top: '50%', left: '50%', zIndex: 10,
+                            transform: `translate(-50%, -50%) scale(${hovered || isPlaying ? 1 : 0.75})`,
+                            width: '72px', height: '72px', borderRadius: '50%',
                             background: isPlaying
-                                ? 'rgba(239,68,68,0.88)'
-                                : 'rgba(0,0,0,0.55)',
-                            border: '3px solid rgba(255,255,255,0.9)',
-                            backdropFilter: 'blur(4px)',
+                                ? 'linear-gradient(135deg, #ef4444, #dc2626)'
+                                : 'linear-gradient(135deg, #7c3aed 0%, #06b6d4 100%)',
+                            border: 'none',
+                            boxShadow: isPlaying
+                                ? '0 0 0 3px rgba(239,68,68,0.3), 0 0 24px rgba(239,68,68,0.5), 0 4px 20px rgba(0,0,0,0.5)'
+                                : '0 0 0 3px rgba(139,92,246,0.4), 0 0 24px rgba(34,211,238,0.4), 0 4px 20px rgba(0,0,0,0.5)',
+                            backdropFilter: 'blur(8px)',
                             color: 'white', cursor: 'pointer',
                             display: 'flex', alignItems: 'center', justifyContent: 'center',
                             opacity: hovered || isPlaying ? 1 : 0,
-                            transition: 'all 0.25s ease',
-                            zIndex: 10,
+                            transition: 'all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
                         }}
+                        onMouseOver={e => { e.currentTarget.style.transform = 'translate(-50%, -50%) scale(1.1)'; }}
+                        onMouseOut={e => { e.currentTarget.style.transform = `translate(-50%, -50%) scale(${hovered || isPlaying ? 1 : 0.75})`; }}
                     >
                         {isPlaying ? (
-                            <svg width="22" height="22" viewBox="0 0 24 24" fill="white">
-                                <rect x="6" y="4" width="4" height="16" rx="1"/>
-                                <rect x="14" y="4" width="4" height="16" rx="1"/>
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+                                <rect x="6" y="4" width="4" height="16" rx="1.5"/>
+                                <rect x="14" y="4" width="4" height="16" rx="1.5"/>
                             </svg>
                         ) : (
-                            <svg width="22" height="22" viewBox="0 0 24 24" fill="white" style={{ marginLeft: '3px' }}>
-                                <polygon points="5,3 20,12 5,21"/>
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="white" style={{ marginLeft: '3px' }}>
+                                <polygon points="5,3 21,12 5,21"/>
                             </svg>
                         )}
                     </button>
                 ) : null}
 
             </div>
-
 
             {/* ── Card Content ── */}
             <div style={{ padding: '1.25rem', display: 'flex', flexDirection: 'column', gap: '0.9rem', flex: 1 }}>
