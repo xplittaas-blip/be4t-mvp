@@ -1,4 +1,5 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
+import { audioManager } from '../../services/audioManager';
 
 // ── Format helpers ────────────────────────────────────────────────────────────
 const fmt = (n) => {
@@ -105,15 +106,19 @@ const SongCard = ({ song, userMode, index = 0, onDetailClick }) => {
     const [hovered, setHovered]     = useState(false);
     const [coverSrc, setCoverSrc]   = useState(song.cover_url || DEFAULT_COVERS[index % DEFAULT_COVERS.length]);
     const [isPlaying, setIsPlaying] = useState(false);
-    const audioRef = useRef(null);
+    const audioRef = useRef(null); // tracks current HTMLAudioElement returned by audioManager
 
     useEffect(() => {
         setCoverSrc(song.cover_url || DEFAULT_COVERS[index % DEFAULT_COVERS.length]);
-        if (audioRef.current) { audioRef.current.pause(); }
+        // Stop this card if song changes
+        if (audioRef.current) { audioManager.stop(audioRef.current); audioRef.current = null; }
         setIsPlaying(false);
     }, [song.cover_url, song.id, index]);
 
-    useEffect(() => () => { audioRef.current?.pause(); }, []);
+    // Cleanup on unmount
+    useEffect(() => () => {
+        if (audioRef.current) { audioManager.stop(audioRef.current); }
+    }, []);
 
     const isRWA  = song.asset_type === 'RWA' || song.asset_type === 'custom';
 
@@ -126,10 +131,26 @@ const SongCard = ({ song, userMode, index = 0, onDetailClick }) => {
         ? `https://open.spotify.com/embed/track/${spotifyTrackId}?utm_source=generator&theme=0`
         : null;
 
-    const handlePlayClick = (e) => {
+    const handlePlayClick = useCallback((e) => {
         e.stopPropagation();
-        if (embedUrl) setShowEmbed(prev => !prev);
-    };
+        if (!song.preview_url) return;
+
+        if (isPlaying && audioRef.current) {
+            // Pause: stop this card's audio directly
+            audioManager.stop(audioRef.current);
+            audioRef.current = null;
+            setIsPlaying(false);
+        } else {
+            // Play: audioManager stops any other playing card automatically
+            const audio = audioManager.play(song.preview_url, () => {
+                // Called when another card starts OR track ends naturally
+                audioRef.current = null;
+                setIsPlaying(false);
+            });
+            audioRef.current = audio;
+            setIsPlaying(true);
+        }
+    }, [isPlaying, song.preview_url]);
 
     return (
         <div
@@ -146,16 +167,6 @@ const SongCard = ({ song, userMode, index = 0, onDetailClick }) => {
                 cursor: 'default', position: 'relative',
             }}
         >
-            {/* Hidden audio element — Deezer 30s MP3 preview */}
-            {song.preview_url && (
-                <audio
-                    ref={audioRef}
-                    src={song.preview_url}
-                    onEnded={() => setIsPlaying(false)}
-                    preload="none"
-                />
-            )}
-
             {/* ── Cover Image ── */}
             <div style={{ position: 'relative', aspectRatio: '4/3', overflow: 'hidden', background: '#0a0a14' }}>
                 <img
@@ -209,7 +220,7 @@ const SongCard = ({ song, userMode, index = 0, onDetailClick }) => {
                     </div>
                 )}
 
-                {/* ── Play/Pause button — uses Deezer MP3 preview ── */}
+                {/* ── Play/Pause button — Spotify 30s preview via audioManager ── */}
                 {song.preview_url ? (
                     <button
                         onClick={handlePlayClick}
