@@ -34,12 +34,13 @@ const TARGET_TRACKS = [
     { q: 'Still Loving You Scorpions',     genre: 'rock', roi: 11.2 },
 ];
 
-// ── Deezer search via Vite proxy (avoids browser CORS) ───────────────────────
+// ── Deezer search via Vite proxy (dev) or Vercel serverless (prod) ───────────
 async function searchDeezer(query) {
-    // In dev: /deezer-api → proxy → api.deezer.com (no CORS)
-    // In prod: /api/deezer serverless function handles this
-    const base = import.meta.env.DEV ? '/deezer-api' : '/api/deezer';
-    const url = `${base}/search?q=${encodeURIComponent(query)}&limit=1`;
+    // Dev:  /deezer-api/search?q=... → Vite proxy → https://api.deezer.com/search?q=...
+    // Prod: /api/deezer?q=...        → Vercel serverless fn → https://api.deezer.com/search?q=...
+    const url = import.meta.env.DEV
+        ? `/deezer-api/search?q=${encodeURIComponent(query)}&limit=1`
+        : `/api/deezer?q=${encodeURIComponent(query)}&limit=1`;
     const res = await fetch(url);
     if (!res.ok) throw new Error(`Deezer ${res.status}`);
     const json = await res.json();
