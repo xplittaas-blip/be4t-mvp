@@ -7,6 +7,7 @@ import AssetUploader from './components/be4t/AssetUploader';
 import Marketplace from './pages/Marketplace';
 import Portfolio from './pages/Portfolio';
 import WaitlistPage from './pages/WaitlistPage';
+import HowItWorks from './components/be4t/HowItWorks';
 import { supabase } from './core/xplit/supabaseClient';
 
 // ── Lazy pages ────────────────────────────────────────────────────────────────
@@ -184,7 +185,7 @@ function App() {
             <main>
                 {/* Explorar: Marketplace with Spotify Top 20 */}
                 {currentPage === 'explore' && (
-                    <Marketplace session={session} />
+                    <Marketplace session={session} onNavigate={navigate} />
                 )}
 
                 {/* Mis Canciones: Portfolio / Dashboard */}
@@ -208,6 +209,11 @@ function App() {
                 {/* Waitlist (Fan / Artista / Disquera) */}
                 {currentPage === 'waitlist' && (
                     <WaitlistPage onNavigate={navigate} />
+                )}
+
+                {/* Cómo Funciona: HowItWorks full page */}
+                {currentPage === 'como-funciona' && (
+                    <HowItWorks onNavigate={navigate} />
                 )}
 
                 {/* Legacy routes (kept for compatibility) */}

@@ -102,43 +102,39 @@ const DEFAULT_COVERS = [
 
 // ── Main SongCard ─────────────────────────────────────────────────────────────
 const SongCard = ({ song, userMode, index = 0, onDetailClick }) => {
-    const [hovered, setHovered] = useState(false);
-    const [imgErr, setImgErr]   = useState(false);
+    const [hovered, setHovered]     = useState(false);
+    const [coverSrc, setCoverSrc]   = useState(song.cover_url || DEFAULT_COVERS[index % DEFAULT_COVERS.length]);
     const [isPlaying, setIsPlaying] = useState(false);
     const audioRef = useRef(null);
 
-    const cover  = (!imgErr && song.cover_url) ? song.cover_url : DEFAULT_COVERS[index % DEFAULT_COVERS.length];
+    useEffect(() => {
+        setCoverSrc(song.cover_url || DEFAULT_COVERS[index % DEFAULT_COVERS.length]);
+        if (audioRef.current) { audioRef.current.pause(); }
+        setIsPlaying(false);
+    }, [song.cover_url, song.id, index]);
+
+    useEffect(() => () => { audioRef.current?.pause(); }, []);
+
     const isRWA  = song.asset_type === 'RWA' || song.asset_type === 'custom';
 
     const badgeColor = isRWA
         ? { bg: 'rgba(20,184,166,0.2)', border: 'rgba(20,184,166,0.5)', text: '#2dd4bf' }
         : { bg: 'rgba(139,92,246,0.2)', border: 'rgba(139,92,246,0.5)', text: '#c4b5fd' };
 
-    // ── Audio: Play on hover ─────────────────────────────────────────────────
-    const handleHoverEnter = () => {
-        setHovered(true);
-        if (song.preview_url && audioRef.current && !isPlaying) {
-            audioRef.current.volume = 0.35;
-            audioRef.current.play().then(() => setIsPlaying(true)).catch(() => {});
-        }
-    };
-    const handleHoverLeave = () => {
-        setHovered(false);
-        if (audioRef.current && isPlaying) {
-            audioRef.current.pause();
-            audioRef.current.currentTime = 0;
-            setIsPlaying(false);
-        }
-    };
+    const spotifyTrackId = song._raw?.metadata?.spotify_track_id || null;
+    const embedUrl = spotifyTrackId
+        ? `https://open.spotify.com/embed/track/${spotifyTrackId}?utm_source=generator&theme=0`
+        : null;
 
-    useEffect(() => {
-        return () => { audioRef.current?.pause(); };
-    }, []);
+    const handlePlayClick = (e) => {
+        e.stopPropagation();
+        if (embedUrl) setShowEmbed(prev => !prev);
+    };
 
     return (
         <div
-            onMouseEnter={handleHoverEnter}
-            onMouseLeave={handleHoverLeave}
+            onMouseEnter={() => setHovered(true)}
+            onMouseLeave={() => setHovered(false)}
             style={{
                 background: 'rgba(18,18,30,0.8)',
                 border: `1px solid ${hovered ? 'rgba(139,92,246,0.3)' : 'rgba(255,255,255,0.07)'}`,
@@ -150,16 +146,22 @@ const SongCard = ({ song, userMode, index = 0, onDetailClick }) => {
                 cursor: 'default', position: 'relative',
             }}
         >
-            {/* Hidden audio for preview */}
+            {/* Hidden audio element — Deezer 30s MP3 preview */}
             {song.preview_url && (
-                <audio ref={audioRef} src={song.preview_url} onEnded={() => setIsPlaying(false)} preload="none" />
+                <audio
+                    ref={audioRef}
+                    src={song.preview_url}
+                    onEnded={() => setIsPlaying(false)}
+                    preload="none"
+                />
             )}
 
             {/* ── Cover Image ── */}
             <div style={{ position: 'relative', aspectRatio: '4/3', overflow: 'hidden', background: '#0a0a14' }}>
                 <img
-                    src={cover} alt={song.title}
-                    onError={() => setImgErr(true)}
+                    src={coverSrc}
+                    alt={song.title}
+                    onError={() => setCoverSrc(DEFAULT_COVERS[index % DEFAULT_COVERS.length])}
                     style={{
                         width: '100%', height: '100%', objectFit: 'cover',
                         transition: 'transform 0.5s ease',
@@ -207,37 +209,43 @@ const SongCard = ({ song, userMode, index = 0, onDetailClick }) => {
                     </div>
                 )}
 
-                {/* Play overlay (audio plays on hover, icon shown) */}
-                {song.preview_url && (
-                    <div style={{
-                        position: 'absolute', inset: 0,
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        background: 'rgba(0,0,0,0.25)',
-                        opacity: hovered ? 1 : 0,
-                        transition: 'opacity 0.25s ease',
-                        pointerEvents: 'none',
-                    }}>
-                        {/* Animated equalizer bars when playing */}
-                        <div style={{ display: 'flex', gap: '3px', alignItems: 'flex-end', height: '28px' }}>
-                            {[1,2,3,4].map(i => (
-                                <div key={i} style={{
-                                    width: '4px', borderRadius: '2px',
-                                    background: '#a855f7',
-                                    height: isPlaying ? `${12 + (i * 4)}px` : '8px',
-                                    transition: `height 0.${i}s ease`,
-                                    ...(isPlaying ? { animation: `eq${i} 0.${5+i}s ease-in-out infinite alternate` } : {}),
-                                }} />
-                            ))}
-                        </div>
-                        <style>{`
-                            @keyframes eq1 { from{height:8px} to{height:24px} }
-                            @keyframes eq2 { from{height:16px} to{height:8px} }
-                            @keyframes eq3 { from{height:20px} to{height:12px} }
-                            @keyframes eq4 { from{height:10px} to{height:22px} }
-                        `}</style>
-                    </div>
-                )}
+                {/* ── Play/Pause button — uses Deezer MP3 preview ── */}
+                {song.preview_url ? (
+                    <button
+                        onClick={handlePlayClick}
+                        title={isPlaying ? 'Pausar' : 'Escuchar 30 segundos'}
+                        style={{
+                            position: 'absolute',
+                            top: '50%', left: '50%',
+                            transform: `translate(-50%, -50%) scale(${hovered || isPlaying ? 1 : 0.85})`,
+                            width: '64px', height: '64px', borderRadius: '50%',
+                            background: isPlaying
+                                ? 'rgba(239,68,68,0.88)'
+                                : 'rgba(0,0,0,0.55)',
+                            border: '3px solid rgba(255,255,255,0.9)',
+                            backdropFilter: 'blur(4px)',
+                            color: 'white', cursor: 'pointer',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            opacity: hovered || isPlaying ? 1 : 0,
+                            transition: 'all 0.25s ease',
+                            zIndex: 10,
+                        }}
+                    >
+                        {isPlaying ? (
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="white">
+                                <rect x="6" y="4" width="4" height="16" rx="1"/>
+                                <rect x="14" y="4" width="4" height="16" rx="1"/>
+                            </svg>
+                        ) : (
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="white" style={{ marginLeft: '3px' }}>
+                                <polygon points="5,3 20,12 5,21"/>
+                            </svg>
+                        )}
+                    </button>
+                ) : null}
+
             </div>
+
 
             {/* ── Card Content ── */}
             <div style={{ padding: '1.25rem', display: 'flex', flexDirection: 'column', gap: '0.9rem', flex: 1 }}>

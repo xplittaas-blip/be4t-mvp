@@ -35,7 +35,7 @@ const SELECT_STYLE = {
 };
 
 // ── Marketplace ───────────────────────────────────────────────────────────────
-const Marketplace = ({ session }) => {
+const Marketplace = ({ session, onNavigate }) => {
     const [userMode, setUserMode]         = useState('fan');
     const [searchQuery, setSearchQuery]   = useState('');
     const [sortBy, setSortBy]             = useState('roi');
@@ -139,7 +139,7 @@ const Marketplace = ({ session }) => {
 
             <main style={{ maxWidth: '1280px', margin: '0 auto', paddingBottom: '5rem' }}>
                 {/* ── Hero Banner ── */}
-                <HeroBanner userMode={userMode} />
+                <HeroBanner userMode={userMode} onNavigate={onNavigate} />
 
                 {/* ── Spotify loading status ── */}
                 {spotifyStatus === 'loading' && (
@@ -179,12 +179,10 @@ const Marketplace = ({ session }) => {
                     }}>
                         <div>
                             <h2 style={{ fontSize: '1.45rem', fontWeight: '800', margin: 0 }}>
-                                {activeTab === 'explorar' ? 'Canciones Destacadas' : 'Mi Portafolio'}
+                                Canciones Destacadas
                             </h2>
                             <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.82rem', margin: '0.2rem 0 0' }}>
-                                {activeTab === 'explorar'
-                                    ? `${isLoading ? '…' : filteredSongs.length} activos disponibles para inversión`
-                                    : 'Gestiona tus inversiones musicales'}
+                                {isLoading ? '…' : filteredSongs.length} activos disponibles para inversión
                             </p>
                         </div>
                         <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>

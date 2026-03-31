@@ -1,6 +1,6 @@
 import React from 'react';
 
-const HeroBanner = ({ userMode }) => {
+const HeroBanner = ({ userMode, onNavigate }) => {
     if (userMode === 'disquera') {
         // Xplit Infrastructure page (screenshot 2)
         return (
@@ -160,13 +160,16 @@ const HeroBanner = ({ userMode }) => {
                     }}>
                         Explorar Canciones →
                     </button>
-                    <button style={{
-                        padding: '0.8rem 1.5rem',
-                        background: 'transparent',
-                        border: '1px solid rgba(255,255,255,0.2)',
-                        borderRadius: '12px',
-                        color: 'rgba(255,255,255,0.8)', fontWeight: '500', fontSize: '0.95rem', cursor: 'pointer',
-                    }}>
+                    <button
+                        onClick={() => onNavigate && onNavigate('como-funciona')}
+                        style={{
+                            padding: '0.8rem 1.5rem',
+                            background: 'transparent',
+                            border: '1px solid rgba(255,255,255,0.2)',
+                            borderRadius: '12px',
+                            color: 'rgba(255,255,255,0.8)', fontWeight: '500', fontSize: '0.95rem', cursor: 'pointer',
+                        }}
+                    >
                         ¿Cómo funciona?
                     </button>
                 </div>
