@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 // ── BE4T Logo ─────────────────────────────────────────────────────────────────
 const BE4TLogo = () => (
@@ -10,12 +10,12 @@ const BE4TLogo = () => (
         boxShadow: '0 0 12px rgba(168,85,247,0.4)',
     }}>
         <svg width="19" height="19" viewBox="0 0 24 24" fill="none">
-            <path d="M9 18V5l12-2v13M9 18a3 3 0 1 1-6 0 3 3 0 0 1 6 0zM21 16a3 3 0 1 1-6 0 3 3 0 0 1 6 0z" stroke="white" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+            <path d="M9 18V5l12-2v13M9 18a3 3 0 1 1-6 0 3 3 0 0 1 6 0zM21 16a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"
+                stroke="white" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
     </div>
 );
 
-// ── Connect Wallet Icon ───────────────────────────────────────────────────────
 const WalletIcon = () => (
     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4"/><path d="M20 12v4H6a2 2 0 0 0 0 4h12v-4M4 6v12"/>
@@ -23,42 +23,49 @@ const WalletIcon = () => (
     </svg>
 );
 
+// ── Hamburger Icon ─────────────────────────────────────────────────────────────
+const HamburgerIcon = ({ open }) => (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"
+        strokeLinecap="round" style={{ transition: 'transform 0.3s ease', transform: open ? 'rotate(90deg)' : 'none' }}>
+        {open ? (
+            <>
+                <line x1="18" y1="6" x2="6" y2="18"/>
+                <line x1="6" y1="6" x2="18" y2="18"/>
+            </>
+        ) : (
+            <>
+                <line x1="3" y1="7" x2="21" y2="7"/>
+                <line x1="3" y1="12" x2="21" y2="12"/>
+                <line x1="3" y1="17" x2="21" y2="17"/>
+            </>
+        )}
+    </svg>
+);
+
 const Navigation = ({ currentPage, setCurrentPage, session, onLoginClick }) => {
     const [mobileOpen, setMobileOpen] = useState(false);
 
+    // Close menu on page change or resize to desktop
+    useEffect(() => {
+        const handleResize = () => { if (window.innerWidth >= 768) setMobileOpen(false); };
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
+    // Prevent body scroll when menu is open
+    useEffect(() => {
+        document.body.style.overflow = mobileOpen ? 'hidden' : '';
+        return () => { document.body.style.overflow = ''; };
+    }, [mobileOpen]);
+
     const navItems = [
-        { id: 'explore', label: '↗ Explorar', description: 'Top 20 Reggaetón' },
-        { id: 'mis-canciones', label: '♫ Mis Canciones', description: 'Tu portafolio de inversiones' },
-        { id: 'disqueras', label: '⊞ Para Disqueras', description: 'Liquidez institucional B2B' },
+        { id: 'explore',       label: '↗ Explorar',       emoji: '🎵', description: 'Top 20 Artistas' },
+        { id: 'mis-canciones', label: '♫ Mis Canciones',  emoji: '🎶', description: 'Tu portafolio' },
+        { id: 'disqueras',     label: '⊞ Para Disqueras', emoji: '🏢', description: 'B2B Institucional' },
+        { id: 'how-it-works',  label: '❓ Cómo Funciona', emoji: '💡', description: 'Aprende más' },
     ];
 
-    const tabBtn = (item) => {
-        const isActive = currentPage === item.id;
-        return (
-            <button
-                key={item.id}
-                onClick={() => { setCurrentPage(item.id); setMobileOpen(false); }}
-                title={item.description}
-                style={{
-                    padding: '0.4rem 0.85rem',
-                    borderRadius: '8px',
-                    border: 'none',
-                    background: isActive ? 'rgba(139,92,246,0.2)' : 'transparent',
-                    color: isActive ? '#c4b5fd' : 'rgba(255,255,255,0.55)',
-                    fontWeight: isActive ? '700' : '400',
-                    fontSize: '0.82rem',
-                    cursor: 'pointer',
-                    whiteSpace: 'nowrap',
-                    borderBottom: isActive ? '2px solid #a855f7' : '2px solid transparent',
-                    transition: 'all 0.2s ease',
-                }}
-                onMouseOver={e => { if (!isActive) { e.currentTarget.style.color = 'rgba(255,255,255,0.85)'; e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; } }}
-                onMouseOut={e => { if (!isActive) { e.currentTarget.style.color = 'rgba(255,255,255,0.55)'; e.currentTarget.style.background = 'transparent'; } }}
-            >
-                {item.label}
-            </button>
-        );
-    };
+    const navigate = (id) => { setCurrentPage(id); setMobileOpen(false); };
 
     return (
         <>
@@ -67,7 +74,57 @@ const Navigation = ({ currentPage, setCurrentPage, session, onLoginClick }) => {
                 * { font-family: 'Inter', -apple-system, sans-serif; }
                 ::placeholder { color: rgba(255,255,255,0.3); }
                 select option { background: #1a1028; color: white; }
+
+                /* ── Mobile menu slide-in ── */
+                .be4t-mobile-backdrop {
+                    display: none;
+                }
+                .be4t-mobile-sidebar {
+                    display: none;
+                }
+
+                @media (max-width: 767px) {
+                    .be4t-nav-links { display: none !important; }
+                    .be4t-hamburger { display: flex !important; }
+                    .be4t-wallet-label { display: none !important; }
+
+                    .be4t-mobile-backdrop {
+                        display: block;
+                        position: fixed; inset: 0; z-index: 299;
+                        background: rgba(0,0,0,0.6);
+                        backdrop-filter: blur(4px);
+                        -webkit-backdrop-filter: blur(4px);
+                        opacity: 0;
+                        pointer-events: none;
+                        transition: opacity 0.3s ease;
+                    }
+                    .be4t-mobile-backdrop.open {
+                        opacity: 1;
+                        pointer-events: all;
+                    }
+
+                    .be4t-mobile-sidebar {
+                        display: flex;
+                        flex-direction: column;
+                        position: fixed;
+                        top: 0; right: 0; bottom: 0;
+                        width: min(80vw, 320px);
+                        z-index: 300;
+                        background: rgba(12, 10, 22, 0.97);
+                        border-left: 1px solid rgba(139,92,246,0.25);
+                        box-shadow: -8px 0 40px rgba(0,0,0,0.6);
+                        transform: translateX(100%);
+                        transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+                        padding: 0;
+                        overflow-y: auto;
+                    }
+                    .be4t-mobile-sidebar.open {
+                        transform: translateX(0);
+                    }
+                }
             `}</style>
+
+            {/* ── Main Navbar ── */}
             <nav style={{
                 position: 'sticky', top: 0, zIndex: 200,
                 background: 'rgba(15,17,23,0.92)',
@@ -78,16 +135,13 @@ const Navigation = ({ currentPage, setCurrentPage, session, onLoginClick }) => {
             }}>
                 <div style={{
                     maxWidth: '1280px', margin: '0 auto',
-                    padding: '0 1.5rem',
+                    padding: '0 1rem',
                     display: 'flex', alignItems: 'center',
-                    height: '62px', gap: '1rem',
+                    height: '62px', gap: '0.75rem',
                 }}>
-
-                    {/* ── Logo ── */}
-                    <div
-                        onClick={() => setCurrentPage('explore')}
-                        style={{ display: 'flex', alignItems: 'center', gap: '0.55rem', cursor: 'pointer', flexShrink: 0 }}
-                    >
+                    {/* Logo */}
+                    <div onClick={() => navigate('explore')}
+                        style={{ display: 'flex', alignItems: 'center', gap: '0.55rem', cursor: 'pointer', flexShrink: 0 }}>
                         <BE4TLogo />
                         <span style={{
                             fontWeight: '900', fontSize: '1.15rem',
@@ -97,78 +151,193 @@ const Navigation = ({ currentPage, setCurrentPage, session, onLoginClick }) => {
                         }}>BE4T</span>
                     </div>
 
-                    {/* ── Center nav (desktop) ── */}
-                    <div style={{
+                    {/* Desktop nav links */}
+                    <div className="be4t-nav-links" style={{
                         flex: 1, display: 'flex', alignItems: 'center',
                         gap: '0.25rem', paddingLeft: '1rem',
                         overflowX: 'auto', scrollbarWidth: 'none',
                     }}>
-                        {navItems.map(tabBtn)}
+                        {navItems.map(item => {
+                            const isActive = currentPage === item.id;
+                            return (
+                                <button key={item.id} onClick={() => navigate(item.id)} title={item.description}
+                                    style={{
+                                        padding: '0.4rem 0.85rem',
+                                        borderRadius: '8px', border: 'none',
+                                        background: isActive ? 'rgba(139,92,246,0.2)' : 'transparent',
+                                        color: isActive ? '#c4b5fd' : 'rgba(255,255,255,0.55)',
+                                        fontWeight: isActive ? '700' : '400',
+                                        fontSize: '0.82rem', cursor: 'pointer', whiteSpace: 'nowrap',
+                                        borderBottom: isActive ? '2px solid #a855f7' : '2px solid transparent',
+                                        transition: 'all 0.2s ease',
+                                    }}
+                                    onMouseOver={e => { if (!isActive) { e.currentTarget.style.color = 'rgba(255,255,255,0.85)'; e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; }}}
+                                    onMouseOut={e => { if (!isActive) { e.currentTarget.style.color = 'rgba(255,255,255,0.55)'; e.currentTarget.style.background = 'transparent'; }}}
+                                >{item.label}</button>
+                            );
+                        })}
                     </div>
 
-                    {/* ── Right actions ── */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', flexShrink: 0 }}>
+                    {/* Spacer on mobile */}
+                    <div style={{ flex: 1 }} />
 
-                        {/* Connect Wallet — Web3 premium button */}
+                    {/* Right actions */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexShrink: 0 }}>
+                        {/* Wallet button */}
                         <button
                             onClick={() => alert('🔗 Wallet connection coming soon!\n\nCompatible con:\n• MetaMask\n• WalletConnect\n• Coinbase Wallet')}
                             style={{
                                 display: 'flex', alignItems: 'center', gap: '0.45rem',
-                                padding: '0.5rem 1.1rem',
+                                padding: '0.5rem 1rem',
                                 background: 'linear-gradient(135deg, rgba(124,58,237,0.15), rgba(6,182,212,0.1))',
                                 border: '1px solid rgba(139,92,246,0.4)',
                                 borderRadius: '100px',
                                 color: '#c4b5fd', fontSize: '0.82rem', fontWeight: '700',
                                 cursor: 'pointer', whiteSpace: 'nowrap',
                                 transition: 'all 0.2s ease',
-                                boxShadow: '0 0 12px rgba(139,92,246,0.1)',
+                                minHeight: '44px', minWidth: '44px',
                             }}
-                            onMouseOver={e => { e.currentTarget.style.background = 'linear-gradient(135deg, rgba(124,58,237,0.3), rgba(6,182,212,0.2))'; e.currentTarget.style.boxShadow = '0 0 20px rgba(139,92,246,0.25)'; }}
-                            onMouseOut={e => { e.currentTarget.style.background = 'linear-gradient(135deg, rgba(124,58,237,0.15), rgba(6,182,212,0.1))'; e.currentTarget.style.boxShadow = '0 0 12px rgba(139,92,246,0.1)'; }}
+                            onMouseOver={e => { e.currentTarget.style.background = 'linear-gradient(135deg, rgba(124,58,237,0.3), rgba(6,182,212,0.2))'; }}
+                            onMouseOut={e => { e.currentTarget.style.background = 'linear-gradient(135deg, rgba(124,58,237,0.15), rgba(6,182,212,0.1))'; }}
                         >
                             <WalletIcon />
-                            Conectar Wallet
+                            <span className="be4t-wallet-label">Conectar Wallet</span>
                         </button>
 
-                        {/* Profile / Auth */}
+                        {/* Profile / Login */}
                         {session ? (
-                            <button
-                                onClick={() => setCurrentPage('perfil')}
-                                title="Mi Perfil"
+                            <button onClick={() => navigate('perfil')} title="Mi Perfil"
                                 style={{
-                                    width: '36px', height: '36px', borderRadius: '50%',
+                                    width: '44px', height: '44px', borderRadius: '50%',
                                     background: 'linear-gradient(135deg, #7c3aed, #a855f7)',
                                     border: '2px solid rgba(168,85,247,0.4)',
                                     color: 'white', fontWeight: '800', fontSize: '0.85rem',
                                     cursor: 'pointer', flexShrink: 0,
                                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                    transition: 'box-shadow 0.2s ease',
-                                }}
-                                onMouseOver={e => e.currentTarget.style.boxShadow = '0 0 16px rgba(168,85,247,0.5)'}
-                                onMouseOut={e => e.currentTarget.style.boxShadow = 'none'}
-                            >
+                                }}>
                                 {(session.user?.email?.[0] || 'U').toUpperCase()}
                             </button>
                         ) : (
-                            <button
-                                onClick={onLoginClick}
+                            <button onClick={onLoginClick}
                                 style={{
-                                    padding: '0.5rem 1.1rem',
+                                    padding: '0.55rem 1rem', minHeight: '44px',
                                     background: 'linear-gradient(135deg, #7c3aed, #a855f7)',
                                     border: 'none', borderRadius: '100px',
                                     color: 'white', fontWeight: '700', fontSize: '0.82rem',
                                     cursor: 'pointer', whiteSpace: 'nowrap',
-                                    transition: 'opacity 0.2s ease',
-                                }}
-                                onMouseOver={e => e.currentTarget.style.opacity = '0.85'}
-                                onMouseOut={e => e.currentTarget.style.opacity = '1'}
-                            >
-                                Iniciar sesión
+                                }}>
+                                Entrar
                             </button>
                         )}
+
+                        {/* ── Hamburger (mobile only) ── */}
+                        <button
+                            className="be4t-hamburger"
+                            onClick={() => setMobileOpen(o => !o)}
+                            aria-label="Abrir menú"
+                            style={{
+                                display: 'none', // overridden by CSS @media
+                                alignItems: 'center', justifyContent: 'center',
+                                width: '44px', height: '44px',
+                                background: mobileOpen ? 'rgba(139,92,246,0.2)' : 'rgba(255,255,255,0.06)',
+                                border: `1px solid ${mobileOpen ? 'rgba(139,92,246,0.5)' : 'rgba(255,255,255,0.1)'}`,
+                                borderRadius: '10px',
+                                color: 'white', cursor: 'pointer',
+                                transition: 'all 0.2s ease', flexShrink: 0,
+                            }}>
+                            <HamburgerIcon open={mobileOpen} />
+                        </button>
                     </div>
                 </div>
             </nav>
+
+            {/* ── Mobile Backdrop ── */}
+            <div className={`be4t-mobile-backdrop${mobileOpen ? ' open' : ''}`}
+                onClick={() => setMobileOpen(false)} />
+
+            {/* ── Mobile Sidebar ── */}
+            <div className={`be4t-mobile-sidebar${mobileOpen ? ' open' : ''}`}>
+                {/* Sidebar header */}
+                <div style={{
+                    padding: '1.25rem 1.5rem',
+                    borderBottom: '1px solid rgba(255,255,255,0.07)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.55rem' }}>
+                        <BE4TLogo />
+                        <span style={{
+                            fontWeight: '900', fontSize: '1.15rem', letterSpacing: '-0.04em',
+                            background: 'linear-gradient(135deg, #ffffff 30%, #c4b5fd 100%)',
+                            WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
+                        }}>BE4T</span>
+                    </div>
+                    <button onClick={() => setMobileOpen(false)}
+                        style={{
+                            width: '36px', height: '36px', borderRadius: '8px',
+                            background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.1)',
+                            color: 'rgba(255,255,255,0.6)', cursor: 'pointer',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        }}>✕</button>
+                </div>
+
+                {/* Nav section */}
+                <div style={{ padding: '1rem', display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                    <p style={{ fontSize: '0.65rem', fontWeight: '700', color: 'rgba(255,255,255,0.3)', letterSpacing: '2px', textTransform: 'uppercase', margin: '0 0 0.5rem 0.5rem' }}>
+                        NAVEGACIÓN
+                    </p>
+                    {navItems.map(item => {
+                        const isActive = currentPage === item.id;
+                        return (
+                            <button key={item.id} onClick={() => navigate(item.id)}
+                                style={{
+                                    display: 'flex', alignItems: 'center', gap: '0.85rem',
+                                    padding: '0.9rem 1rem',
+                                    borderRadius: '12px', border: 'none',
+                                    background: isActive ? 'rgba(139,92,246,0.18)' : 'transparent',
+                                    color: isActive ? '#c4b5fd' : 'rgba(255,255,255,0.75)',
+                                    fontWeight: isActive ? '700' : '500',
+                                    fontSize: '0.95rem', cursor: 'pointer',
+                                    textAlign: 'left', width: '100%',
+                                    borderLeft: isActive ? '3px solid #a855f7' : '3px solid transparent',
+                                    transition: 'all 0.2s ease',
+                                    minHeight: '52px',
+                                }}>
+                                <span style={{ fontSize: '1.25rem', lineHeight: 1 }}>{item.emoji}</span>
+                                <div>
+                                    <div>{item.label.replace(/^[↗♫⊞❓]\s/, '')}</div>
+                                    <div style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.35)', marginTop: '0.1rem' }}>{item.description}</div>
+                                </div>
+                            </button>
+                        );
+                    })}
+                </div>
+
+                {/* Bottom actions */}
+                <div style={{ marginTop: 'auto', padding: '1rem 1rem 2rem', borderTop: '1px solid rgba(255,255,255,0.06)', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                    <button
+                        onClick={() => alert('🔗 Wallet connection coming soon!')}
+                        style={{
+                            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.6rem',
+                            padding: '0.85rem', minHeight: '52px',
+                            background: 'linear-gradient(135deg, rgba(124,58,237,0.2), rgba(6,182,212,0.15))',
+                            border: '1px solid rgba(139,92,246,0.4)', borderRadius: '12px',
+                            color: '#c4b5fd', fontWeight: '700', fontSize: '0.9rem', cursor: 'pointer',
+                        }}>
+                        <WalletIcon /> Conectar Wallet
+                    </button>
+                    {!session && (
+                        <button onClick={() => { onLoginClick?.(); setMobileOpen(false); }}
+                            style={{
+                                padding: '0.85rem', minHeight: '52px',
+                                background: 'linear-gradient(135deg, #7c3aed, #a855f7)',
+                                border: 'none', borderRadius: '12px',
+                                color: 'white', fontWeight: '700', fontSize: '0.9rem', cursor: 'pointer',
+                            }}>
+                            Iniciar sesión
+                        </button>
+                    )}
+                </div>
+            </div>
         </>
     );
 };

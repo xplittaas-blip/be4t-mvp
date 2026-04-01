@@ -222,7 +222,7 @@ const AssetDetailView = ({ asset, allAssets = [], onBack }) => {
                 </button>
 
                 {/* Quick stats in header */}
-                <div style={{ flex: 1, display: 'flex', gap: '2rem', justifyContent: 'flex-end', flexWrap: 'wrap' }}>
+                <div className="be4t-topbar-stats" style={{ flex: 1, display: 'flex', gap: '2rem', justifyContent: 'flex-end', flexWrap: 'wrap' }}>
                     {[
                         { label: 'TOTAL STREAMS', value: fmt(meta.spotify_streams), color: '#1DB954' },
                         { label: 'TOTAL VIEWS', value: fmt(meta.youtube_views), color: '#FF0000' },
@@ -287,14 +287,17 @@ const AssetDetailView = ({ asset, allAssets = [], onBack }) => {
             </div>
 
             {/* ── Two-Column Layout ── */}
-            <div style={{
-                maxWidth: '1100px', margin: '0 auto',
-                padding: '0 1.5rem 4rem',
-                display: 'grid',
-                gridTemplateColumns: '1fr 420px',
-                gap: '2rem',
-                alignItems: 'start',
-            }}>
+            <div
+                className="be4t-detail-outer"
+                style={{
+                    maxWidth: '1100px', margin: '0 auto',
+                    padding: '0 1.5rem 4rem',
+                    display: 'grid',
+                    gridTemplateColumns: '1fr 420px',
+                    gap: '2rem',
+                    alignItems: 'start',
+                }}
+            >
                 {/* ─── LEFT COLUMN ─── */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
 
@@ -498,7 +501,7 @@ const AssetDetailView = ({ asset, allAssets = [], onBack }) => {
                 </div>
 
                 {/* ─── RIGHT COLUMN: Calculator ─── */}
-                <div style={{ position: 'sticky', top: '80px' }}>
+                <div className="be4t-detail-sticky" style={{ position: 'sticky', top: '80px' }}>
                     <RoyaltyCalculator asset={asset} />
                 </div>
             </div>

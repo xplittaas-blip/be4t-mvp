@@ -9,6 +9,7 @@ import './Marketplace.css';
 // ── Global styles needed ──────────────────────────────────────────────────────
 const globalStyles = `
     @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.5; } }
+    @keyframes spin { to { transform: rotate(360deg); } }
     @keyframes shimmer {
         0% { background-position: -200% 0; }
         100% { background-position: 200% 0; }
@@ -16,6 +17,99 @@ const globalStyles = `
     * { box-sizing: border-box; }
     input[type="range"]::-webkit-slider-thumb { cursor: pointer; }
     select option { background: #1a1028; }
+
+    /* ── Responsive Song Grid ── */
+    .be4t-song-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 1.5rem;
+    }
+    .be4t-grid-outer {
+        padding: 0 1.5rem;
+    }
+    .be4t-filters {
+        padding: 1.5rem 1.5rem 1rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+    .be4t-filter-controls {
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+    .be4t-filter-controls select {
+        min-height: 40px;
+    }
+    .be4t-section-title {
+        font-size: 1.45rem;
+        font-weight: 800;
+        margin: 0;
+    }
+
+    /* ── Mobile (≤ 480px) ── */
+    @media (max-width: 480px) {
+        .be4t-song-grid {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+        .be4t-grid-outer {
+            padding: 0 0.75rem;
+        }
+        .be4t-filters {
+            padding: 1rem 0.75rem 0.75rem;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        .be4t-filter-controls {
+            width: 100%;
+        }
+        .be4t-filter-controls select {
+            flex: 1;
+            min-height: 44px;
+            font-size: 0.85rem;
+        }
+        .be4t-section-title {
+            font-size: 1.2rem;
+        }
+    }
+
+    /* ── Tablet (481px – 767px) ── */
+    @media (min-width: 481px) and (max-width: 767px) {
+        .be4t-song-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+        .be4t-grid-outer {
+            padding: 0 1rem;
+        }
+        .be4t-filters {
+            padding: 1rem 1rem 0.75rem;
+        }
+        .be4t-section-title {
+            font-size: 1.3rem;
+        }
+    }
+
+    /* ── AssetDetailView responsive ── */
+    @media (max-width: 767px) {
+        /* Two-column layout stacks to single column */
+        .be4t-detail-grid {
+            grid-template-columns: 1fr !important;
+        }
+        .be4t-detail-sticky {
+            position: static !important;
+        }
+        .be4t-detail-outer {
+            padding: 1rem !important;
+        }
+        .be4t-topbar-stats {
+            display: none !important;
+        }
+    }
 `;
 
 // ── Sort functions ────────────────────────────────────────────────────────────
@@ -124,11 +218,7 @@ const Marketplace = ({ session, onNavigate }) => {
 
     // ── Loading Skeleton Grid ─────────────────────────────────────────────
     const renderSkeletons = () => (
-        <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
-            gap: '1.5rem',
-        }}>
+        <div className="be4t-song-grid">
             {Array.from({ length: 6 }).map((_, i) => <SongCardSkeleton key={i} />)}
         </div>
     );
@@ -172,20 +262,14 @@ const Marketplace = ({ session, onNavigate }) => {
 
                 {/* ── Section title + filters ── */}
                 {userMode !== 'disquera' && (
-                    <div style={{
-                        padding: '1.5rem 1.5rem 1rem',
-                        display: 'flex', justifyContent: 'space-between',
-                        alignItems: 'center', flexWrap: 'wrap', gap: '1rem',
-                    }}>
+                    <div className="be4t-filters">
                         <div>
-                            <h2 style={{ fontSize: '1.45rem', fontWeight: '800', margin: 0 }}>
-                                Canciones Destacadas
-                            </h2>
+                            <h2 className="be4t-section-title">Canciones Destacadas</h2>
                             <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.82rem', margin: '0.2rem 0 0' }}>
                                 {isLoading ? '…' : filteredSongs.length} activos disponibles para inversión
                             </p>
                         </div>
-                        <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                        <div className="be4t-filter-controls">
                             <select value={genreFilter} onChange={e => setGenreFilter(e.target.value)} style={SELECT_STYLE}>
                                 <option value="all">🎵 Todos los géneros</option>
                                 <option value="reggaeton">🔥 Reggaetón</option>
@@ -203,7 +287,7 @@ const Marketplace = ({ session, onNavigate }) => {
 
                 {/* ── Song Grid ── */}
                 {userMode !== 'disquera' && (
-                    <div style={{ padding: '0 1.5rem' }}>
+                    <div className="be4t-grid-outer">
                         {isLoading ? (
                             renderSkeletons()
                         ) : filteredSongs.length === 0 ? (
@@ -215,11 +299,7 @@ const Marketplace = ({ session, onNavigate }) => {
                                 </p>
                             </div>
                         ) : (
-                            <div style={{
-                                display: 'grid',
-                                gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
-                                gap: '1.5rem',
-                            }}>
+                            <div className="be4t-song-grid">
                                 {filteredSongs.map((song, i) => (
                                     <SongCard
                                         key={song.id}
