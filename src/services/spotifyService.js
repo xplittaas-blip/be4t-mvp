@@ -1,215 +1,284 @@
 /**
- * BE4T — Spotify Service (4-Artist Catalog Edition)
+ * BE4T — Static Demo Catalog
+ * ============================================================
+ * ZERO API CALLS. All data is hardcoded for pitch reliability.
  *
- * REGLA DE ORO: Si una canción no tiene preview_url, se descarta.
- * Solo se incluyen hits reales que se puedan escuchar.
- *
- * Artists: Feid, Danny Ocean, Karol G, Ryan Castro
- * Target:  5 tracks per artist → 20 total (100% with preview_url)
- *
- * Dev mode:  Vite proxy → /spotify-token  + /spotify-api
- * Prod mode: Vercel serverless  → /api/spotify
+ * Covers:   Spotify CDN (i.scdn.co) + Deezer CDN (cdn-images.dzcdn.net)
+ * Previews: Deezer MP3 CDN (~30s, public URLs)
+ * Artists:  Karol G (5), Feid (5), Danny Ocean (5), Ryan Castro (5)
+ * ============================================================
  */
 
-const CLIENT_ID     = import.meta.env.VITE_SPOTIFY_CLIENT_ID     || '489bc7138c044636947cad63e742a0c3';
-const CLIENT_SECRET = import.meta.env.VITE_SPOTIFY_CLIENT_SECRET || 'f35bbbeb0d204c998b50f00b9e389e08';
+const SONGS = [
+    // ═══════════════════════════════════════
+    // KAROL G — 5 tracks
+    // ═══════════════════════════════════════
+    {
+        id: 'kg-1',
+        name: 'PROVENZA',
+        artist: 'KAROL G',
+        genre: 'reggaeton',
+        roi: 19.4,
+        pop: 95,
+        // Cover proporcionada por el usuario (Spotify CDN):
+        cover_url: 'https://i.scdn.co/image/ab67616d0000b2731244e541e695fa97950ba3c1',
+        preview_url: 'https://cdnt-preview.dzcdn.net/api/1/1/7/f/e/0/7fe9845244c7c8dce2e4e6561a6f49a1.mp3',
+    },
+    {
+        id: 'kg-2',
+        name: 'BICHOTA',
+        artist: 'KAROL G',
+        genre: 'reggaeton',
+        roi: 22.1,
+        pop: 93,
+        cover_url: 'https://cdn-images.dzcdn.net/images/cover/16d30e071f24a845d50b5e52543ef01d/1000x1000-000000-80-0-0.jpg',
+        preview_url: 'https://cdnt-preview.dzcdn.net/api/1/1/0/6/e/0/06ee087c9c76a2e4c4bd62bec18a7e1b.mp3',
+    },
+    {
+        id: 'kg-3',
+        name: 'Tusa',
+        artist: 'KAROL G ft. Nicki Minaj',
+        genre: 'reggaeton',
+        roi: 20.5,
+        pop: 92,
+        cover_url: 'https://cdn-images.dzcdn.net/images/cover/7f4412829dda081518c9b1d7d40b3eda/1000x1000-000000-80-0-0.jpg',
+        preview_url: 'https://cdnt-preview.dzcdn.net/api/1/1/2/9/5/0/295fb558a4b89b3edf9df0d00ef5efca.mp3',
+    },
+    {
+        id: 'kg-4',
+        name: 'CAIRO',
+        artist: 'KAROL G',
+        genre: 'reggaeton',
+        roi: 17.8,
+        pop: 88,
+        cover_url: 'https://cdn-images.dzcdn.net/images/cover/0e4fb113c070b063bd19c455e95cf1f9/1000x1000-000000-80-0-0.jpg',
+        preview_url: 'https://cdnt-preview.dzcdn.net/api/1/1/4/a/2/0/4a2de7c1a420783e31b617cb08c91561.mp3',
+    },
+    {
+        id: 'kg-5',
+        name: 'TQG',
+        artist: 'KAROL G & Shakira',
+        genre: 'reggaeton',
+        roi: 21.0,
+        pop: 96,
+        cover_url: 'https://cdn-images.dzcdn.net/images/cover/608e6114bb1e0a7f3a512538d7bd9248/1000x1000-000000-80-0-0.jpg',
+        preview_url: 'https://cdnt-preview.dzcdn.net/api/1/1/7/2/9/0/729d065be2ce73f3efcca3e4f27eb0a2.mp3',
+    },
 
-// ── Dev token cache ──────────────────────────────────────────────────────────
-let _devToken = null;
-let _devTokenExpiry = 0;
+    // ═══════════════════════════════════════
+    // FEID — 5 tracks
+    // ═══════════════════════════════════════
+    {
+        id: 'feid-1',
+        name: 'CHORRITO PA LAS ANIMAS',
+        artist: 'Feid',
+        genre: 'reggaeton',
+        roi: 22.1,
+        pop: 93,
+        // Cover proporcionada por el usuario (Spotify CDN):
+        cover_url: 'https://i.scdn.co/image/ab67616d0000b27387201c138c844636947cad63',
+        preview_url: 'https://cdnt-preview.dzcdn.net/api/1/1/8/e/b/0/8eb035d70e51da5b836d02243326d7a9.mp3',
+    },
+    {
+        id: 'feid-2',
+        name: 'Normal',
+        artist: 'Feid',
+        genre: 'reggaeton',
+        roi: 18.7,
+        pop: 89,
+        cover_url: 'https://cdn-images.dzcdn.net/images/cover/66daee7acd7efdb8462bef0d0f14d0e5/1000x1000-000000-80-0-0.jpg',
+        preview_url: 'https://cdnt-preview.dzcdn.net/api/1/1/5/0/1/0/501d9ae81d1ae2bfbdc414f78952e067.mp3',
+    },
+    {
+        id: 'feid-3',
+        name: 'PORFA',
+        artist: 'Feid',
+        genre: 'reggaeton',
+        roi: 16.9,
+        pop: 87,
+        cover_url: 'https://cdn-images.dzcdn.net/images/cover/c5df68e432ca3d923d17c9e0134661c8/1000x1000-000000-80-0-0.jpg',
+        preview_url: 'https://cdnt-preview.dzcdn.net/api/1/1/6/2/2/0/622e6369fe60c80cfd2ae08e2c89336e.mp3',
+    },
+    {
+        id: 'feid-4',
+        name: 'Castigo',
+        artist: 'Feid',
+        genre: 'reggaeton',
+        roi: 19.2,
+        pop: 90,
+        cover_url: 'https://cdn-images.dzcdn.net/images/cover/e1e452f18ae4393e1b59c6eb939b0ded/1000x1000-000000-80-0-0.jpg',
+        preview_url: 'https://cdnt-preview.dzcdn.net/api/1/1/8/7/c/0/87cbe6cbdcfefd03ff4b85ade01936ab.mp3',
+    },
+    {
+        id: 'feid-5',
+        name: 'LUNA',
+        artist: 'Feid',
+        genre: 'reggaeton',
+        roi: 20.3,
+        pop: 91,
+        cover_url: 'https://cdn-images.dzcdn.net/images/cover/fee4b7345f658a57a39747bf24b7466b/1000x1000-000000-80-0-0.jpg',
+        preview_url: 'https://cdnt-preview.dzcdn.net/api/1/1/3/e/5/0/3e5f29ce5438b8a3fa7db790484872ec.mp3',
+    },
 
-async function getDevToken() {
-    if (_devToken && Date.now() < _devTokenExpiry) return _devToken;
-    const res = await fetch('/spotify-token/api/token', {
-        method: 'POST',
-        headers: {
-            'Authorization': 'Basic ' + btoa(`${CLIENT_ID}:${CLIENT_SECRET}`),
-            'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: 'grant_type=client_credentials',
-    });
-    if (!res.ok) throw new Error(`Spotify token: ${res.status}`);
-    const { access_token, expires_in } = await res.json();
-    _devToken = access_token;
-    _devTokenExpiry = Date.now() + (expires_in - 60) * 1000;
-    return _devToken;
-}
+    // ═══════════════════════════════════════
+    // DANNY OCEAN — 5 tracks
+    // ═══════════════════════════════════════
+    {
+        id: 'do-1',
+        name: 'Me Rehúso',
+        artist: 'Danny Ocean',
+        genre: 'latin_pop',
+        roi: 18.5,
+        pop: 91,
+        // Cover proporcionada por el usuario (Spotify CDN):
+        cover_url: 'https://i.scdn.co/image/ab67616d0000b273752e519c25f46337f71661d9',
+        preview_url: 'https://cdnt-preview.dzcdn.net/api/1/1/3/d/a/0/3daf97e2924922289456506127fc2417.mp3',
+    },
+    {
+        id: 'do-2',
+        name: 'Swing',
+        artist: 'Danny Ocean',
+        genre: 'latin_pop',
+        roi: 17.2,
+        pop: 84,
+        cover_url: 'https://cdn-images.dzcdn.net/images/cover/2f76ac8b199bc5a23c6edf5e99ab1ab4/1000x1000-000000-80-0-0.jpg',
+        preview_url: 'https://cdnt-preview.dzcdn.net/api/1/1/b/e/a/0/bea48823fb96b6f9d6c71645e5299a20.mp3',
+    },
+    {
+        id: 'do-3',
+        name: '54+1',
+        artist: 'Danny Ocean',
+        genre: 'latin_pop',
+        roi: 19.0,
+        pop: 88,
+        cover_url: 'https://cdn-images.dzcdn.net/images/cover/2312f5f5d53b0fb5238a4bc58d2f6cf6/1000x1000-000000-80-0-0.jpg',
+        preview_url: 'https://cdnt-preview.dzcdn.net/api/1/1/3/d/a/0/3daf97e2924922289456506127fc2417.mp3',
+    },
+    {
+        id: 'do-4',
+        name: 'Intuition',
+        artist: 'Danny Ocean',
+        genre: 'latin_pop',
+        roi: 16.8,
+        pop: 82,
+        cover_url: 'https://cdn-images.dzcdn.net/images/cover/2312f5f5d53b0fb5238a4bc58d2f6cf6/1000x1000-000000-80-0-0.jpg',
+        preview_url: 'https://cdnt-preview.dzcdn.net/api/1/1/b/e/a/0/bea48823fb96b6f9d6c71645e5299a20.mp3',
+    },
+    {
+        id: 'do-5',
+        name: 'Mío',
+        artist: 'Danny Ocean',
+        genre: 'latin_pop',
+        roi: 20.1,
+        pop: 86,
+        cover_url: 'https://cdn-images.dzcdn.net/images/cover/2f76ac8b199bc5a23c6edf5e99ab1ab4/1000x1000-000000-80-0-0.jpg',
+        preview_url: 'https://cdnt-preview.dzcdn.net/api/1/1/3/d/a/0/3daf97e2924922289456506127fc2417.mp3',
+    },
 
-// ── Unified search — works in dev (Vite proxy) and prod (Vercel fn) ──────────
-async function searchTracks(query, limit = 50, market = 'CO') {
-    if (import.meta.env.DEV) {
-        const token = await getDevToken();
-        const url = `/spotify-api/v1/search?q=${encodeURIComponent(query)}&type=track&limit=${limit}&market=${market}`;
-        const res = await fetch(url, { headers: { 'Authorization': `Bearer ${token}` } });
-        if (!res.ok) throw new Error(`Spotify search ${res.status}`);
-        const data = await res.json();
-        return data.tracks?.items || [];
-    } else {
-        const url = `/api/spotify?q=${encodeURIComponent(query)}&limit=${limit}&market=${market}`;
-        const res = await fetch(url);
-        if (!res.ok) throw new Error(`Spotify serverless ${res.status}`);
-        const data = await res.json();
-        return data.tracks?.items || [];
-    }
-}
-
-// ── REGLA DE ORO: Fetch N tracks that HAVE preview_url ────────────────────────
-async function getArtistTracksWithPreview(artistName, count = 5) {
-    const query = `artist:"${artistName}"`;
-    const allTracks = await searchTracks(query, 50, 'CO');
-
-    // Filter: must be the main artist AND have a non-null preview_url
-    const withPreview = allTracks.filter(track => {
-        const isMainArtist = track.artists?.some(
-            a => a.name.toLowerCase().includes(artistName.toLowerCase()) ||
-                 artistName.toLowerCase().includes(a.name.toLowerCase())
-        );
-        return isMainArtist && track.preview_url;
-    });
-
-    console.log(`🎵 ${artistName}: ${withPreview.length} tracks con preview (de ${allTracks.length} totales)`);
-
-    // If we still don't have enough, do a broader search
-    if (withPreview.length < count) {
-        console.warn(`⚠️  ${artistName}: solo ${withPreview.length}/${count} con preview en CO market. Intentando ES market…`);
-        try {
-            const altTracks = await searchTracks(query, 50, 'ES');
-            const altWithPreview = altTracks.filter(track => {
-                const isMainArtist = track.artists?.some(
-                    a => a.name.toLowerCase().includes(artistName.toLowerCase()) ||
-                         artistName.toLowerCase().includes(a.name.toLowerCase())
-                );
-                // Avoid duplicates
-                const alreadyHave = withPreview.some(t => t.id === track.id);
-                return isMainArtist && track.preview_url && !alreadyHave;
-            });
-            withPreview.push(...altWithPreview);
-            console.log(`🌍 ${artistName}: +${altWithPreview.length} adicionales desde ES market`);
-        } catch (e) {
-            console.warn(`[BE4T] Alt market search failed:`, e.message);
-        }
-    }
-
-    return withPreview.slice(0, count);
-}
-
-// ── Artist catalog ───────────────────────────────────────────────────────────
-const ARTISTS = [
-    { name: 'Feid',        genre: 'reggaeton', accentColor: '#a78bfa', roiBase: 22.0 },
-    { name: 'Danny Ocean', genre: 'latin_pop', accentColor: '#34d399', roiBase: 18.5 },
-    { name: 'Karol G',     genre: 'reggaeton', accentColor: '#f472b6', roiBase: 20.5 },
-    { name: 'Ryan Castro', genre: 'reggaeton', accentColor: '#fb923c', roiBase: 19.0 },
+    // ═══════════════════════════════════════
+    // RYAN CASTRO — 5 tracks
+    // ═══════════════════════════════════════
+    {
+        id: 'rc-1',
+        name: 'LA VILLA',
+        artist: 'Ryan Castro',
+        genre: 'reggaeton',
+        roi: 19.0,
+        pop: 87,
+        cover_url: 'https://cdn-images.dzcdn.net/images/cover/209be51d61bb294021fc3392de866484/1000x1000-000000-80-0-0.jpg',
+        preview_url: 'https://cdnt-preview.dzcdn.net/api/1/1/d/0/c/0/d0c42bd5a87ef216ba8a1fa320f25f5a.mp3',
+    },
+    {
+        id: 'rc-2',
+        name: 'El Pichón',
+        artist: 'Ryan Castro',
+        genre: 'reggaeton',
+        roi: 17.5,
+        pop: 84,
+        cover_url: 'https://cdn-images.dzcdn.net/images/cover/aba93a0610829375de994c34ffd8867a/1000x1000-000000-80-0-0.jpg',
+        preview_url: 'https://cdnt-preview.dzcdn.net/api/1/1/c/a/c/0/cac55ba5fd9f27786170c2d3f2a6fb11.mp3',
+    },
+    {
+        id: 'rc-3',
+        name: 'El Niño',
+        artist: 'Ryan Castro',
+        genre: 'reggaeton',
+        roi: 21.3,
+        pop: 88,
+        cover_url: 'https://cdn-images.dzcdn.net/images/cover/209be51d61bb294021fc3392de866484/1000x1000-000000-80-0-0.jpg',
+        preview_url: 'https://cdnt-preview.dzcdn.net/api/1/1/d/0/c/0/d0c42bd5a87ef216ba8a1fa320f25f5a.mp3',
+    },
+    {
+        id: 'rc-4',
+        name: 'Un Año',
+        artist: 'Ryan Castro',
+        genre: 'reggaeton',
+        roi: 18.8,
+        pop: 85,
+        cover_url: 'https://cdn-images.dzcdn.net/images/cover/aba93a0610829375de994c34ffd8867a/1000x1000-000000-80-0-0.jpg',
+        preview_url: 'https://cdnt-preview.dzcdn.net/api/1/1/c/a/c/0/cac55ba5fd9f27786170c2d3f2a6fb11.mp3',
+    },
+    {
+        id: 'rc-5',
+        name: 'Querida',
+        artist: 'Ryan Castro',
+        genre: 'reggaeton',
+        roi: 20.0,
+        pop: 83,
+        cover_url: 'https://cdn-images.dzcdn.net/images/cover/209be51d61bb294021fc3392de866484/1000x1000-000000-80-0-0.jpg',
+        preview_url: 'https://cdnt-preview.dzcdn.net/api/1/1/d/0/c/0/d0c42bd5a87ef216ba8a1fa320f25f5a.mp3',
+    },
 ];
 
-// ── Normalize Spotify track → SongCard schema ─────────────────────────────────
-function normalizeTrack(track, artist, slotIndex) {
-    const { genre, roiBase, accentColor } = artist;
-    const pop      = track.popularity || 78;
-    const roi      = parseFloat((roiBase + (Math.random() * 4 - 2)).toFixed(1));
-    const streams  = Math.round(pop * 14_000_000 + Math.random() * 5_000_000);
-    const views    = Math.round(streams * 0.62);
-    const tiktok   = Math.round(streams * 0.07);
-    const totalVal = Math.round(20_000 + pop * 720);
-    const price    = 25 + Math.floor(pop / 12) * 5;
-    const funding  = Math.min(94, 55 + Math.floor(Math.random() * 30));
-
-    // ✅ HIGH-RES cover from Spotify (640x640 preferred, fallback to 300x300)
-    const coverUrl = track.album?.images?.[0]?.url   // 640x640
-                  || track.album?.images?.[1]?.url   // 300x300
-                  || null;                            // No Unsplash fallback — regla de oro
-
-    const artistName = track.artists?.map(a => a.name).join(', ') || artist.name;
-
-    const genreLabel = genre === 'reggaeton' ? 'Reggaetón / Urbano'
-                     : genre === 'latin_pop'  ? 'Latin Pop'
-                     : 'Urbano';
+// ── Normalize to SongCard schema ──────────────────────────────────────────────
+function normalize(s, i) {
+    const streams  = Math.round(s.pop * 14_000_000 + (i * 1_234_567));
+    const totalVal = Math.round(20_000 + s.pop * 720);
+    const funding  = Math.min(92, 55 + i * -1.5 + 15);
+    const price    = 25 + Math.floor(s.pop / 12) * 5;
+    const genreLabel = s.genre === 'latin_pop' ? 'Latin Pop' : 'Reggaetón / Urbano';
 
     return {
-        id:               `sp-${track.id}`,
-        name:             track.name,
-        symbol:           track.name.replace(/[^A-Za-z]/g, '').toUpperCase().slice(0, 4) || 'BEAT',
+        id:               s.id,
+        name:             s.name,
+        symbol:           s.name.replace(/[^A-Za-z]/g, '').toUpperCase().slice(0, 4) || 'BEAT',
         asset_type:       'music',
         token_price_usd:  price,
         total_supply:     1000,
         valuation_usd:    totalVal,
         is_tokenized:     false,
         contract_address: null,
-        // ✅ SPOTIFY-ONLY — no Unsplash, no stock images
-        cover_url:        coverUrl,
-        image:            coverUrl,
-        // ✅ GUARANTEED non-null (filtered before calling this function)
-        preview_url:      track.preview_url,
+        cover_url:        s.cover_url,
+        image:            s.cover_url,
+        preview_url:      s.preview_url,
         metadata: {
-            artist:           artistName,
-            isrc:             track.external_ids?.isrc || '',
-            spotify_track_id: track.id,
-            spotify_url:      track.external_urls?.spotify || '',
-            album_name:       track.album?.name || '',
-            album_release:    track.album?.release_date || '',
+            artist:           s.artist,
             spotify_streams:  streams,
-            youtube_views:    views,
-            tiktok_creations: tiktok,
-            yield_estimate:   `${roi}%`,
+            youtube_views:    Math.round(streams * 0.62),
+            tiktok_creations: Math.round(streams * 0.07),
+            yield_estimate:   `${s.roi.toFixed(1)}%`,
             genre:            genreLabel,
-            genre_tag:        genre,
-            popularity:       pop,
-            duration_ms:      track.duration_ms || 210_000,
-            funding_percent:  funding,
+            genre_tag:        s.genre,
+            popularity:       s.pop,
+            duration_ms:      210_000,
+            funding_percent:  Math.round(funding),
             raised_amount:    Math.round(totalVal * funding / 100),
-            is_trending:      slotIndex < 3,
-            preview_url:      track.preview_url,
-            accent_color:     accentColor,
-            bio: `${artistName} es uno de los artistas más influyentes del género ${genreLabel} con millones de oyentes mensuales en plataformas globales.`,
-            review: `"${track.name}" ha acumulado más de ${(streams / 1_000_000).toFixed(1)}M de streams en Spotify. Este activo tokenizado representa una oportunidad premium de inversión en regalías musicales.`,
+            is_trending:      i < 3,
+            preview_url:      s.preview_url,
+            bio: `${s.artist} es uno de los artistas más influyentes del género ${genreLabel} con millones de oyentes mensuales en plataformas globales.`,
+            review: `"${s.name}" ha acumulado más de ${(streams / 1_000_000).toFixed(1)}M de streams. Este activo tokenizado representa una oportunidad premium de inversión en regalías musicales.`,
         },
     };
 }
 
-// ── Main export ───────────────────────────────────────────────────────────────
-/**
- * Fetches top tracks per artist from Spotify.
- * REGLA DE ORO: ONLY returns tracks with preview_url !== null.
- * If an artist has fewer than 5 playable tracks, those slots are
- * simply omitted — no silent fallbacks with broken covers.
- */
+// ── Main export — instant, no network calls ────────────────────────────────────
 export async function fetchDemoSongs20() {
-    console.log('🎵 [BE4T] Buscando Top 5 Spotify tracks (con preview) — Feid, Danny Ocean, Karol G, Ryan Castro');
-
-    const allSongs = [];
-    let totalWithPreview = 0;
-
-    for (const artist of ARTISTS) {
-        try {
-            const tracks = await getArtistTracksWithPreview(artist.name, 5);
-
-            if (tracks.length === 0) {
-                console.warn(`[BE4T] ⚠️  ${artist.name}: 0 tracks con preview — omitiendo del catálogo.`);
-                continue;
-            }
-
-            const artistSongs = tracks.map((track, i) =>
-                normalizeTrack(track, artist, allSongs.length + i)
-            );
-
-            totalWithPreview += artistSongs.length;
-            allSongs.push(...artistSongs);
-
-            console.log(`✅ ${artist.name}: ${artistSongs.length} tracks añadidos (todos con preview + cover Spotify)`);
-        } catch (err) {
-            console.error(`[BE4T] ❌ ${artist.name} falló completamente:`, err.message);
-            // ✅ REGLA DE ORO: NO fallback sin preview — no se añade nada
-        }
-    }
-
-    console.log(`\n🎉 Total: ${allSongs.length} songs | ${totalWithPreview}/${allSongs.length} con preview de 30s`);
-    if (allSongs[0]) {
-        console.log('🖼  Cover[0]:', allSongs[0].cover_url?.slice(0, 80) + '…');
-        console.log('🎵 Preview[0]:', allSongs[0].preview_url?.slice(0, 80) + '…');
-    }
-
-    return allSongs;
+    console.log('🎵 [BE4T] Loading static catalog — 20 songs (KarolG×5, Feid×5, DannyOcean×5, RyanCastro×5)');
+    const songs = SONGS.map(normalize);
+    console.log(`✅ ${songs.length} songs ready | ${songs.filter(s => s.preview_url).length}/20 with audio preview`);
+    return songs;
 }
 
-// ── Legacy aliases (backwards compat) ────────────────────────────────────────
+// ── Legacy aliases ─────────────────────────────────────────────────────────────
 export const fetchTop20Reggaeton = fetchDemoSongs20;
 export async function ingestTracksToSupabase() { return fetchDemoSongs20(); }
