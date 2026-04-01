@@ -352,37 +352,6 @@ const AssetDetailView = ({ asset, allAssets = [], onBack }) => {
                         )}
                     </div>
 
-                    {/* Verify on Platforms */}
-                    <div style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '12px', padding: '1.25rem' }}>
-                        <h4 style={{ fontSize: '0.82rem', color: 'rgba(255,255,255,0.55)', margin: '0 0 1rem', fontWeight: '500', lineHeight: 1.4 }}>
-                            🎧 Escucha la canción completa o mira el video en:
-                        </h4>
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.75rem' }}>
-                            {[
-                                { icon: <SpotifyIcon size={14} />, label: 'Spotify', bg: 'rgba(29,185,84,0.15)', border: 'rgba(29,185,84,0.3)', color: '#1DB954', url: `https://open.spotify.com/search/${encodeURIComponent(asset.name)}` },
-                                { icon: <YouTubeIcon size={14} />, label: 'YouTube', bg: 'rgba(255,0,0,0.12)', border: 'rgba(255,0,0,0.3)', color: '#FF4444', url: `https://youtube.com/results?search_query=${encodeURIComponent(asset.name + ' ' + (meta.artist || ''))}` },
-                                { icon: <TikTokIcon size={14} />, label: 'TikTok', bg: 'rgba(45,212,191,0.1)', border: 'rgba(45,212,191,0.3)', color: '#2DD4BF', url: `https://tiktok.com/search?q=${encodeURIComponent(asset.name)}` },
-                            ].map(p => (
-                                <a
-                                    key={p.label}
-                                    href={p.url} target="_blank" rel="noreferrer"
-                                    style={{
-                                        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem',
-                                        padding: '0.65rem',
-                                        background: p.bg, border: `1px solid ${p.border}`,
-                                        borderRadius: '10px', color: p.color,
-                                        fontWeight: '600', fontSize: '0.85rem',
-                                        textDecoration: 'none', transition: 'all 0.2s ease',
-                                    }}
-                                    onMouseOver={e => e.currentTarget.style.opacity = '0.8'}
-                                    onMouseOut={e => e.currentTarget.style.opacity = '1'}
-                                >
-                                    {p.icon} {p.label}
-                                </a>
-                            ))}
-                        </div>
-                    </div>
-
                     {/* ── Streaming Metrics ── */}
                     <div style={{
                         background: 'rgba(255,255,255,0.03)',
@@ -572,6 +541,36 @@ const AssetDetailView = ({ asset, allAssets = [], onBack }) => {
                             </div>
                         </div>
                     )}
+
+                    {/* ── Listen on Platforms (deprioritized) ── */}
+                    <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '12px', padding: '1.1rem' }}>
+                        <h4 style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.35)', margin: '0 0 0.85rem', fontWeight: '500', letterSpacing: '0.5px' }}>
+                            🎧 Escucha la canción completa o mira el video en:
+                        </h4>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.6rem' }}>
+                            {[
+                                { icon: <SpotifyIcon size={13} />, label: 'Spotify', bg: 'rgba(29,185,84,0.1)', border: 'rgba(29,185,84,0.2)', color: '#1DB954', url: `https://open.spotify.com/search/${encodeURIComponent(asset.name)}` },
+                                { icon: <YouTubeIcon size={13} />, label: 'YouTube', bg: 'rgba(255,0,0,0.08)', border: 'rgba(255,0,0,0.2)', color: '#FF4444', url: `https://youtube.com/results?search_query=${encodeURIComponent(asset.name + ' ' + (meta.artist || ''))}` },
+                                { icon: <TikTokIcon size={13} />, label: 'TikTok', bg: 'rgba(45,212,191,0.07)', border: 'rgba(45,212,191,0.2)', color: '#2DD4BF', url: `https://tiktok.com/search?q=${encodeURIComponent(asset.name)}` },
+                            ].map(p => (
+                                <a key={p.label} href={p.url} target="_blank" rel="noreferrer"
+                                    style={{
+                                        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.35rem',
+                                        padding: '0.55rem',
+                                        background: p.bg, border: `1px solid ${p.border}`,
+                                        borderRadius: '8px', color: p.color,
+                                        fontWeight: '500', fontSize: '0.8rem',
+                                        textDecoration: 'none', transition: 'opacity 0.2s ease',
+                                        opacity: 0.8,
+                                    }}
+                                    onMouseOver={e => e.currentTarget.style.opacity = '1'}
+                                    onMouseOut={e => e.currentTarget.style.opacity = '0.8'}
+                                >
+                                    {p.icon} {p.label}
+                                </a>
+                            ))}
+                        </div>
+                    </div>
 
                     {/* Related songs */}
                     {relatedSongs.length > 0 && (
