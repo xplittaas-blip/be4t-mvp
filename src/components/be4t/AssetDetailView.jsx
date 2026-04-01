@@ -194,6 +194,21 @@ const AssetDetailView = ({ asset, allAssets = [], onBack }) => {
         return () => { audioRef.current?.pause(); };
     }, []);
 
+    // ── Mobile detection ────────────────────────────────────────────────────
+    const [isMobile, setIsMobile] = useState(() => window.innerWidth < 768);
+    useEffect(() => {
+        const onResize = () => setIsMobile(window.innerWidth < 768);
+        window.addEventListener('resize', onResize);
+        return () => window.removeEventListener('resize', onResize);
+    }, []);
+
+    // ── Mobile CTA state ────────────────────────────────────────────────────
+    const [ctaAmount, setCtaAmount] = useState(50);
+    const ctaPresets = [50, 100, 250, 500];
+    const totalValForCta = asset.valuation_usd || (asset.token_price_usd * asset.total_supply) || 25000;
+    const ctaOwnership = ((ctaAmount / totalValForCta) * 100).toFixed(3);
+    const ctaRoi = meta.yield_estimate || '~19%';
+
     // Related songs (exclude current)
     const relatedSongs = allAssets.filter(a => a.id !== asset.id).slice(0, 3);
 
@@ -291,9 +306,9 @@ const AssetDetailView = ({ asset, allAssets = [], onBack }) => {
                 className="be4t-detail-outer"
                 style={{
                     maxWidth: '1100px', margin: '0 auto',
-                    padding: '0 1.5rem 4rem',
+                    padding: isMobile ? '0 0.75rem 4rem' : '0 1.5rem 4rem',
                     display: 'grid',
-                    gridTemplateColumns: '1fr 420px',
+                    gridTemplateColumns: isMobile ? '1fr' : '1fr 420px',
                     gap: '2rem',
                     alignItems: 'start',
                 }}
@@ -438,6 +453,96 @@ const AssetDetailView = ({ asset, allAssets = [], onBack }) => {
                         </div>
                     </div>
 
+                    {/* ── MOBILE HERO CTA — shows only on mobile, right after metrics ── */}
+                    {isMobile && (
+                        <div style={{
+                            background: 'linear-gradient(135deg, rgba(124,58,237,0.12), rgba(6,182,212,0.08))',
+                            border: '1px solid rgba(139,92,246,0.35)',
+                            borderRadius: '16px',
+                            padding: '1.25rem',
+                            display: 'flex', flexDirection: 'column', gap: '1rem',
+                        }}>
+                            {/* Header */}
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                <span style={{ fontSize: '1.1rem' }}>🧮</span>
+                                <span style={{ fontWeight: '700', fontSize: '0.95rem' }}>Calculadora de Retorno</span>
+                            </div>
+
+                            {/* Amount display */}
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <span style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.85rem' }}>Monto a Invertir</span>
+                                <span style={{ fontSize: '1.6rem', fontWeight: '800' }}>
+                                    ${ctaAmount.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                                </span>
+                            </div>
+
+                            {/* Slider */}
+                            <input
+                                type="range" min={10} max={5000} step={10}
+                                value={ctaAmount}
+                                onChange={e => setCtaAmount(Number(e.target.value))}
+                                style={{ width: '100%', accentColor: '#7c3aed', cursor: 'pointer', height: '6px' }}
+                            />
+
+                            {/* Preset chips */}
+                            <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                {ctaPresets.map(p => (
+                                    <button key={p} onClick={() => setCtaAmount(p)}
+                                        style={{
+                                            flex: 1, padding: '0.55rem 0', borderRadius: '8px', minHeight: '44px',
+                                            border: ctaAmount === p ? '1px solid rgba(139,92,246,0.7)' : '1px solid rgba(255,255,255,0.12)',
+                                            background: ctaAmount === p ? 'rgba(139,92,246,0.25)' : 'rgba(255,255,255,0.05)',
+                                            color: ctaAmount === p ? '#c4b5fd' : 'rgba(255,255,255,0.5)',
+                                            fontWeight: ctaAmount === p ? '700' : '400',
+                                            fontSize: '0.88rem', cursor: 'pointer',
+                                        }}>${p}</button>
+                                ))}
+                            </div>
+
+                            {/* Key metric row */}
+                            <div style={{
+                                display: 'flex', justifyContent: 'space-between',
+                                background: 'rgba(255,255,255,0.04)', borderRadius: '10px', padding: '0.75rem 1rem',
+                            }}>
+                                <div style={{ textAlign: 'center' }}>
+                                    <div style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '1px' }}>Tu participación</div>
+                                    <div style={{ fontSize: '1.1rem', fontWeight: '800', color: '#c4b5fd' }}>{ctaOwnership}%</div>
+                                </div>
+                                <div style={{ width: '1px', background: 'rgba(255,255,255,0.08)' }} />
+                                <div style={{ textAlign: 'center' }}>
+                                    <div style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '1px' }}>ROI Estimado</div>
+                                    <div style={{ fontSize: '1.1rem', fontWeight: '800', color: '#22c55e' }}>↗ {ctaRoi}</div>
+                                </div>
+                                <div style={{ width: '1px', background: 'rgba(255,255,255,0.08)' }} />
+                                <div style={{ textAlign: 'center' }}>
+                                    <div style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '1px' }}>Regalías</div>
+                                    <div style={{ fontSize: '1.1rem', fontWeight: '800', color: 'white' }}>8%</div>
+                                </div>
+                            </div>
+
+                            {/* THE BIG CTA BUTTON */}
+                            <button
+                                onClick={() => alert(`💸 Confirmando inversión de $${ctaAmount.toLocaleString()} en "${asset.name}"\n\nParticipación: ${ctaOwnership}%\nROI estimado: ${ctaRoi}\n\n✅ En producción, aquí se conectará tu wallet.`)}
+                                style={{
+                                    width: '100%', padding: '1.1rem', minHeight: '56px',
+                                    background: 'linear-gradient(135deg, #7c3aed 0%, #a855f7 50%, #06b6d4 100%)',
+                                    border: 'none', borderRadius: '14px',
+                                    color: 'white', fontWeight: '900', fontSize: '1.1rem',
+                                    cursor: 'pointer', letterSpacing: '-0.01em',
+                                    boxShadow: '0 4px 24px rgba(139,92,246,0.4), 0 0 0 1px rgba(139,92,246,0.3)',
+                                    transition: 'transform 0.15s ease, box-shadow 0.15s ease',
+                                }}
+                                onMouseOver={e => { e.currentTarget.style.transform = 'scale(1.01)'; e.currentTarget.style.boxShadow = '0 6px 32px rgba(139,92,246,0.6)'; }}
+                                onMouseOut={e => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.boxShadow = '0 4px 24px rgba(139,92,246,0.4)'; }}
+                            >
+                                💸 Invertir ${ctaAmount.toLocaleString()} en "{asset.name}"
+                            </button>
+                            <p style={{ textAlign: 'center', fontSize: '0.7rem', color: 'rgba(255,255,255,0.3)', margin: 0 }}>
+                                Al invertir aceptas los términos y condiciones de BE4T
+                            </p>
+                        </div>
+                    )}
+
                     {/* About the song */}
                     {meta.review && (
                         <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '12px', padding: '1.25rem' }}>
@@ -500,10 +605,12 @@ const AssetDetailView = ({ asset, allAssets = [], onBack }) => {
                     )}
                 </div>
 
-                {/* ─── RIGHT COLUMN: Calculator ─── */}
-                <div className="be4t-detail-sticky" style={{ position: 'sticky', top: '80px' }}>
-                    <RoyaltyCalculator asset={asset} />
-                </div>
+                {/* ─── RIGHT COLUMN: Calculator (desktop only) ─── */}
+                {!isMobile && (
+                    <div className="be4t-detail-sticky" style={{ position: 'sticky', top: '80px' }}>
+                        <RoyaltyCalculator asset={asset} />
+                    </div>
+                )}
             </div>
         </div>
     );
