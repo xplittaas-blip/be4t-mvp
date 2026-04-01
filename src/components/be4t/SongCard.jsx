@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { audioManager } from '../../services/audioManager';
+import { fetchPreviewUrl } from '../../services/previewService';
 
 // ── Format helpers ────────────────────────────────────────────────────────────
 const fmt = (n) => {
@@ -98,7 +99,9 @@ export const SongCardSkeleton = () => (
 const SongCard = ({ song, userMode, index = 0, onDetailClick }) => {
     const [hovered, setHovered]     = useState(false);
     const [isPlaying, setIsPlaying] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
     const audioRef = useRef(null);
+    const previewRef = useRef(song.preview_url || null);
 
     // Cleanup on unmount or song change
     useEffect(() => {
@@ -106,31 +109,51 @@ const SongCard = ({ song, userMode, index = 0, onDetailClick }) => {
             audioManager.stop(audioRef.current);
             audioRef.current = null;
         }
+        previewRef.current = song.preview_url || null;
         setIsPlaying(false);
+        setIsLoading(false);
     }, [song.id]);
 
     useEffect(() => () => {
         if (audioRef.current) audioManager.stop(audioRef.current);
     }, []);
 
-    const handlePlayClick = useCallback((e) => {
+    const deezerId = song.deezer_id || song._raw?.metadata?.deezer_id;
+    const hasAudio = !!(deezerId || song.preview_url);
+
+    const handlePlayClick = useCallback(async (e) => {
         e.stopPropagation();
         e.preventDefault();
-        if (!song.preview_url) return;
+        if (!hasAudio) return;
 
         if (isPlaying && audioRef.current) {
             audioManager.stop(audioRef.current);
             audioRef.current = null;
             setIsPlaying(false);
-        } else {
-            const audio = audioManager.play(song.preview_url, () => {
-                audioRef.current = null;
-                setIsPlaying(false);
-            });
-            audioRef.current = audio;
-            setIsPlaying(true);
+            return;
         }
-    }, [isPlaying, song.preview_url]);
+
+        // Get preview URL (cached after first fetch)
+        let previewUrl = previewRef.current;
+        if (!previewUrl && deezerId) {
+            setIsLoading(true);
+            previewUrl = await fetchPreviewUrl(deezerId);
+            previewRef.current = previewUrl;
+            setIsLoading(false);
+        }
+
+        if (!previewUrl) {
+            console.warn('[SongCard] No preview URL available for:', song.title);
+            return;
+        }
+
+        const audio = audioManager.play(previewUrl, () => {
+            audioRef.current = null;
+            setIsPlaying(false);
+        });
+        audioRef.current = audio;
+        setIsPlaying(true);
+    }, [isPlaying, hasAudio, deezerId, song.title]);
 
     const isRWA = song.asset_type === 'RWA' || song.asset_type === 'custom';
     const badgeColor = isRWA
@@ -141,8 +164,6 @@ const SongCard = ({ song, userMode, index = 0, onDetailClick }) => {
     const coverBg = song.cover_url
         ? `url("${song.cover_url}")`
         : 'linear-gradient(135deg, #1a0533 0%, #0a0a1a 100%)';
-
-    const hasPreview = Boolean(song.preview_url);
 
     return (
         <div
@@ -176,7 +197,6 @@ const SongCard = ({ song, userMode, index = 0, onDetailClick }) => {
                     backgroundPosition: 'center',
                     backgroundRepeat: 'no-repeat',
                     backgroundColor: '#0a0a14',
-                    // Zoom on hover via transform on the pseudo-div below
                 }}
             >
                 {/* Zoom layer */}
@@ -239,20 +259,22 @@ const SongCard = ({ song, userMode, index = 0, onDetailClick }) => {
                 )}
 
                 {/* ── BE4T NEON PLAY / PAUSE BUTTON — center overlay ── */}
-                {hasPreview ? (
+                {hasAudio ? (
                     <button
                         id={`play-btn-${song.id}`}
                         onClick={handlePlayClick}
-                        title={isPlaying ? 'Pausar preview' : 'Escuchar 30s — Spotify Preview'}
+                        title={isPlaying ? 'Pausar preview' : 'Escuchar 30s'}
                         style={{
                             position: 'absolute',
                             top: '50%', left: '50%',
                             zIndex: 10,
-                            transform: `translate(-50%, -50%) scale(${hovered || isPlaying ? 1 : 0.6})`,
+                            transform: `translate(-50%, -50%) scale(${hovered || isPlaying || isLoading ? 1 : 0.6})`,
                             width: '76px', height: '76px',
                             borderRadius: '50%',
                             background: isPlaying
                                 ? 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)'
+                                : isLoading
+                                ? 'linear-gradient(135deg, #6d28d9 0%, #0891b2 100%)'
                                 : 'linear-gradient(135deg, #7c3aed 0%, #06b6d4 100%)',
                             border: 'none',
                             boxShadow: isPlaying
@@ -260,24 +282,26 @@ const SongCard = ({ song, userMode, index = 0, onDetailClick }) => {
                                 : '0 0 0 4px rgba(139,92,246,0.3), 0 0 32px rgba(34,211,238,0.5), 0 6px 24px rgba(0,0,0,0.6)',
                             backdropFilter: 'blur(10px)',
                             color: 'white',
-                            cursor: 'pointer',
+                            cursor: isLoading ? 'wait' : 'pointer',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            opacity: hovered || isPlaying ? 1 : 0,
+                            opacity: hovered || isPlaying || isLoading ? 1 : 0,
                             transition: 'all 0.32s cubic-bezier(0.34, 1.56, 0.64, 1)',
                         }}
-                        onMouseOver={e => { e.currentTarget.style.transform = 'translate(-50%, -50%) scale(1.12)'; }}
-                        onMouseOut={e => { e.currentTarget.style.transform = `translate(-50%, -50%) scale(${hovered || isPlaying ? 1 : 0.6})`; }}
+                        onMouseOver={e => { if (!isLoading) e.currentTarget.style.transform = 'translate(-50%, -50%) scale(1.12)'; }}
+                        onMouseOut={e => { e.currentTarget.style.transform = `translate(-50%, -50%) scale(${hovered || isPlaying || isLoading ? 1 : 0.6})`; }}
                     >
-                        {isPlaying ? (
-                            // Pause icon
+                        {isLoading ? (
+                            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" style={{ animation: 'spin 0.8s linear infinite' }}>
+                                <path d="M12 2a10 10 0 0 1 10 10" />
+                            </svg>
+                        ) : isPlaying ? (
                             <svg width="26" height="26" viewBox="0 0 24 24" fill="white">
                                 <rect x="5" y="3" width="4.5" height="18" rx="2"/>
                                 <rect x="14.5" y="3" width="4.5" height="18" rx="2"/>
                             </svg>
                         ) : (
-                            // Play icon (offset right for optical center)
                             <svg width="26" height="26" viewBox="0 0 24 24" fill="white" style={{ marginLeft: '4px' }}>
                                 <polygon points="5,2 21,12 5,22"/>
                             </svg>
