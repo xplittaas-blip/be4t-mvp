@@ -146,33 +146,9 @@ const HeroBanner = ({ userMode, onNavigate }) => {
                     <span style={{ color: '#a855f7' }}>que amas</span>
                 </h1>
 
-                <p style={{ color: 'rgba(255,255,255,0.55)', fontSize: '1rem', lineHeight: 1.65, maxWidth: '440px', marginBottom: '2rem' }}>
-                    Compra participación en canciones reales y recibe regalías por streaming. Sin cripto, sin complicaciones.
+                <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '0.97rem', lineHeight: 1.75, maxWidth: '520px', marginBottom: '0' }}>
+                    Todo comienza con la tokenización de activos musicales: integramos el valor de la música en la blockchain para empoderar a artistas, sellos discográficos y agentes autónomos. Optimizamos procesos operativos y desbloqueamos flujos de ingresos antes inaccesibles a través de la propiedad digital fraccionada.
                 </p>
-
-                <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-                    <button style={{
-                        padding: '0.8rem 1.75rem',
-                        background: 'linear-gradient(135deg, #7c3aed, #a855f7)',
-                        border: 'none', borderRadius: '12px',
-                        color: 'white', fontWeight: '700', fontSize: '0.95rem', cursor: 'pointer',
-                        display: 'flex', alignItems: 'center', gap: '0.5rem',
-                    }}>
-                        Explorar Canciones →
-                    </button>
-                    <button
-                        onClick={() => onNavigate && onNavigate('como-funciona')}
-                        style={{
-                            padding: '0.8rem 1.5rem',
-                            background: 'transparent',
-                            border: '1px solid rgba(255,255,255,0.2)',
-                            borderRadius: '12px',
-                            color: 'rgba(255,255,255,0.8)', fontWeight: '500', fontSize: '0.95rem', cursor: 'pointer',
-                        }}
-                    >
-                        ¿Cómo funciona?
-                    </button>
-                </div>
             </div>
         </div>
     );

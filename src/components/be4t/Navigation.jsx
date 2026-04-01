@@ -62,7 +62,7 @@ const Navigation = ({ currentPage, setCurrentPage, session, onLoginClick }) => {
         { id: 'explore',       label: '↗ Explorar',       emoji: '🎵', description: 'Top 20 Artistas' },
         { id: 'mis-canciones', label: '♫ Mis Canciones',  emoji: '🎶', description: 'Tu portafolio' },
         { id: 'disqueras',     label: '⊞ Para Disqueras', emoji: '🏢', description: 'B2B Institucional' },
-        { id: 'how-it-works',  label: '❓ Cómo Funciona', emoji: '💡', description: 'Aprende más' },
+        { id: 'como-funciona', label: '❓ Cómo Funciona', emoji: '💡', description: 'Aprende más' },
     ];
 
     const navigate = (id) => { setCurrentPage(id); setMobileOpen(false); };
