@@ -336,7 +336,9 @@ const AssetDetailView = ({ asset, allAssets = [], onBack }) => {
 
                     {/* Verify on Platforms */}
                     <div style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '12px', padding: '1.25rem' }}>
-                        <h4 style={{ fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '2px', color: 'rgba(255,255,255,0.4)', margin: '0 0 1rem' }}>VERIFICAR EN PLATAFORMAS</h4>
+                        <h4 style={{ fontSize: '0.82rem', color: 'rgba(255,255,255,0.55)', margin: '0 0 1rem', fontWeight: '500', lineHeight: 1.4 }}>
+                            🎧 Escucha la canción completa o mira el video en:
+                        </h4>
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.75rem' }}>
                             {[
                                 { icon: <SpotifyIcon size={14} />, label: 'Spotify', bg: 'rgba(29,185,84,0.15)', border: 'rgba(29,185,84,0.3)', color: '#1DB954', url: `https://open.spotify.com/search/${encodeURIComponent(asset.name)}` },
