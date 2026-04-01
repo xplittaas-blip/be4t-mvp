@@ -363,6 +363,76 @@ const AssetDetailView = ({ asset, allAssets = [], onBack }) => {
                         </div>
                     </div>
 
+                    {/* ── Streaming Metrics ── */}
+                    <div style={{
+                        background: 'rgba(255,255,255,0.03)',
+                        border: '1px solid rgba(255,255,255,0.07)',
+                        borderRadius: '12px',
+                        padding: '1.25rem',
+                    }}>
+                        <h4 style={{ fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '2px', color: 'rgba(255,255,255,0.4)', margin: '0 0 1.1rem' }}>
+                            MÉTRICAS DE PLATAFORMAS
+                        </h4>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1rem' }}>
+                            {/* Spotify Streams */}
+                            <div style={{
+                                background: 'rgba(29,185,84,0.07)',
+                                border: '1px solid rgba(29,185,84,0.2)',
+                                borderRadius: '10px', padding: '1rem',
+                                display: 'flex', flexDirection: 'column', gap: '0.4rem',
+                            }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                                    <SpotifyIcon size={13} />
+                                    <span style={{ fontSize: '0.62rem', fontWeight: '700', color: '#1DB954', textTransform: 'uppercase', letterSpacing: '1px' }}>
+                                        STREAMS
+                                    </span>
+                                </div>
+                                <div style={{ fontSize: '1.6rem', fontWeight: '800', letterSpacing: '-0.03em', lineHeight: 1 }}>
+                                    {fmt(meta.spotify_streams)}
+                                </div>
+                                <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.3)' }}>en Spotify</div>
+                            </div>
+
+                            {/* YouTube Views */}
+                            <div style={{
+                                background: 'rgba(255,0,0,0.07)',
+                                border: '1px solid rgba(255,0,0,0.2)',
+                                borderRadius: '10px', padding: '1rem',
+                                display: 'flex', flexDirection: 'column', gap: '0.4rem',
+                            }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                                    <YouTubeIcon size={13} />
+                                    <span style={{ fontSize: '0.62rem', fontWeight: '700', color: '#FF4444', textTransform: 'uppercase', letterSpacing: '1px' }}>
+                                        VIEWS
+                                    </span>
+                                </div>
+                                <div style={{ fontSize: '1.6rem', fontWeight: '800', letterSpacing: '-0.03em', lineHeight: 1 }}>
+                                    {fmt(meta.youtube_views)}
+                                </div>
+                                <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.3)' }}>en YouTube</div>
+                            </div>
+
+                            {/* TikTok Creations */}
+                            <div style={{
+                                background: 'rgba(45,212,191,0.07)',
+                                border: '1px solid rgba(45,212,191,0.2)',
+                                borderRadius: '10px', padding: '1rem',
+                                display: 'flex', flexDirection: 'column', gap: '0.4rem',
+                            }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                                    <TikTokIcon size={13} />
+                                    <span style={{ fontSize: '0.62rem', fontWeight: '700', color: '#2DD4BF', textTransform: 'uppercase', letterSpacing: '1px' }}>
+                                        CREACIONES
+                                    </span>
+                                </div>
+                                <div style={{ fontSize: '1.6rem', fontWeight: '800', letterSpacing: '-0.03em', lineHeight: 1 }}>
+                                    {fmt(meta.tiktok_creations)}
+                                </div>
+                                <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.3)' }}>en TikTok</div>
+                            </div>
+                        </div>
+                    </div>
+
                     {/* About the song */}
                     {meta.review && (
                         <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '12px', padding: '1.25rem' }}>
