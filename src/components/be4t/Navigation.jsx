@@ -1,18 +1,25 @@
 import React, { useState, useEffect } from 'react';
 
-// ── BE4T Logo ─────────────────────────────────────────────────────────────────
-const BE4TLogo = () => (
-    <div style={{
-        width: '34px', height: '34px', flexShrink: 0,
-        background: 'linear-gradient(135deg, #7c3aed 0%, #a855f7 50%, #06b6d4 100%)',
-        borderRadius: '10px',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        boxShadow: '0 0 12px rgba(168,85,247,0.4)',
-    }}>
-        <svg width="19" height="19" viewBox="0 0 24 24" fill="none">
-            <path d="M9 18V5l12-2v13M9 18a3 3 0 1 1-6 0 3 3 0 0 1 6 0zM21 16a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"
-                stroke="white" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
+// ── BE4T Brand Logo (uses /public/be4t-logo.svg) ────────────────────────────
+const BE4TWordmark = ({ onClick }) => (
+    <div
+        onClick={onClick}
+        title="BE4T — Inicio"
+        style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', flexShrink: 0, userSelect: 'none' }}
+    >
+        <img
+            src="/be4t-logo.svg"
+            alt="BE4T"
+            style={{ height: '30px', width: 'auto', display: 'block' }}
+            onError={e => { e.currentTarget.style.display = 'none'; e.currentTarget.nextSibling.style.display = 'flex'; }}
+        />
+        {/* Fallback text if SVG fails */}
+        <span style={{
+            display: 'none', alignItems: 'center', gap: '0.4rem',
+            fontWeight: '900', fontSize: '1.2rem', letterSpacing: '-0.04em',
+            background: 'linear-gradient(90deg, #00D4FF, #9B5CF5)',
+            WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
+        }}>BE4T</span>
     </div>
 );
 
@@ -139,17 +146,8 @@ const Navigation = ({ currentPage, setCurrentPage, session, onLoginClick }) => {
                     display: 'flex', alignItems: 'center',
                     height: '62px', gap: '0.75rem',
                 }}>
-                    {/* Logo */}
-                    <div onClick={() => navigate('explore')}
-                        style={{ display: 'flex', alignItems: 'center', gap: '0.55rem', cursor: 'pointer', flexShrink: 0 }}>
-                        <BE4TLogo />
-                        <span style={{
-                            fontWeight: '900', fontSize: '1.15rem',
-                            letterSpacing: '-0.04em',
-                            background: 'linear-gradient(135deg, #ffffff 30%, #c4b5fd 100%)',
-                            WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
-                        }}>BE4T</span>
-                    </div>
+                    {/* Logo — click goes home */}
+                    <BE4TWordmark onClick={() => navigate('explore')} />
 
                     {/* Desktop nav links */}
                     <div className="be4t-nav-links" style={{
@@ -263,14 +261,7 @@ const Navigation = ({ currentPage, setCurrentPage, session, onLoginClick }) => {
                     borderBottom: '1px solid rgba(255,255,255,0.07)',
                     display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.55rem' }}>
-                        <BE4TLogo />
-                        <span style={{
-                            fontWeight: '900', fontSize: '1.15rem', letterSpacing: '-0.04em',
-                            background: 'linear-gradient(135deg, #ffffff 30%, #c4b5fd 100%)',
-                            WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
-                        }}>BE4T</span>
-                    </div>
+                    <BE4TWordmark onClick={() => navigate('explore')} />
                     <button onClick={() => setMobileOpen(false)}
                         style={{
                             width: '36px', height: '36px', borderRadius: '8px',
