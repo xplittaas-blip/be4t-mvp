@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import WalletFundingModal from './WalletFundingModal';
+
 
 // ── BE4T Brand Logo (uses /public/be4t-logo.svg) ────────────────────────────
 const BE4TWordmark = ({ onClick }) => (
@@ -51,6 +53,7 @@ const HamburgerIcon = ({ open }) => (
 
 const Navigation = ({ currentPage, setCurrentPage, session, onLoginClick }) => {
     const [mobileOpen, setMobileOpen] = useState(false);
+    const [walletOpen, setWalletOpen] = useState(false);
 
     // Close menu on page change or resize to desktop
     useEffect(() => {
@@ -181,9 +184,9 @@ const Navigation = ({ currentPage, setCurrentPage, session, onLoginClick }) => {
 
                     {/* Right actions */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexShrink: 0 }}>
-                        {/* Wallet button */}
+                        {/* Wallet button — opens Hybrid Funding Modal */}
                         <button
-                            onClick={() => alert('🔗 Wallet connection coming soon!\n\nCompatible con:\n• MetaMask\n• WalletConnect\n• Coinbase Wallet')}
+                            onClick={() => setWalletOpen(true)}
                             style={{
                                 display: 'flex', alignItems: 'center', gap: '0.45rem',
                                 padding: '0.5rem 1rem',
@@ -306,7 +309,7 @@ const Navigation = ({ currentPage, setCurrentPage, session, onLoginClick }) => {
                 {/* Bottom actions */}
                 <div style={{ marginTop: 'auto', padding: '1rem 1rem 2rem', borderTop: '1px solid rgba(255,255,255,0.06)', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                     <button
-                        onClick={() => alert('🔗 Wallet connection coming soon!')}
+                        onClick={() => { setWalletOpen(true); setMobileOpen(false); }}
                         style={{
                             display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.6rem',
                             padding: '0.85rem', minHeight: '52px',
@@ -329,6 +332,7 @@ const Navigation = ({ currentPage, setCurrentPage, session, onLoginClick }) => {
                     )}
                 </div>
             </div>
+            <WalletFundingModal isOpen={walletOpen} onClose={() => setWalletOpen(false)} />
         </>
     );
 };
