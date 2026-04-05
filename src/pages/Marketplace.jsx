@@ -3,6 +3,7 @@ import HeroBanner from '../components/be4t/HeroBanner';
 import SongCard, { normalizeSong, SongCardSkeleton } from '../components/be4t/SongCard';
 import AssetDetailView from '../components/be4t/AssetDetailView';
 import TokenizationModal from '../components/be4t/TokenizationModal';
+import EarlyAccessModal from '../components/be4t/EarlyAccessModal';
 import { fetchDemoSongs20 } from '../services/spotifyService';
 import './Marketplace.css';
 
@@ -112,6 +113,143 @@ const globalStyles = `
     }
 `;
 
+// ── Social proof avatars ───────────────────────────────────────────────────────
+const AVATARS = [
+    'https://i.pravatar.cc/40?img=1','https://i.pravatar.cc/40?img=5',
+    'https://i.pravatar.cc/40?img=11','https://i.pravatar.cc/40?img=20','https://i.pravatar.cc/40?img=44',
+];
+
+// ── WaitlistBanner ────────────────────────────────────────────────────────────
+const WaitlistBanner = ({ onOpenModal }) => {
+    const [hov, setHov] = useState(false);
+    return (
+        <div style={{
+            margin: '1.25rem 1.5rem 0',
+            padding: '1.5rem 2rem',
+            borderRadius: '20px',
+            background: 'linear-gradient(135deg, rgba(124,58,237,0.12) 0%, rgba(6,182,212,0.08) 100%)',
+            border: '1px solid rgba(139,92,246,0.25)',
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            flexWrap: 'wrap', gap: '1.25rem',
+            position: 'relative', overflow: 'hidden',
+        }}>
+            <style>{`
+                @keyframes be4t-wl-pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.6;transform:scale(1.2)} }
+                .be4t-wl-btn:hover { transform: scale(1.03) translateY(-1px) !important; box-shadow: 0 6px 32px rgba(124,58,237,0.6) !important; }
+                @media(max-width:600px){ .be4t-wl-btn{ width:100% !important; } }
+            `}</style>
+            {/* Glow bg */}
+            <div style={{ position:'absolute', top:'-40%', right:'-5%', width:'280px', height:'280px', borderRadius:'50%', background:'radial-gradient(circle, rgba(139,92,246,0.15) 0%, transparent 70%)', pointerEvents:'none' }} />
+
+            {/* Copy */}
+            <div style={{ flex:'1 1 260px', minWidth:0, position:'relative' }}>
+                <div style={{ display:'inline-flex', alignItems:'center', gap:'0.45rem', marginBottom:'0.55rem' }}>
+                    <span style={{ display:'inline-block', width:'8px', height:'8px', borderRadius:'50%', background:'#22c55e', boxShadow:'0 0 8px #22c55e', animation:'be4t-wl-pulse 1.5s ease-in-out infinite' }} />
+                    <span style={{ fontSize:'0.62rem', fontWeight:'700', color:'#4ade80', textTransform:'uppercase', letterSpacing:'1.5px' }}>
+                        Beta Cerrada — Cupos Limitados
+                    </span>
+                </div>
+                <h3 style={{ margin:'0 0 0.35rem', fontFamily:"'Inter Tight','Inter',sans-serif", fontWeight:'900', fontSize:'clamp(1.05rem,3vw,1.3rem)', background:'linear-gradient(90deg,#ffffff 40%,#c4b5fd)', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', letterSpacing:'-0.03em' }}>
+                    Sé el primero en saber cuándo abrimos.
+                </h3>
+                <p style={{ margin:0, color:'rgba(255,255,255,0.5)', fontSize:'0.83rem', lineHeight:1.55 }}>
+                    Invierte en hits antes de ser mainstream — acceso prioritario para los primeros inscritos.
+                </p>
+                {/* Social proof */}
+                <div style={{ display:'flex', alignItems:'center', gap:'0.75rem', marginTop:'0.8rem' }}>
+                    <div style={{ display:'flex' }}>
+                        {AVATARS.map((src,i) => (
+                            <img key={i} src={src} alt="" width={26} height={26}
+                                style={{ borderRadius:'50%', border:'2px solid #0f1117', marginLeft:i===0?0:'-8px', objectFit:'cover' }}
+                                onError={e => { e.target.style.display='none'; }}
+                            />
+                        ))}
+                    </div>
+                    <span style={{ fontSize:'0.76rem', color:'rgba(255,255,255,0.4)' }}>
+                        <strong style={{ color:'#c4b5fd' }}>+137 personas</strong> ya están en la lista
+                    </span>
+                </div>
+            </div>
+
+            {/* CTA */}
+            <button
+                className="be4t-wl-btn"
+                onClick={onOpenModal}
+                onMouseEnter={() => setHov(true)}
+                onMouseLeave={() => setHov(false)}
+                style={{
+                    flexShrink:0, padding:'0.9rem 1.75rem', minHeight:'52px',
+                    background:'linear-gradient(135deg,#7c3aed,#a855f7,#06b6d4)',
+                    border:'none', borderRadius:'14px',
+                    color:'white', fontWeight:'900', fontSize:'0.98rem',
+                    cursor:'pointer', letterSpacing:'-0.01em',
+                    boxShadow:'0 4px 24px rgba(124,58,237,0.4)',
+                    transform:'scale(1)', transition:'all 0.2s ease',
+                    whiteSpace:'nowrap',
+                }}
+            >
+                🚀 Unirme a la lista de espera
+            </button>
+        </div>
+    );
+};
+
+// ── StickyWaitlistCTA (mobile floating pill) ──────────────────────────────────
+const StickyWaitlistCTA = ({ onOpenModal }) => {
+    const [visible, setVisible] = useState(false);
+    const [dismissed, setDismissed] = useState(false);
+
+    useEffect(() => {
+        const t = setTimeout(() => setVisible(true), 3000);
+        const onScroll = () => { if (window.scrollY > 250) setVisible(true); };
+        window.addEventListener('scroll', onScroll, { passive: true });
+        return () => { clearTimeout(t); window.removeEventListener('scroll', onScroll); };
+    }, []);
+
+    if (dismissed) return null;
+    return (
+        <>
+            <style>{`
+                @media (min-width: 768px) { .be4t-sticky-wl-wrap { display: none !important; } }
+            `}</style>
+            <div className="be4t-sticky-wl-wrap" style={{
+                position:'fixed', bottom:'1.25rem', left:'50%',
+                transform:`translateX(-50%) translateY(${visible?'0':'110px'})`,
+                zIndex:900, transition:'transform 0.4s cubic-bezier(0.34,1.56,0.64,1)',
+                display:'flex',
+            }}>
+                <div style={{
+                    display:'flex', alignItems:'center', gap:'0.5rem',
+                    background:'rgba(8,6,20,0.92)',
+                    backdropFilter:'blur(20px)', WebkitBackdropFilter:'blur(20px)',
+                    border:'1px solid rgba(139,92,246,0.4)', borderRadius:'100px',
+                    padding:'0.5rem 0.6rem 0.5rem 1rem',
+                    boxShadow:'0 8px 32px rgba(0,0,0,0.6), 0 0 0 1px rgba(6,182,212,0.08)',
+                }}>
+                    <span style={{ width:'7px', height:'7px', borderRadius:'50%', background:'#22c55e', boxShadow:'0 0 8px #22c55e', flexShrink:0, animation:'be4t-wl-pulse 1.5s ease-in-out infinite' }} />
+                    <span style={{ fontSize:'0.8rem', color:'rgba(255,255,255,0.85)', whiteSpace:'nowrap', fontWeight:'600' }}>
+                        ¿Quieres acceso anticipado?
+                    </span>
+                    <button onClick={onOpenModal} style={{
+                        padding:'0.5rem 1rem', minHeight:'38px',
+                        background:'linear-gradient(135deg,#7c3aed,#06b6d4)',
+                        border:'none', borderRadius:'100px',
+                        color:'white', fontWeight:'800', fontSize:'0.8rem',
+                        cursor:'pointer', whiteSpace:'nowrap',
+                        boxShadow:'0 2px 10px rgba(124,58,237,0.4)',
+                    }}>🚀 Unirme</button>
+                    <button onClick={() => setDismissed(true)} aria-label="Cerrar" style={{
+                        width:'30px', height:'30px', borderRadius:'50%', flexShrink:0,
+                        background:'rgba(255,255,255,0.08)', border:'none',
+                        color:'rgba(255,255,255,0.4)', cursor:'pointer', fontSize:'0.72rem',
+                        display:'flex', alignItems:'center', justifyContent:'center',
+                    }}>✕</button>
+                </div>
+            </div>
+        </>
+    );
+};
+
 // ── Sort functions ────────────────────────────────────────────────────────────
 const SORT_FNS = {
     roi:       (a, b) => (b.roi_est || 0)            - (a.roi_est || 0),
@@ -139,6 +277,7 @@ const Marketplace = ({ session, onNavigate }) => {
     const [spotifyStatus, setSpotifyStatus] = useState('loading');
     const [detailAsset, setDetailAsset]   = useState(null);
     const [tokenizingAsset, setTokenizingAsset] = useState(null);
+    const [waitlistOpen, setWaitlistOpen] = useState(false);
 
     // ── Load 20 songs directly from Spotify (no Supabase for demo) ────────
     useEffect(() => {
@@ -230,6 +369,11 @@ const Marketplace = ({ session, onNavigate }) => {
             <main style={{ maxWidth: '1280px', margin: '0 auto', paddingBottom: '5rem' }}>
                 {/* ── Hero Banner ── */}
                 <HeroBanner userMode={userMode} onNavigate={onNavigate} />
+
+                {/* ── Waitlist Banner (entre hero y catálogo) ── */}
+                {userMode !== 'disquera' && (
+                    <WaitlistBanner onOpenModal={() => setWaitlistOpen(true)} />
+                )}
 
                 {/* ── Spotify loading status ── */}
                 {spotifyStatus === 'loading' && (
@@ -325,6 +469,12 @@ const Marketplace = ({ session, onNavigate }) => {
                     }}
                 />
             )}
+
+            {/* ── Sticky mobile waitlist pill ── */}
+            <StickyWaitlistCTA onOpenModal={() => setWaitlistOpen(true)} />
+
+            {/* ── Early Access Modal ── */}
+            <EarlyAccessModal isOpen={waitlistOpen} onClose={() => setWaitlistOpen(false)} />
         </div>
     );
 };
