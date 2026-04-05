@@ -230,7 +230,7 @@ const Navigation = ({ currentPage, setCurrentPage, session, onLoginClick }) => {
                                     boxShadow: '0 2px 14px rgba(124,58,237,0.4)',
                                 }}
                             >
-                                🚀 Acceso Anticipado
+                                Acceso Anticipado
                             </button>
                         )}
 
@@ -330,7 +330,7 @@ const Navigation = ({ currentPage, setCurrentPage, session, onLoginClick }) => {
                                 border: 'none', borderRadius: '12px',
                                 color: 'white', fontWeight: '700', fontSize: '0.9rem', cursor: 'pointer',
                             }}>
-                            🚀 Obtener Acceso Anticipado
+                            Obtener Acceso Anticipado
                         </button>
                     )}
                 </div>

@@ -16,10 +16,10 @@ const COUNTRIES = [
 ];
 
 const PROFILE_OPTIONS = [
-    { value: 'inversionista', label: '💰 Inversionista', desc: 'Quiero invertir en catalogos musicales' },
-    { value: 'artista',       label: '🎵 Artista',        desc: 'Quiero tokenizar mi música' },
-    { value: 'sello',         label: '🏢 Sello Discográfico', desc: 'Quiero infraestructura BE4T B2B' },
-    { value: 'fan',           label: '❤️ Fan',             desc: 'Quiero apoyar a mis artistas favoritos' },
+    { value: 'inversionista', label: 'Inversionista',      tag: 'INV',  desc: 'Invierto en catálogos musicales' },
+    { value: 'artista',       label: 'Artista',             tag: 'ART',  desc: 'Quiero tokenizar mi música' },
+    { value: 'sello',         label: 'Sello Discográfico',  tag: 'B2B',  desc: 'Infraestructura BE4T empresarial' },
+    { value: 'fan',           label: 'Fan',                 tag: 'FAN',  desc: 'Apoyo a mis artistas favoritos' },
 ];
 
 // ── Simple email regex ────────────────────────────────────────────────────────
@@ -44,7 +44,7 @@ const Stars = () => (
     </div>
 );
 
-// ── Profile selector chip ─────────────────────────────────────────────────────
+// ── Profile selector chip (typography-only, no icons) ──────────────────────────
 const ProfileChip = ({ option, selected, onClick }) => {
     const [hov, setHov] = useState(false);
     const active = selected === option.value;
@@ -56,35 +56,49 @@ const ProfileChip = ({ option, selected, onClick }) => {
             onMouseLeave={() => setHov(false)}
             style={{
                 flex: '1 1 calc(50% - 0.3rem)',
-                minWidth: '120px',
-                padding: '0.75rem 0.6rem',
+                minWidth: '130px',
+                padding: '0.85rem 1rem',
                 borderRadius: '12px',
-                border: active
-                    ? '1px solid rgba(139,92,246,0.7)'
-                    : hov ? '1px solid rgba(6,182,212,0.4)' : '1px solid rgba(255,255,255,0.1)',
                 background: active
-                    ? 'linear-gradient(135deg, rgba(124,58,237,0.2), rgba(6,182,212,0.1))'
-                    : hov ? 'rgba(255,255,255,0.06)' : 'rgba(255,255,255,0.03)',
-                color: active ? 'white' : 'rgba(255,255,255,0.65)',
+                    ? 'linear-gradient(135deg, rgba(0,212,255,0.07), rgba(139,92,246,0.12))'
+                    : hov ? 'rgba(255,255,255,0.04)' : 'rgba(255,255,255,0.025)',
+                border: 'none',
+                outline: active
+                    ? '1.5px solid rgba(0,212,255,0.6)'
+                    : hov ? '1px solid rgba(139,92,246,0.4)' : '1px solid rgba(255,255,255,0.08)',
+                color: active ? '#fff' : 'rgba(255,255,255,0.55)',
                 cursor: 'pointer', textAlign: 'left',
-                transition: 'all 0.2s ease',
-                boxShadow: active ? '0 0 16px rgba(124,58,237,0.25)' : 'none',
+                transition: 'all 0.18s ease',
+                boxShadow: active
+                    ? 'inset 0 0 20px rgba(0,212,255,0.06), 0 0 0 3px rgba(0,212,255,0.1)'
+                    : 'none',
             }}
         >
-            <div style={{ fontSize: '1rem', marginBottom: '0.2rem' }}>{option.label}</div>
-            <div style={{ fontSize: '0.67rem', color: 'rgba(255,255,255,0.4)', lineHeight: 1.3 }}>{option.desc}</div>
+            <div style={{
+                fontSize: '0.62rem', fontWeight: '700', letterSpacing: '1.5px',
+                textTransform: 'uppercase', marginBottom: '0.3rem',
+                color: active ? '#00D4FF' : 'rgba(255,255,255,0.3)',
+                fontFamily: "'Inter Tight','Inter',sans-serif",
+                transition: 'color 0.18s',
+            }}>{option.tag}</div>
+            <div style={{ fontSize: '0.88rem', fontWeight: '700', letterSpacing: '-0.01em', marginBottom: '0.2rem', fontFamily: "'Inter Tight','Inter',sans-serif" }}>
+                {option.label}
+            </div>
+            <div style={{ fontSize: '0.66rem', color: 'rgba(255,255,255,0.35)', lineHeight: 1.4 }}>
+                {option.desc}
+            </div>
         </button>
     );
 };
 
-// ── Input component ───────────────────────────────────────────────────────────
+// ── Validation error inline ──────────────────────────────────────────────────────────────────
 const Field = ({ label, error, children }) => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
-        <label style={{ fontSize: '0.72rem', fontWeight: '600', color: 'rgba(255,255,255,0.5)', letterSpacing: '1px', textTransform: 'uppercase' }}>
+        <label style={{ fontSize: '0.7rem', fontWeight: '700', color: 'rgba(255,255,255,0.4)', letterSpacing: '1.5px', textTransform: 'uppercase', fontFamily: "'Inter Tight','Inter',sans-serif" }}>
             {label}
         </label>
         {children}
-        {error && <span style={{ fontSize: '0.7rem', color: '#f87171' }}>⚠ {error}</span>}
+        {error && <span style={{ fontSize: '0.7rem', color: '#f87171', letterSpacing: '0.2px' }}>{error}</span>}
     </div>
 );
 
@@ -264,14 +278,16 @@ const EarlyAccessModal = ({ isOpen, onClose }) => {
                             <div style={{ marginBottom: '1.5rem' }}>
                                 {/* Badge */}
                                 <div style={{
-                                    display: 'inline-flex', alignItems: 'center', gap: '0.4rem',
-                                    background: 'rgba(139,92,246,0.15)', border: '1px solid rgba(139,92,246,0.35)',
-                                    borderRadius: '100px', padding: '0.28rem 0.85rem',
+                                    display: 'inline-flex', alignItems: 'center', gap: '0.5rem',
+                                    background: 'rgba(0,212,255,0.06)',
+                                    border: '1px solid rgba(0,212,255,0.2)',
+                                    borderRadius: '100px', padding: '0.3rem 1rem',
                                     marginBottom: '0.9rem',
-                                    fontSize: '0.63rem', color: '#c4b5fd',
-                                    fontWeight: '700', textTransform: 'uppercase', letterSpacing: '1.5px',
                                 }}>
-                                    🚀 Early Access — Cupos Limitados
+                                    <span style={{ display: 'inline-block', width: '6px', height: '6px', borderRadius: '50%', background: '#00D4FF', boxShadow: '0 0 6px #00D4FF' }} />
+                                    <span style={{ fontSize: '0.62rem', color: '#00D4FF', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '1.5px', fontFamily: "'Inter Tight','Inter',sans-serif" }}>
+                                        Early Access — Cupos Limitados
+                                    </span>
                                 </div>
 
                                 <h2 style={{
@@ -356,8 +372,9 @@ const EarlyAccessModal = ({ isOpen, onClose }) => {
 
                             {/* Error banner */}
                             {status === 'error' && (
-                                <div style={{ padding: '0.75rem 1rem', background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.25)', borderRadius: '10px', marginBottom: '1rem', fontSize: '0.82rem', color: '#fca5a5' }}>
-                                    ❌ {errorMsg}
+                                <div style={{ padding: '0.75rem 1rem', background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', borderRadius: '10px', marginBottom: '1rem', fontSize: '0.82rem', color: '#fca5a5', display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                                    <span style={{ display: 'inline-block', width: '6px', height: '6px', borderRadius: '50%', background: '#f87171', flexShrink: 0 }} />
+                                    {errorMsg}
                                 </div>
                             )}
 
@@ -388,7 +405,7 @@ const EarlyAccessModal = ({ isOpen, onClose }) => {
                                         </svg>
                                         Reservando tu lugar...
                                     </>
-                                ) : '🚀 Unirme a la Lista de Espera'}
+                                ) : 'Unirme a la Lista de Espera'}
                             </button>
 
                             {/* Terms micro-copy */}
@@ -402,15 +419,19 @@ const EarlyAccessModal = ({ isOpen, onClose }) => {
                     {/* ── SUCCESS VIEW ── */}
                     {status === 'success' && (
                         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.1rem', padding: '1.5rem 0.5rem', textAlign: 'center' }}>
-                            {/* Animated checkmark */}
+                            {/* Check circle */}
                             <div style={{
                                 width: '72px', height: '72px', borderRadius: '50%',
-                                background: 'linear-gradient(135deg, #7c3aed, #06b6d4)',
+                                background: 'linear-gradient(135deg, rgba(0,212,255,0.15), rgba(139,92,246,0.15))',
+                                border: '1.5px solid rgba(0,212,255,0.5)',
                                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                fontSize: '2rem',
-                                boxShadow: '0 0 32px rgba(124,58,237,0.5), 0 0 64px rgba(6,182,212,0.2)',
+                                boxShadow: '0 0 32px rgba(0,212,255,0.2)',
                                 animation: 'be4t-pulse-border 2s ease infinite',
-                            }}>🚀</div>
+                            }}>
+                                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#00D4FF" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                    <polyline points="20 6 9 17 4 12" />
+                                </svg>
+                            </div>
 
                             <div>
                                 <h3 style={{
@@ -427,16 +448,22 @@ const EarlyAccessModal = ({ isOpen, onClose }) => {
                                 </p>
                             </div>
 
-                            {/* Perks */}
-                            <div style={{ width: '100%', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '14px', padding: '1rem' }}>
+                            {/* Perks — gradient bar accent, no emoji */}
+                            <div style={{ width: '100%', borderRadius: '14px', border: '1px solid rgba(255,255,255,0.06)', overflow: 'hidden' }}>
                                 {[
-                                    { icon: '⚡', text: 'Acceso prioritario al Marketplace' },
-                                    { icon: '🎁', text: 'Comisiones 0% en tu primera inversión' },
-                                    { icon: '📊', text: 'Reporte exclusivo de tendencias musicales' },
-                                ].map(p => (
-                                    <div key={p.text} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.6rem' }}>
-                                        <span style={{ fontSize: '1rem' }}>{p.icon}</span>
-                                        <span style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.85rem' }}>{p.text}</span>
+                                    { tag: '01', title: 'Acceso Prioritario', text: 'Notificación antes de la apertura general.' },
+                                    { tag: '02', title: 'Comisión 0%',       text: 'En tu primera operación de inversión.' },
+                                    { tag: '03', title: 'Datos Exclusivos',  text: 'Análisis de tendencias antes del lanzamiento.' },
+                                ].map((p, i) => (
+                                    <div key={p.tag} style={{ display: 'flex', alignItems: 'stretch', background: 'rgba(255,255,255,0.025)', borderBottom: i < 2 ? '1px solid rgba(255,255,255,0.05)' : 'none' }}>
+                                        <div style={{ width: '3px', background: 'linear-gradient(180deg,#00D4FF,#8B5CF6)', flexShrink: 0 }} />
+                                        <div style={{ padding: '0.85rem 1rem' }}>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.2rem' }}>
+                                                <span style={{ fontSize: '0.58rem', fontWeight: '700', color: 'rgba(0,212,255,0.7)', letterSpacing: '1px', fontFamily: "'Inter Tight',sans-serif" }}>{p.tag}</span>
+                                                <span style={{ fontSize: '0.82rem', fontWeight: '700', color: 'rgba(255,255,255,0.9)' }}>{p.title}</span>
+                                            </div>
+                                            <div style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.4)', lineHeight: 1.5 }}>{p.text}</div>
+                                        </div>
                                     </div>
                                 ))}
                             </div>

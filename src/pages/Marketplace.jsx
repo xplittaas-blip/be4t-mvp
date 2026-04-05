@@ -188,7 +188,7 @@ const WaitlistBanner = ({ onOpenModal }) => {
                     whiteSpace:'nowrap',
                 }}
             >
-                🚀 Unirme a la lista de espera
+                Unirme a la lista de espera
             </button>
         </div>
     );
@@ -237,7 +237,7 @@ const StickyWaitlistCTA = ({ onOpenModal }) => {
                         color:'white', fontWeight:'800', fontSize:'0.8rem',
                         cursor:'pointer', whiteSpace:'nowrap',
                         boxShadow:'0 2px 10px rgba(124,58,237,0.4)',
-                    }}>🚀 Unirme</button>
+                    }}>Unirme</button>
                     <button onClick={() => setDismissed(true)} aria-label="Cerrar" style={{
                         width:'30px', height:'30px', borderRadius:'50%', flexShrink:0,
                         background:'rgba(255,255,255,0.08)', border:'none',

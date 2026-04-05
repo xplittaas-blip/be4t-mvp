@@ -4,12 +4,12 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 const SLIDES = [
     {
         id: 'b2b',
-        badge: '🏢 PARA SELLOS & ARTISTAS',
+        badge: 'PARA SELLOS & ARTISTAS',
         badgeColor: '#06b6d4',
         title: ['El Futuro de la', 'Gestión Musical'],
         titleGradient: 'linear-gradient(90deg, #06b6d4 0%, #a855f7 60%, #7c3aed 100%)',
         subtitle: 'Todo comienza con la tokenización de activos musicales: integramos el valor de la música en la blockchain para empoderar a artistas, sellos discográficos y agentes autónomos. Optimizamos procesos operativos y desbloqueamos flujos de ingresos antes inaccesibles a través de la propiedad digital fraccionada.',
-        cta: { label: 'Agendar Demo →', action: () => alert('📩 Demo institucional: partners@be4t.com'), primary: true },
+        cta: { label: 'Agendar Demo →', action: () => alert('Demo institucional: partners@be4t.com'), primary: true },
         accent: '#06b6d4',
         bgOverlay: 'linear-gradient(135deg, #040c18 0%, #060e22 40%, #08111a 100%)',
         waveColor1: '#0891b2',
@@ -17,7 +17,7 @@ const SLIDES = [
     },
     {
         id: 'fans',
-        badge: '🎵 PARA INVERSORES & FANS',
+        badge: 'PARA INVERSORES & FANS',
         badgeColor: '#a855f7',
         title: ['Invierte en la', 'Música que Amas'],
         titleGradient: 'linear-gradient(90deg, #a855f7 0%, #c084fc 40%, #06b6d4 100%)',
@@ -49,10 +49,6 @@ const WaveformBg = ({ color1, color2 }) => (
             <rect key={i} x={i * 21} y={(400 - h) / 2} width="11" height={h} rx="6"
                 fill="url(#wg1)" opacity={0.4 + (i % 4) * 0.15} />
         ))}
-        <text x="490" y="90"  fontSize="48" fill={`${color2}88`}>♪</text>
-        <text x="560" y="165" fontSize="32" fill={`${color1}66`}>♫</text>
-        <text x="465" y="240" fontSize="40" fill={`${color2}55`}>♩</text>
-        <text x="530" y="310" fontSize="26" fill={`${color1}44`}>♬</text>
     </svg>
 );
 
