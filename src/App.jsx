@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Navigation from './components/be4t/Navigation';
 import Footer from './components/be4t/Footer';
 import MiniPlayer from './components/be4t/MiniPlayer';
-import AuthModal from './components/be4t/AuthModal';
+import EarlyAccessModal from './components/be4t/EarlyAccessModal';
 import AssetUploader from './components/be4t/AssetUploader';
 import Marketplace from './pages/Marketplace';
 import Portfolio from './pages/Portfolio';
@@ -230,10 +230,9 @@ function App() {
 
             <MiniPlayer />
             <Footer />
-            <AuthModal
+            <EarlyAccessModal
                 isOpen={showAuthModal}
                 onClose={() => setShowAuthModal(false)}
-                songName="BE4T"
             />
         </div>
     );

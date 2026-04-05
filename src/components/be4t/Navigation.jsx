@@ -221,13 +221,16 @@ const Navigation = ({ currentPage, setCurrentPage, session, onLoginClick }) => {
                         ) : (
                             <button onClick={onLoginClick}
                                 style={{
-                                    padding: '0.55rem 1rem', minHeight: '44px',
-                                    background: 'linear-gradient(135deg, #7c3aed, #a855f7)',
+                                    padding: '0.5rem 1.1rem', minHeight: '44px',
+                                    background: 'linear-gradient(135deg, #7c3aed, #a855f7, #06b6d4)',
+                                    backgroundSize: '200% auto',
                                     border: 'none', borderRadius: '100px',
-                                    color: 'white', fontWeight: '700', fontSize: '0.82rem',
-                                    cursor: 'pointer', whiteSpace: 'nowrap',
-                                }}>
-                                Entrar
+                                    color: 'white', fontWeight: '800', fontSize: '0.78rem',
+                                    cursor: 'pointer', whiteSpace: 'nowrap', letterSpacing: '-0.01em',
+                                    boxShadow: '0 2px 14px rgba(124,58,237,0.4)',
+                                }}
+                            >
+                                🚀 Acceso Anticipado
                             </button>
                         )}
 
@@ -327,7 +330,7 @@ const Navigation = ({ currentPage, setCurrentPage, session, onLoginClick }) => {
                                 border: 'none', borderRadius: '12px',
                                 color: 'white', fontWeight: '700', fontSize: '0.9rem', cursor: 'pointer',
                             }}>
-                            Iniciar sesión
+                            🚀 Obtener Acceso Anticipado
                         </button>
                     )}
                 </div>
