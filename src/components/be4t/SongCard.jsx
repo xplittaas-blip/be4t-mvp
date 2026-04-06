@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { audioManager } from '../../services/audioManager';
 import { fetchPreviewUrl } from '../../services/previewService';
+import { fetchSongMetrics } from '../../services/metricsService';
 
 // ── Format helpers ────────────────────────────────────────────────────────────
 const fmt = (n) => {
@@ -100,8 +101,43 @@ const SongCard = ({ song, userMode, index = 0, onDetailClick }) => {
     const [hovered, setHovered]     = useState(false);
     const [isPlaying, setIsPlaying] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
-    const audioRef = useRef(null);
+    const audioRef   = useRef(null);
     const previewRef = useRef(song.preview_url || null);
+
+    // ── Live metrics state (enriches static catalog values) ──────────────────
+    const [metrics, setMetrics] = useState(null);
+
+    useEffect(() => {
+        let cancelled = false;
+        fetchSongMetrics(song).then(m => {
+            if (!cancelled) setMetrics(m);
+        }).catch(() => {/* keep catalog values */});
+        return () => { cancelled = true; };
+    }, [song.id]); // re-fetch only when song changes
+
+    // Derived display values: live metrics override catalog defaults
+    const displayStreams  = metrics?.spotify_streams  ?? song.spotify_streams;
+    const displayViews    = metrics?.youtube_views    ?? song.youtube_views;
+    const displayTikTok   = metrics?.tiktok_creations ?? song.tiktok_creations;
+    const growthData      = metrics?.growth ?? null;
+    const growthPct       = growthData?.pct  ?? song.growth;
+    const growthPositive  = growthData?.positive ?? song.growth_positive;
+    const sparklinePoints = growthData?.sparkline ?? null;
+    const isLive          = metrics?.source === 'live';
+
+    // Build SVG polyline points string from sparkline array [8 values 40-100]
+    const toPolyline = (pts) => {
+        if (!pts?.length) return growthPositive
+            ? '0,12 12,9 25,10 35,5 42,3 50,1'
+            : '0,1 12,4 25,6 35,10 42,9 50,13';
+        const max = Math.max(...pts), min = Math.min(...pts);
+        const range = max - min || 1;
+        return pts.map((v, i) => {
+            const x = (i / (pts.length - 1)) * 50;
+            const y = 13 - ((v - min) / range) * 12;
+            return `${x.toFixed(1)},${y.toFixed(1)}`;
+        }).join(' ');
+    };
 
     // Cleanup on unmount or song change
     useEffect(() => {
@@ -351,32 +387,58 @@ const SongCard = ({ song, userMode, index = 0, onDetailClick }) => {
                     </p>
                 </div>
 
-                {/* Platform metrics */}
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.5rem' }}>
-                    {[
-                        { Icon: SpotifyIcon, label: 'STREAMS', value: fmt(song.spotify_streams) },
-                        { Icon: YouTubeIcon, label: 'VIEWS',   value: fmt(song.youtube_views) },
-                        { Icon: TikTokIcon,  label: 'CREAT.',  value: fmt(song.tiktok_creations) },
-                    ].map(({ Icon, label, value }) => (
-                        <div key={label} style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
-                                <Icon size={11} />
-                                <span style={{ fontSize: '0.58rem', color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: '600' }}>{label}</span>
-                            </div>
-                            <span style={{ fontSize: '0.88rem', fontWeight: '700', color: 'white' }}>{value}</span>
+                {/* Platform metrics — live data from metricsService */}
+                <div style={{ position: 'relative' }}>
+                    {/* LIVE indicator — only shown when Deezer API returned fresh popularity */}
+                    {isLive && (
+                        <div style={{
+                            position: 'absolute', top: '-6px', right: 0,
+                            display: 'flex', alignItems: 'center', gap: '3px',
+                            fontSize: '0.52rem', color: '#22c55e', fontWeight: '700',
+                            textTransform: 'uppercase', letterSpacing: '1px',
+                        }}>
+                            <span style={{
+                                display: 'inline-block', width: '5px', height: '5px',
+                                borderRadius: '50%', background: '#22c55e',
+                                boxShadow: '0 0 4px #22c55e',
+                                animation: 'be4t-dot-pulse 2s ease-in-out infinite',
+                            }} />
+                            Live
                         </div>
-                    ))}
+                    )}
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.5rem' }}>
+                        {[
+                            { Icon: SpotifyIcon, label: 'STREAMS', value: fmt(displayStreams),  sub: 'en Spotify'  },
+                            { Icon: YouTubeIcon, label: 'VIEWS',   value: fmt(displayViews),    sub: 'en YouTube'  },
+                            { Icon: TikTokIcon,  label: 'CREAT.',  value: fmt(displayTikTok),   sub: 'en TikTok'  },
+                        ].map(({ Icon, label, value, sub }) => (
+                            <div key={label} style={{
+                                background: 'rgba(255,255,255,0.03)',
+                                border: '1px solid rgba(255,255,255,0.06)',
+                                borderRadius: '8px', padding: '0.4rem 0.5rem',
+                                display: 'flex', flexDirection: 'column', gap: '0.15rem',
+                            }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
+                                    <Icon size={10} />
+                                    <span style={{ fontSize: '0.55rem', color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: '600' }}>{label}</span>
+                                </div>
+                                <span style={{ fontSize: '0.92rem', fontWeight: '800', color: 'white', letterSpacing: '-0.02em' }}>{value}</span>
+                                <span style={{ fontSize: '0.52rem', color: 'rgba(255,255,255,0.22)' }}>{sub}</span>
+                            </div>
+                        ))}
+                    </div>
                 </div>
 
-                {/* Growth signal + sparkline */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                    <span style={{ fontSize: '0.78rem', fontWeight: '700', color: song.growth_positive ? '#22c55e' : '#ef4444' }}>
-                        {song.growth_positive ? '↗' : '↘'} {song.growth} growth
+                {/* Growth signal + real sparkline */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <span style={{ fontSize: '0.78rem', fontWeight: '700', color: growthPositive ? '#22c55e' : '#ef4444' }}>
+                        {growthPositive ? '↗' : '↘'} {growthPct} growth
                     </span>
-                    <svg width="50" height="14" viewBox="0 0 50 14">
+                    <svg width="56" height="14" viewBox="0 0 56 14" style={{ flex: '0 0 56px' }}>
                         <polyline
-                            points={song.growth_positive ? "0,12 12,9 25,10 35,5 42,3 50,1" : "0,1 12,4 25,6 35,10 42,9 50,13"}
-                            fill="none" stroke={song.growth_positive ? '#22c55e' : '#ef4444'}
+                            points={toPolyline(sparklinePoints)}
+                            fill="none"
+                            stroke={growthPositive ? '#22c55e' : '#ef4444'}
                             strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"
                         />
                     </svg>
@@ -439,6 +501,10 @@ const SongCard = ({ song, userMode, index = 0, onDetailClick }) => {
                 @keyframes be4t-pulse-ring {
                     0%   { transform: translate(-50%, -50%) scale(1);   opacity: 0.7; }
                     100% { transform: translate(-50%, -50%) scale(1.55); opacity: 0; }
+                }
+                @keyframes be4t-dot-pulse {
+                    0%, 100% { opacity: 1; }
+                    50%       { opacity: 0.3; }
                 }
             `}</style>
         </div>
