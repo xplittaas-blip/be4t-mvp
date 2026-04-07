@@ -131,11 +131,11 @@ const BlueprintIcon = ({ type, color }) => {
 const PROFILES = {
     disquera: {
         label: 'Disqueras',
-        emoji: '🏛️',
+        emoji: '🏗️',
         accent: '#22d3ee',
-        cta: { label: 'Agendar Demo B2B', action: () => alert('📩 Demo institucional: partners@be4t.com') },
-        headline: 'Protocolo de Liquidez de Activos',
-        subhead: 'No archives tu historia, financia tu futuro.',
+        cta: { label: 'Agendar Demo B2B', action: () => alert('Demo institucional: partners@be4t.com') },
+        headline: 'Liquidez Inmediata para tu Catálogo',
+        subhead: 'Sin adelantos de riesgo. Sin perder el control de la distribución.',
         steps: [
             {
                 icon: 'audit',
@@ -145,29 +145,33 @@ const PROFILES = {
                 body: [
                     'Mediante la ingesta de metadata vía ',
                     <T key="api" color="#22d3ee">API certificada</T>,
-                    ', auditamos el rendimiento histórico de tus masters. Proyectamos flujos de caja precisos basados en datos reales de Spotify, YouTube y TikTok. Tus activos hablan por sí solos en números.',
+                    ', auditamos el rendimiento histórico de tus masters. No arriesgues tu flujo de caja en adelantos tradicionales — nuestros modelos de proyección basados en datos reales de Spotify, YouTube y TikTok determinan el valor financiero de cada canción con precisión institucional.',
                 ],
             },
             {
                 icon: 'tokenize',
                 number: '02',
-                title: 'Tokenización RWA',
-                tagline: 'Tu catálogo se convierte en capital digital',
+                title: 'Tokenización de Regalías',
+                tagline: 'Adelanta regalías a tus artistas. Mantén el control.',
                 body: [
                     'Implementamos el estándar ',
                     <T key="erc" color="#22d3ee">ERC-3643</T>,
-                    ' (RWA Compliance) — el protocolo institucional de tokenización de activos del mundo real. Cada fracción de tus derechos queda registrada on-chain: auditable, legal y recuperable en cualquier jurisdicción.',
+                    ' (RWA Compliance). Usa BE4T para ',
+                    <T key="adv" color="#22d3ee">adelantar regalías a tus artistas</T>,
+                    ' mediante nuestra infraestructura auditada: tú mantienes el control de la distribución mientras nosotros fondeamos el crecimiento. Sin deuda, sin ceder propiedad intelectual.',
                 ],
             },
             {
                 icon: 'liquidity',
                 number: '03',
-                title: 'Acceso a Liquidez',
-                tagline: 'Capital en 72h. Sin deuda, sin ceder control.',
+                title: 'Marca Blanca — Tu Marketplace',
+                tagline: 'Despliega bajo tu identidad. Nosotros ponemos el protocolo.',
                 body: [
-                    'Libera ',
-                    <T key="cap" color="#22d3ee">capital de trabajo</T>,
-                    ' sin emitir deuda ni diluir tu estructura accionaria. Conservas el 100% del control estratégico de tu propiedad intelectual mientras accedes a los recursos que necesitas para firmar tu próximo talento o expandir tu operación.',
+                    'Despliega tu propio ',
+                    <T key="mp" color="#22d3ee">Marketplace de inversión</T>,
+                    ' con tu identidad visual bajo nuestro protocolo auditado. Tus fans invierten en tus artistas bajo tu dominio, con la infraestructura de liquidez de BE4T en el fondo. Listo en ',
+                    <T key="h" color="#22d3ee">menos de 72 horas</T>,
+                    '.',
                 ],
             },
         ],
@@ -176,9 +180,9 @@ const PROFILES = {
         label: 'Artistas',
         emoji: '🎤',
         accent: '#a78bfa',
-        cta: { label: 'Postular Mi Hit', action: () => alert('🎵 Postular canción: artists@be4t.com') },
-        headline: 'Arquitectura de Independencia Financiera',
-        subhead: 'Tu talento es el activo, tus fans son tus socios.',
+        cta: { label: 'Postular Mi Hit', action: () => alert('Postular canción: artists@be4t.com') },
+        headline: 'Recauda en 72 Horas, no en Meses',
+        subhead: '¿Necesitas presupuesto para tu próximo video o gira? El capital está en tu comunidad.',
         steps: [
             {
                 icon: 'rights',
@@ -196,23 +200,25 @@ const PROFILES = {
             {
                 icon: 'smart_contract',
                 number: '02',
-                title: 'Smart Contract en Arbitrum',
-                tagline: 'El intermediario murió. El código es la ley.',
+                title: 'Oferta de Regalías Futuras',
+                tagline: 'Vende una fracción hoy. Tu creatividad sigue siendo tuya.',
                 body: [
-                    'Desplegamos ',
+                    'Vende una fracción de tus ',
+                    <T key="ry" color="#a78bfa">regalías futuras</T>,
+                    ' a tus fans e inversores y recibe el capital hoy. Sin deudas bancarias, sin sellos intermediarios. Desplegamos ',
                     <T key="sc" color="#a78bfa">Smart Contracts</T>,
-                    ' en ',
-                    <T key="arb" color="#a78bfa">Arbitrum L2</T>,
-                    ' — tarifas de gas mínimas (< $0.01), velocidad de liquidación en segundos. Emites fracciones de tus regalías a tu comunidad directamente, sin sellos, sin abogados, sin esperas. Solo código.',
+                    ' en Arbitrum L2 — tarifas mínimas, liquidación en segundos. Tú creas, nosotros estructuramos.',
                 ],
             },
             {
                 icon: 'payment',
                 number: '03',
-                title: 'Pago Instantáneo',
-                tagline: 'Creas. El sistema cobra. Tú recibes.',
+                title: 'Capital Inmediato',
+                tagline: 'Presupuesto para tu gira o video en 72 horas',
                 body: [
-                    'Cada stream, cada view, cada creación en TikTok activa los ',
+                    'Una vez completada tu oferta, recibes el capital en ',
+                    <T key="h72" color="#a78bfa">72 horas</T>,
+                    '. Cada stream, cada view, cada creación en TikTok activa los ',
                     <T key="or" color="#a78bfa">Oráculos de Datos</T>,
                     ' que conectan el éxito de tus canciones con tu wallet. La distribución de regalías es ',
                     <T key="auto" color="#a78bfa">automática e instantánea</T>,
@@ -222,11 +228,11 @@ const PROFILES = {
         ],
     },
     fan: {
-        label: 'Fans',
-        emoji: '🎧',
+        label: 'Inversores',
+        emoji: '📈',
         accent: '#34d399',
         cta: { label: 'Explorar Top 20', action: () => window.scrollTo({ top: 0, behavior: 'smooth' }) },
-        headline: 'La Economía de la Propiedad',
+        headline: 'La Economía de la Propiedad Musical',
         subhead: 'Deja de ser un oyente. Conviértete en el dueño de tus hits.',
         steps: [
             {
@@ -243,6 +249,13 @@ const PROFILES = {
                     <T key="tk" color="#34d399">TikTok</T>,
                     ' actualizadas en tiempo real. Identifica las canciones con mayor momentum de streams y ROI proyectado. Invierte en lo que ya sabes que va a pegar.',
                 ],
+                insight: {
+                    label: 'Activo Descorrelacionado',
+                    body: 'La música latina es un activo refugio. Mientras los mercados fluctúan, los streams en Latam crecen un 19.4% anual. Invierte en hits, no en especulación.',
+                    stat: '+19.4%',
+                    statLabel: 'Crecimiento anual de streams Latam',
+                    color: '#34d399',
+                },
             },
             {
                 icon: 'token_buy',
@@ -357,6 +370,49 @@ const StepCard = ({ step, accent, index, isEven }) => {
                 }}>
                     {step.body}
                 </p>
+
+                {/* Activo Descorrelacionado insight — renders if step defines insight */}
+                {step.insight && (
+                    <div style={{
+                        marginTop: '1.25rem',
+                        padding: '1rem',
+                        background: `${step.insight.color}08`,
+                        border: `1px solid ${step.insight.color}30`,
+                        borderLeft: `3px solid ${step.insight.color}`,
+                        borderRadius: '0 10px 10px 0',
+                    }}>
+                        <div style={{
+                            display: 'flex', alignItems: 'center', gap: '0.6rem',
+                            marginBottom: '0.5rem',
+                        }}>
+                            <span style={{
+                                fontSize: '1.4rem', fontWeight: '900',
+                                color: step.insight.color, letterSpacing: '-0.04em',
+                                fontFamily: "'Inter Tight', 'Inter', sans-serif",
+                            }}>
+                                {step.insight.stat}
+                            </span>
+                            <div>
+                                <div style={{
+                                    fontSize: '0.6rem', fontWeight: '700',
+                                    color: step.insight.color, textTransform: 'uppercase',
+                                    letterSpacing: '1px',
+                                }}>
+                                    {step.insight.label}
+                                </div>
+                                <div style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.35)' }}>
+                                    {step.insight.statLabel}
+                                </div>
+                            </div>
+                        </div>
+                        <p style={{
+                            fontSize: '0.78rem', color: 'rgba(255,255,255,0.5)',
+                            lineHeight: 1.65, margin: 0,
+                        }}>
+                            {step.insight.body}
+                        </p>
+                    </div>
+                )}
             </div>
 
             {/* Center column (node) — spans correctly */}
