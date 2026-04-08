@@ -38,11 +38,28 @@ export const normalizeSong = (raw) => {
     const totalVal = raw.valuation_usd || (raw.token_price_usd * raw.total_supply) || 0;
     const seed = String(raw.id).split('').reduce((a, b) => a + b.charCodeAt(0), 0);
 
-    const fundingPct = meta.funding_percent ?? raw.funding_percent ?? (40 + (seed % 55));
-    const raisedAmount = meta.raised_amount ?? raw.raised_amount ?? (totalVal * fundingPct / 100);
-
     const yieldStr = meta.yield_estimate || raw.yield_prospect || raw.apy || '14%';
     const roi = parseFloat(yieldStr.replace('%', '')) || 14;
+
+    // ── Market Cap & Token Supply ─────────────────────────────────────────────
+    const totalSupply     = raw.total_supply || 10_000;
+    const tokenPrice      = raw.token_price_usd || (totalVal / totalSupply) || 10;
+    const marketCap       = totalVal || tokenPrice * totalSupply;
+    const tokensAvailable = meta.tokens_available ?? raw.tokens_available
+                            ?? Math.floor(totalSupply * (0.25 + (seed % 50) / 100)); // 25-75% available
+
+    // ── Risk Tier classification (based on stream proxy) ─────────────────────
+    const proxyStreams = meta.spotify_streams || raw.spotify_streams
+                        || Math.floor(totalVal * 12.5 + seed * 1000);
+    const isBlueChip  = proxyStreams >= 1_000_000;
+    const riskTier    = meta.risk_tier || raw.risk_tier
+                        || (isBlueChip ? 'BLUE_CHIP' : 'EMERGING');
+
+    // ── APY: Emerging commands higher potential yield than Blue Chip ──────────
+    const apyBase = riskTier === 'BLUE_CHIP'
+        ? 11 + (seed % 7)          // 11–18% — stable royalty income
+        : 22 + (seed % 12);        // 22–34% — high-risk, high-upside
+    const apy     = meta.apy ?? raw.apy ?? apyBase;
 
     return {
         id:               raw.id,
@@ -54,18 +71,20 @@ export const normalizeSong = (raw) => {
         preview_url:      raw.preview_url || meta.preview_url || null,
         asset_type:       raw.asset_type === 'music' ? 'MUSIC' : 'RWA',
         tag:              raw.tag || (raw.asset_type === 'music' ? 'MUSIC' : 'RWA'),
-        spotify_streams:  meta.spotify_streams || raw.spotify_streams
-                          || Math.floor(totalVal * 12.5 + seed * 1000),
+        spotify_streams:  proxyStreams,
         youtube_views:    meta.youtube_views || raw.youtube_views
                           || Math.floor(totalVal * 8.2 + seed * 500),
         tiktok_creations: meta.tiktok_creations || raw.tiktok_creations
                           || Math.floor(totalVal * 0.9 + seed * 100),
         growth:           `+${roi.toFixed(1)}%`,
         growth_positive:  roi >= 0,
-        funding_percent:  fundingPct,
-        raised_amount:    raisedAmount,
-        total_valuation:  totalVal,
-        price:            raw.token_price_usd || (totalVal / (raw.total_supply || 1000)),
+        // ── Financial asset fields ───────────────────────────────────────────
+        market_cap:       marketCap,
+        tokens_available: tokensAvailable,
+        total_supply:     totalSupply,
+        risk_tier:        riskTier,
+        apy:              apy,
+        price:            tokenPrice,
         roi_est:          roi,
         is_tokenized:     raw.is_tokenized || false,
         contract_address: raw.contract_address || null,
@@ -278,21 +297,36 @@ const SongCard = ({ song, userMode, index = 0, onDetailClick }) => {
                     {song.tag || song.asset_type}
                 </div>
 
-                {/* Trending / Hot badge */}
-                {song.is_trending && (
-                    <div style={{ position: 'absolute', top: '12px', right: '12px', display: 'flex', gap: '4px', zIndex: 5 }}>
+                {/* Risk Tier badge + Trending */}
+                <div style={{ position: 'absolute', top: '12px', right: '12px', display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '4px', zIndex: 5 }}>
+                    {/* Risk Tier */}
+                    {song.risk_tier === 'BLUE_CHIP' ? (
+                        <span style={{
+                            background: 'rgba(6,182,212,0.18)',
+                            border: '1px solid rgba(6,182,212,0.55)',
+                            borderRadius: '100px', padding: '3px 9px',
+                            fontSize: '0.6rem', fontWeight: '800',
+                            color: '#22d3ee', letterSpacing: '0.8px',
+                            fontFamily: "'Courier New', monospace",
+                        }}>BLUE CHIP</span>
+                    ) : (
+                        <span style={{
+                            background: 'rgba(234,179,8,0.15)',
+                            border: '1px solid rgba(234,179,8,0.5)',
+                            borderRadius: '100px', padding: '3px 9px',
+                            fontSize: '0.6rem', fontWeight: '800',
+                            color: '#fbbf24', letterSpacing: '0.8px',
+                            fontFamily: "'Courier New', monospace",
+                        }}>EMERGING</span>
+                    )}
+                    {/* HOT badge */}
+                    {song.is_trending && (
                         <span style={{
                             background: 'rgba(239,68,68,0.9)', borderRadius: '100px', padding: '3px 9px',
                             fontSize: '0.65rem', fontWeight: '800', color: 'white', letterSpacing: '0.5px',
-                        }}>🔥 HOT</span>
-                        {index === 0 && (
-                            <span style={{
-                                background: 'rgba(234,179,8,0.9)', borderRadius: '100px', padding: '3px 9px',
-                                fontSize: '0.65rem', fontWeight: '800', color: 'white',
-                            }}>⚡ #1</span>
-                        )}
-                    </div>
-                )}
+                        }}>HOT</span>
+                    )}
+                </div>
 
                 {/* ── BE4T NEON PLAY / PAUSE BUTTON — center overlay ── */}
                 {hasAudio ? (
@@ -444,36 +478,69 @@ const SongCard = ({ song, userMode, index = 0, onDetailClick }) => {
                     </svg>
                 </div>
 
-                {/* Funding progress bar */}
-                <div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.35rem' }}>
-                        <span style={{ fontSize: '0.73rem', color: 'rgba(255,255,255,0.4)' }}>
-                            {fmtUSD(song.raised_amount)} recaudado
+                {/* ── Financial terminal: Market Cap + Tokens + APY ── */}
+                <div style={{
+                    background: 'rgba(0,0,0,0.35)',
+                    border: '1px solid rgba(255,255,255,0.06)',
+                    borderRadius: '10px',
+                    padding: '0.65rem 0.75rem',
+                    display: 'flex', flexDirection: 'column', gap: '0.45rem',
+                }}>
+                    {/* Market Cap row */}
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <span style={{ fontSize: '0.6rem', color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '1px', fontFamily: "'Courier New', monospace" }}>
+                            Market Cap
                         </span>
-                        <span style={{ fontSize: '0.73rem', color: 'rgba(255,255,255,0.4)' }}>
-                            {Math.round(song.funding_percent)}%
+                        <span style={{ fontSize: '0.82rem', fontWeight: '700', color: 'rgba(255,255,255,0.85)', letterSpacing: '-0.01em' }}>
+                            {fmtUSD(song.market_cap)}
                         </span>
                     </div>
-                    <div style={{ height: '4px', background: 'rgba(255,255,255,0.1)', borderRadius: '100px', overflow: 'hidden' }}>
-                        <div style={{
-                            height: '100%',
-                            width: `${Math.min(song.funding_percent, 100)}%`,
-                            background: 'linear-gradient(90deg, #7c3aed, #a855f7)',
-                            borderRadius: '100px',
-                            transition: 'width 0.8s ease',
-                        }} />
+                    {/* Tokens Available row */}
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <span style={{ fontSize: '0.6rem', color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '1px', fontFamily: "'Courier New', monospace" }}>
+                            Tokens Disp.
+                        </span>
+                        <span style={{ fontSize: '0.82rem', fontWeight: '700', color: 'rgba(255,255,255,0.7)', letterSpacing: '-0.01em' }}>
+                            {fmt(song.tokens_available)}
+                            <span style={{ fontSize: '0.58rem', color: 'rgba(255,255,255,0.28)', marginLeft: '3px' }}>
+                                / {fmt(song.total_supply)}
+                            </span>
+                        </span>
                     </div>
+                    {/* APY row — emerald for returns */}
+                    <div style={{
+                        display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                        borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '0.4rem', marginTop: '0.1rem',
+                    }}>
+                        <span style={{ fontSize: '0.6rem', color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '1px', fontFamily: "'Courier New', monospace" }}>
+                            Est. APY
+                        </span>
+                        <span style={{
+                            fontSize: '0.95rem', fontWeight: '900',
+                            color: '#10b981',
+                            letterSpacing: '-0.02em',
+                            textShadow: '0 0 12px rgba(16,185,129,0.4)',
+                        }}>
+                            {Number(song.apy).toFixed(1)}%
+                        </span>
+                    </div>
+                    {/* Risk note */}
+                    <p style={{ fontSize: '0.58rem', color: 'rgba(255,255,255,0.25)', margin: 0, lineHeight: 1.4 }}>
+                        {song.risk_tier === 'BLUE_CHIP'
+                            ? 'Bajo riesgo · Retorno estable · Regalías perpetuas'
+                            : 'Alto riesgo · Potencial de apreciación masivo'}
+                    </p>
                 </div>
 
-                {/* Price + ROI */}
+                {/* Price + Token */}
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
                     <div>
-                        <div style={{ fontSize: '0.62rem', color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: '600' }}>DESDE</div>
+                        <div style={{ fontSize: '0.62rem', color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: '600' }}>PRECIO / TOKEN</div>
                         <div style={{ fontSize: '1.2rem', fontWeight: '800', letterSpacing: '-0.03em' }}>{fmtUSD(song.price)}</div>
                     </div>
                     <div style={{ textAlign: 'right' }}>
-                        <div style={{ fontSize: '0.62rem', color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: '600' }}>ROI EST.</div>
-                        <div style={{ fontSize: '1.2rem', fontWeight: '800', color: '#22c55e', letterSpacing: '-0.03em' }}>{song.roi_est?.toFixed(1)}%</div>
+                        <div style={{ fontSize: '0.62rem', color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: '600' }}>APY EST.</div>
+                        <div style={{ fontSize: '1.2rem', fontWeight: '800', color: '#10b981', letterSpacing: '-0.03em' }}>{Number(song.apy).toFixed(1)}%</div>
                     </div>
                 </div>
 

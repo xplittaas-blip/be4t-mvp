@@ -74,8 +74,8 @@ const DisquerasPage = ({ session, onLoginNeeded }) => {
                             borderLeft: '3px solid rgba(6,182,212,0.5)',
                             paddingLeft: '1rem',
                         }}>
-                            Optimiza tu flujo de caja adelantando regalías sin comprometer el capital operativo
-                            de tu sello o plataforma de distribución.
+                            Adelantamos el flujo de caja de tus apuestas emergentes. Monetiza el futuro
+                            de tus artistas hoy, sin esperar a los ciclos de pago de las plataformas.
                         </p>
 
                         {/* Cuerpo del texto */}
@@ -83,11 +83,12 @@ const DisquerasPage = ({ session, onLoginNeeded }) => {
                             color: 'rgba(255,255,255,0.5)', fontSize: '0.97rem',
                             lineHeight: 1.85, maxWidth: '680px', marginBottom: '2.25rem',
                         }}>
-                            En BE4T habilitamos a las distribuidoras y sellos independientes para{' '}
-                            <strong style={{ color: 'rgba(255,255,255,0.82)', fontWeight: '700' }}>adelantar regalías de sus catálogos</strong>{' '}
-                            a través de nuestra comunidad de inversores globales. Tú mantienes la administración
-                            de las licencias y el control de la distribución, mientras nosotros proveemos el capital
-                            necesario para fondear nuevos lanzamientos, adelantos a artistas y estrategias de marketing.
+                            BE4T habilita a distribuidoras y sellos independientes para{' '}
+                            <strong style={{ color: 'rgba(255,255,255,0.82)', fontWeight: '700' }}>convertir regalías futuras en capital hoy</strong>{' '}
+                            a través de nuestra comunidad de inversores globales. Tu catálogo se convierte en
+                            un activo de flujo de caja tokenizado: tus artistas reciben adelantos, tú mantienes
+                            el control de la distribución y las licencias, y los inversores reciben fracciones
+                            de regalías de por vida. Sin esperar ciclos de 90 días de las plataformas.
                         </p>
 
                         <div style={{ display: 'flex', gap: '0.85rem', flexWrap: 'wrap' }}>
