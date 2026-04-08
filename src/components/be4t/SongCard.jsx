@@ -478,69 +478,80 @@ const SongCard = ({ song, userMode, index = 0, onDetailClick }) => {
                     </svg>
                 </div>
 
-                {/* ── Financial terminal: Market Cap + Tokens + APY ── */}
+                {/* ── Financial terminal: Market Cap + Tokens + APY hero ── */}
                 <div style={{
-                    background: 'rgba(0,0,0,0.35)',
-                    border: '1px solid rgba(255,255,255,0.06)',
-                    borderRadius: '10px',
-                    padding: '0.65rem 0.75rem',
-                    display: 'flex', flexDirection: 'column', gap: '0.45rem',
+                    background: 'rgba(0,0,0,0.3)',
+                    border: '1px solid rgba(255,255,255,0.07)',
+                    borderRadius: '12px',
+                    overflow: 'hidden',
                 }}>
-                    {/* Market Cap row */}
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <span style={{ fontSize: '0.6rem', color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '1px', fontFamily: "'Courier New', monospace" }}>
-                            Market Cap
-                        </span>
-                        <span style={{ fontSize: '0.82rem', fontWeight: '700', color: 'rgba(255,255,255,0.85)', letterSpacing: '-0.01em' }}>
-                            {fmtUSD(song.market_cap)}
-                        </span>
+                    {/* Row 1: Market Cap | Tokens — 2-col stacked */}
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                        {[
+                            { label: 'Market Cap',     value: fmtUSD(song.market_cap) },
+                            { label: 'Tokens Disp.',   value: `${fmt(song.tokens_available)} / ${fmt(song.total_supply)}` },
+                        ].map(({ label, value }, i) => (
+                            <div key={label} style={{
+                                padding: '0.7rem 0.85rem',
+                                borderRight: i === 0 ? '1px solid rgba(255,255,255,0.06)' : 'none',
+                                display: 'flex', flexDirection: 'column', gap: '0.2rem',
+                            }}>
+                                <span style={{
+                                    fontSize: '0.55rem', color: 'rgba(255,255,255,0.3)',
+                                    textTransform: 'uppercase', letterSpacing: '1px',
+                                }}>
+                                    {label}
+                                </span>
+                                <span style={{
+                                    fontSize: '0.88rem', fontWeight: '700',
+                                    color: 'rgba(255,255,255,0.85)', letterSpacing: '-0.02em',
+                                }}>
+                                    {value}
+                                </span>
+                            </div>
+                        ))}
                     </div>
-                    {/* Tokens Available row */}
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <span style={{ fontSize: '0.6rem', color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '1px', fontFamily: "'Courier New', monospace" }}>
-                            Tokens Disp.
-                        </span>
-                        <span style={{ fontSize: '0.82rem', fontWeight: '700', color: 'rgba(255,255,255,0.7)', letterSpacing: '-0.01em' }}>
-                            {fmt(song.tokens_available)}
-                            <span style={{ fontSize: '0.58rem', color: 'rgba(255,255,255,0.28)', marginLeft: '3px' }}>
-                                / {fmt(song.total_supply)}
-                            </span>
-                        </span>
-                    </div>
-                    {/* APY row — emerald for returns */}
+
+                    {/* Row 2: APY hero */}
                     <div style={{
-                        display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                        borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '0.4rem', marginTop: '0.1rem',
+                        padding: '0.65rem 0.85rem',
+                        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                     }}>
-                        <span style={{ fontSize: '0.6rem', color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '1px', fontFamily: "'Courier New', monospace" }}>
-                            Est. APY
-                        </span>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                            <span style={{
+                                fontSize: '0.55rem', color: 'rgba(255,255,255,0.3)',
+                                textTransform: 'uppercase', letterSpacing: '1px',
+                            }}>
+                                Est. APY
+                            </span>
+                            <span style={{
+                                fontSize: '0.68rem', color: 'rgba(255,255,255,0.28)', lineHeight: 1.4,
+                            }}>
+                                {song.risk_tier === 'BLUE_CHIP'
+                                    ? 'Bajo riesgo · Retorno estable'
+                                    : 'Alto riesgo · Alto potencial'}
+                            </span>
+                        </div>
                         <span style={{
-                            fontSize: '0.95rem', fontWeight: '900',
-                            color: '#10b981',
-                            letterSpacing: '-0.02em',
-                            textShadow: '0 0 12px rgba(16,185,129,0.4)',
+                            fontSize: '1.65rem', fontWeight: '900',
+                            color: '#10b981', letterSpacing: '-0.04em',
+                            textShadow: '0 0 16px rgba(16,185,129,0.45)',
+                            lineHeight: 1,
                         }}>
                             {Number(song.apy).toFixed(1)}%
                         </span>
                     </div>
-                    {/* Risk note */}
-                    <p style={{ fontSize: '0.58rem', color: 'rgba(255,255,255,0.25)', margin: 0, lineHeight: 1.4 }}>
-                        {song.risk_tier === 'BLUE_CHIP'
-                            ? 'Bajo riesgo · Retorno estable · Regalías perpetuas'
-                            : 'Alto riesgo · Potencial de apreciación masivo'}
-                    </p>
                 </div>
 
-                {/* Price + Token */}
+                {/* Price + APY footer row */}
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
                     <div>
-                        <div style={{ fontSize: '0.62rem', color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: '600' }}>PRECIO / TOKEN</div>
-                        <div style={{ fontSize: '1.2rem', fontWeight: '800', letterSpacing: '-0.03em' }}>{fmtUSD(song.price)}</div>
+                        <div style={{ fontSize: '0.58rem', color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '2px' }}>Precio / Token</div>
+                        <div style={{ fontSize: '1.15rem', fontWeight: '800', letterSpacing: '-0.03em' }}>{fmtUSD(song.price)}</div>
                     </div>
                     <div style={{ textAlign: 'right' }}>
-                        <div style={{ fontSize: '0.62rem', color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: '600' }}>APY EST.</div>
-                        <div style={{ fontSize: '1.2rem', fontWeight: '800', color: '#10b981', letterSpacing: '-0.03em' }}>{Number(song.apy).toFixed(1)}%</div>
+                        <div style={{ fontSize: '0.58rem', color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '2px' }}>APY Est.</div>
+                        <div style={{ fontSize: '1.15rem', fontWeight: '900', color: '#10b981', letterSpacing: '-0.03em' }}>{Number(song.apy).toFixed(1)}%</div>
                     </div>
                 </div>
 
@@ -573,6 +584,7 @@ const SongCard = ({ song, userMode, index = 0, onDetailClick }) => {
                     0%, 100% { opacity: 1; }
                     50%       { opacity: 0.3; }
                 }
+                @keyframes spin { to { transform: rotate(360deg); } }
             `}</style>
         </div>
     );
