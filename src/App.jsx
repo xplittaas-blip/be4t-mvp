@@ -45,103 +45,182 @@ const DisquerasPage = ({ session, onLoginNeeded }) => {
                 <AssetUploader onComplete={() => setShowEmitir(false)} />
             ) : (
                 <div style={{ maxWidth: '960px', margin: '0 auto', padding: '3rem 1.5rem' }}>
-                    {/* Header */}
+                    {/* ── Header —— Para Distribuidoras y Disqueras ─────────────────── */}
                     <div style={{ marginBottom: '3rem' }}>
-                        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', background: 'rgba(6,182,212,0.1)', border: '1px solid rgba(6,182,212,0.3)', borderRadius: '100px', padding: '0.3rem 0.85rem', marginBottom: '1rem' }}>
-                            <span style={{ fontSize: '0.7rem', color: '#2dd4bf', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '1.5px' }}>Infraestructura B2B — Distribuidoras &amp; Sellos Indie</span>
+                        <div style={{
+                            display: 'inline-flex', alignItems: 'center', gap: '0.4rem',
+                            background: 'rgba(6,182,212,0.08)',
+                            border: '1px solid rgba(6,182,212,0.28)',
+                            borderRadius: '100px', padding: '0.3rem 0.85rem', marginBottom: '1.25rem',
+                        }}>
+                            <span style={{ fontSize: '0.68rem', color: '#2dd4bf', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '1.5px' }}>
+                                Infraestructura B2B — Solución de Capital
+                            </span>
                         </div>
-                        <h1 style={{ fontSize: 'clamp(2rem, 5vw, 3rem)', fontWeight: '900', letterSpacing: '-0.04em', lineHeight: 1.1, marginBottom: '1rem' }}>
-                            Liquidez Inmediata para tu Catálogo
+
+                        <h1 style={{
+                            fontSize: 'clamp(2rem, 5vw, 3.2rem)', fontWeight: '900',
+                            letterSpacing: '-0.04em', lineHeight: 1.05, marginBottom: '0.75rem',
+                            fontFamily: "'Inter Tight', 'Inter', sans-serif",
+                        }}>
+                            Para Distribuidoras y Disqueras
                         </h1>
-                        <p style={{ color: 'rgba(255,255,255,0.55)', fontSize: '1rem', lineHeight: 1.8, maxWidth: '640px', marginBottom: '2rem' }}>
-                            No arriesgues tu flujo de caja en adelantos. Usa BE4T para adelantar regalías
-                            a tus artistas mediante nuestra infraestructura de tokenización.
-                            <strong style={{ color: 'rgba(255,255,255,0.85)' }}> Mantén el control de la distribución</strong> mientras nosotros fondeamos el crecimiento.
+
+                        {/* Promesa central */}
+                        <p style={{
+                            fontSize: '1.05rem', fontWeight: '600',
+                            color: 'rgba(255,255,255,0.8)', lineHeight: 1.7,
+                            maxWidth: '680px', marginBottom: '1.25rem',
+                            borderLeft: '3px solid rgba(6,182,212,0.5)',
+                            paddingLeft: '1rem',
+                        }}>
+                            Optimiza tu flujo de caja adelantando regalías sin comprometer el capital operativo
+                            de tu sello o plataforma de distribución.
                         </p>
+
+                        {/* Cuerpo del texto */}
+                        <p style={{
+                            color: 'rgba(255,255,255,0.5)', fontSize: '0.97rem',
+                            lineHeight: 1.85, maxWidth: '680px', marginBottom: '2.25rem',
+                        }}>
+                            En BE4T habilitamos a las distribuidoras y sellos independientes para{' '}
+                            <strong style={{ color: 'rgba(255,255,255,0.82)', fontWeight: '700' }}>adelantar regalías de sus catálogos</strong>{' '}
+                            a través de nuestra comunidad de inversores globales. Tú mantienes la administración
+                            de las licencias y el control de la distribución, mientras nosotros proveemos el capital
+                            necesario para fondear nuevos lanzamientos, adelantos a artistas y estrategias de marketing.
+                        </p>
+
                         <div style={{ display: 'flex', gap: '0.85rem', flexWrap: 'wrap' }}>
                             <button
-                                onClick={() => session ? setShowEmitir(true) : onLoginNeeded()}
+                                onClick={() => alert('Consultar Solución de Capital: partners@be4t.com')}
                                 style={{
-                                    padding: '0.85rem 1.75rem',
-                                    background: 'linear-gradient(135deg, #7c3aed, #a855f7)',
+                                    padding: '0.9rem 1.85rem',
+                                    background: 'linear-gradient(135deg, #06b6d4, #7c3aed)',
                                     border: 'none', borderRadius: '12px',
                                     color: 'white', fontWeight: '800', fontSize: '0.95rem', cursor: 'pointer',
+                                    letterSpacing: '-0.01em',
                                 }}
                             >
-                                {session ? 'Emitir un Activo' : 'Iniciar sesión para Emitir'}
+                                Consultar Solución de Capital →
                             </button>
-                            <button
-                                onClick={() => alert('Demo institucional: partners@be4t.com')}
-                                style={{
-                                    padding: '0.85rem 1.5rem',
-                                    background: 'rgba(6,182,212,0.1)',
-                                    border: '1px solid rgba(6,182,212,0.35)',
-                                    borderRadius: '12px', color: '#2dd4bf',
-                                    fontWeight: '700', fontSize: '0.95rem', cursor: 'pointer',
-                                }}
-                            >
-                                Solicitar Demo B2B →
-                            </button>
+                            {session && (
+                                <button
+                                    onClick={() => setShowEmitir(true)}
+                                    style={{
+                                        padding: '0.9rem 1.5rem',
+                                        background: 'rgba(255,255,255,0.04)',
+                                        border: '1px solid rgba(255,255,255,0.15)',
+                                        borderRadius: '12px', color: 'rgba(255,255,255,0.6)',
+                                        fontWeight: '600', fontSize: '0.92rem', cursor: 'pointer',
+                                    }}
+                                >
+                                    Emitir un Activo
+                                </button>
+                            )}
                         </div>
                     </div>
 
-                    {/* B2B Feature grid */}
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem', marginBottom: '3rem' }}>
+                    {/* ── Tres Pilares de Valor (sin iconos, bordes gradiente Cian → Violeta) ── */}
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1.25rem', marginBottom: '3rem' }}>
                         {[
                             {
-                                bg: 'rgba(124,58,237,0.15)', border: 'rgba(124,58,237,0.3)',
-                                title: 'Liquidez sin Deuda',
-                                desc: 'Adelanta el flujo de regalías de tus artistas sin necesidad de endeudarte ni ceder la propiedad intelectual del catálogo. Capital inmediato para financiar el siguiente lanzamiento o firmar nuevos talentos.',
+                                gradStart: '#06b6d4', gradEnd: '#6366f1',
+                                title: 'Liquidez Estratégica',
+                                desc: 'Libera el valor de tus activos actuales para reinvertir en la guerra de los adelantos. Accede a capital sin deuda, sin diluir la propiedad intelectual de tu catálogo.',
                             },
                             {
-                                bg: 'rgba(6,182,212,0.1)', border: 'rgba(6,182,212,0.3)',
-                                title: 'Marca Blanca (TaaS)',
-                                desc: 'Despliega tu propio Marketplace de inversión con tu identidad visual bajo nuestro protocolo auditado. Tus fans invierten en tus artistas, bajo tu dominio, con la seguridad de la infraestructura BE4T.',
-                                highlight: true,
-                                highlightColor: '#2dd4bf',
+                                gradStart: '#8b5cf6', gradEnd: '#06b6d4',
+                                title: 'Infraestructura White-Label',
+                                desc: 'Despliega un marketplace de inversión propio con tu identidad visual para tus artistas firmados. Tu audiencia invierte bajo tu marca, con el protocolo auditado de BE4T.',
+                                featured: true,
                             },
                             {
-                                bg: 'rgba(16,185,129,0.1)', border: 'rgba(16,185,129,0.25)',
-                                title: 'Automatización de Splits',
-                                desc: 'Distribuye regalías a miles de micro-inversores con un clic. Reportes automáticos certificados para auditoría y cumplimiento regulatorio.',
-                                extra: (
-                                    <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.75rem', alignItems: 'center' }}>
-                                        {['#1DB954','#FF0000','#2DD4BF'].map((c, i) => (
-                                            <div key={i} style={{ width: '16px', height: '16px', borderRadius: '50%', background: c, opacity: 0.85 }} />
-                                        ))}
-                                        <span style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.35)' }}>API certificada Spotify · YouTube · TikTok</span>
-                                    </div>
-                                ),
-                            },
-                            {
-                                bg: 'rgba(234,179,8,0.08)', border: 'rgba(234,179,8,0.2)',
-                                title: 'Cumplimiento Institucional',
-                                desc: 'ERC-3643 para activos de seguridad regulados. Contratos auditados por firma independiente. Adaptado a marcos regulatorios de activos digitales en Colombia, México y España.',
+                                gradStart: '#6366f1', gradEnd: '#8b5cf6',
+                                title: 'Gestión Automatizada',
+                                desc: 'Contratos auditados y administración digital de pagos para los titulares de derechos. Splits automáticos, reportes certificados y cumplimiento regulatorio en un solo sistema.',
                             },
                         ].map(card => (
                             <div key={card.title} style={{
-                                background: card.bg, border: `1px solid ${card.border}`,
-                                borderRadius: '16px', padding: '1.5rem',
-                                backdropFilter: 'blur(8px)',
-                                position: 'relative', overflow: 'hidden',
+                                position: 'relative',
+                                borderRadius: '16px',
+                                padding: '1px', // border thickness
+                                background: `linear-gradient(135deg, ${card.gradStart}, ${card.gradEnd})`,
+                                boxShadow: card.featured ? `0 0 32px rgba(139,92,246,0.15)` : 'none',
                             }}>
-                                {card.highlight && (
-                                    <div style={{
-                                        position: 'absolute', top: 0, left: 0, right: 0, height: '2px',
-                                        background: `linear-gradient(90deg, transparent, ${card.highlightColor}, transparent)`,
-                                    }} />
-                                )}
-                                <h3 style={{ fontWeight: '800', fontSize: '1rem', marginBottom: '0.5rem', letterSpacing: '-0.02em' }}>{card.title}</h3>
-                                {card.highlight && (
-                                    <div style={{ display: 'inline-block', fontSize: '0.6rem', fontWeight: '700', color: card.highlightColor, textTransform: 'uppercase', letterSpacing: '1px', background: `${card.highlightColor}15`, border: `1px solid ${card.highlightColor}30`, borderRadius: '4px', padding: '2px 6px', marginBottom: '0.5rem' }}>Feature destacado</div>
-                                )}
-                                <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.85rem', lineHeight: 1.7, margin: 0 }}>{card.desc}</p>
-                                {card.extra}
+                                <div style={{
+                                    background: '#0f1117',
+                                    borderRadius: '15px',
+                                    padding: '1.75rem',
+                                    height: '100%',
+                                }}>
+                                    {card.featured && (
+                                        <div style={{
+                                            display: 'inline-block', marginBottom: '0.75rem',
+                                            fontSize: '0.58rem', fontWeight: '700',
+                                            color: '#2dd4bf', textTransform: 'uppercase',
+                                            letterSpacing: '1.5px',
+                                            background: 'rgba(6,182,212,0.08)',
+                                            border: '1px solid rgba(6,182,212,0.25)',
+                                            borderRadius: '4px', padding: '2px 8px',
+                                        }}>
+                                            Feature destacado
+                                        </div>
+                                    )}
+                                    <h3 style={{
+                                        fontWeight: '800', fontSize: '1rem', margin: '0 0 0.65rem',
+                                        letterSpacing: '-0.025em',
+                                        background: `linear-gradient(90deg, ${card.gradStart}, ${card.gradEnd})`,
+                                        WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
+                                    }}>
+                                        {card.title}
+                                    </h3>
+                                    <p style={{ color: 'rgba(255,255,255,0.48)', fontSize: '0.855rem', lineHeight: 1.75, margin: 0 }}>
+                                        {card.desc}
+                                    </p>
+                                </div>
                             </div>
                         ))}
                     </div>
 
-                    {/* Artistas — La Promesa */}
+                    {/* ── Cumplimiento + API strip ── */}
+                    <div style={{
+                        display: 'flex', gap: '1.25rem', marginBottom: '3rem', flexWrap: 'wrap',
+                    }}>
+                        <div style={{
+                            flex: 1, minWidth: '260px',
+                            background: 'rgba(234,179,8,0.06)',
+                            border: '1px solid rgba(234,179,8,0.18)',
+                            borderRadius: '14px', padding: '1.25rem',
+                        }}>
+                            <h4 style={{ fontWeight: '800', fontSize: '0.9rem', marginBottom: '0.4rem', letterSpacing: '-0.02em' }}>
+                                Cumplimiento Institucional
+                            </h4>
+                            <p style={{ color: 'rgba(255,255,255,0.45)', fontSize: '0.82rem', lineHeight: 1.7, margin: 0 }}>
+                                ERC-3643 para activos de seguridad regulados. Contratos auditados por firma independiente.
+                                Adaptado a marcos regulatorios en Colombia, México y España.
+                            </p>
+                        </div>
+                        <div style={{
+                            flex: 1, minWidth: '260px',
+                            background: 'rgba(16,185,129,0.06)',
+                            border: '1px solid rgba(16,185,129,0.18)',
+                            borderRadius: '14px', padding: '1.25rem',
+                        }}>
+                            <h4 style={{ fontWeight: '800', fontSize: '0.9rem', marginBottom: '0.7rem', letterSpacing: '-0.02em' }}>
+                                Plataformas Integradas
+                            </h4>
+                            <div style={{ display: 'flex', gap: '0.6rem', alignItems: 'center' }}>
+                                {['#1DB954', '#FF0000', '#2DD4BF'].map((c, i) => (
+                                    <div key={i} style={{ width: '14px', height: '14px', borderRadius: '50%', background: c }} />
+                                ))}
+                                <span style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.35)' }}>
+                                    API certificada Spotify · YouTube · TikTok
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* ── Artistas — La Promesa ── */}
                     <div style={{
                         background: 'linear-gradient(135deg, rgba(139,92,246,0.08), rgba(124,58,237,0.04))',
                         border: '1px solid rgba(139,92,246,0.2)',
@@ -153,16 +232,16 @@ const DisquerasPage = ({ session, onLoginNeeded }) => {
                             <span style={{ fontSize: '0.65rem', color: '#c4b5fd', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '1.5px' }}>Para Artistas — La Promesa</span>
                         </div>
                         <h2 style={{ fontSize: 'clamp(1.5rem, 3.5vw, 2.2rem)', fontWeight: '900', letterSpacing: '-0.04em', lineHeight: 1.1, marginBottom: '0.85rem' }}>
-                            Recauda en 72 horas,<br /><span style={{ color: '#c4b5fd' }}>no en meses</span>
+                            Capital cuando lo necesitas,<br /><span style={{ color: '#c4b5fd' }}>sin deuda bancaria</span>
                         </h2>
                         <p style={{ color: 'rgba(255,255,255,0.55)', fontSize: '0.98rem', lineHeight: 1.8, maxWidth: '600px', marginBottom: '2rem' }}>
-                            ¿Necesitas presupuesto para tu próximo video o gira? Vende una fracción de tus regalías futuras
-                            y recibe el capital hoy.{' '}
+                            Vende una fracción de tus regalías futuras
+                            y recibe el capital para tu próximo lanzamiento.{' '}
                             <strong style={{ color: 'rgba(255,255,255,0.85)' }}>Sin deudas bancarias</strong>, solo fans e inversores impulsando tu carrera.
                         </p>
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem', marginBottom: '2rem' }}>
                             {[
-                                { stat: '72h', label: 'Capital en cuenta', color: '#22c55e' },
+                                { stat: 'Rápido', label: 'Capital disponible', color: '#22c55e' },
                                 { stat: '0%', label: 'Sin deuda bancaria', color: '#c4b5fd' },
                                 { stat: '100%', label: 'Autoría preservada', color: '#2dd4bf' },
                             ].map(({ stat, label, color }) => (
