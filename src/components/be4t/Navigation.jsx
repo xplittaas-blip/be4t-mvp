@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import WalletFundingModal from './WalletFundingModal';
-
+import ConnectWalletButton from './ConnectWalletButton';
 
 // ── BE4T Brand Logo (uses /public/be4t-logo.svg) ────────────────────────────
 const BE4TWordmark = ({ onClick }) => (
@@ -184,25 +184,29 @@ const Navigation = ({ currentPage, setCurrentPage, session, onLoginClick }) => {
 
                     {/* Right actions */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexShrink: 0 }}>
-                        {/* Wallet button — opens Hybrid Funding Modal */}
+                        {/* Web3 Wallet Connect — mode-aware */}
+                        <ConnectWalletButton />
+
+                        {/* BE4T Funding Modal (Supabase auth) */}
                         <button
                             onClick={() => setWalletOpen(true)}
+                            title="Fondear cuenta"
                             style={{
                                 display: 'flex', alignItems: 'center', gap: '0.45rem',
-                                padding: '0.5rem 1rem',
-                                background: 'linear-gradient(135deg, rgba(124,58,237,0.15), rgba(6,182,212,0.1))',
-                                border: '1px solid rgba(139,92,246,0.4)',
+                                padding: '0.5rem 0.9rem',
+                                background: 'rgba(124,58,237,0.1)',
+                                border: '1px solid rgba(139,92,246,0.3)',
                                 borderRadius: '100px',
-                                color: '#c4b5fd', fontSize: '0.82rem', fontWeight: '700',
+                                color: '#c4b5fd', fontSize: '0.78rem', fontWeight: '600',
                                 cursor: 'pointer', whiteSpace: 'nowrap',
                                 transition: 'all 0.2s ease',
                                 minHeight: '44px', minWidth: '44px',
                             }}
-                            onMouseOver={e => { e.currentTarget.style.background = 'linear-gradient(135deg, rgba(124,58,237,0.3), rgba(6,182,212,0.2))'; }}
-                            onMouseOut={e => { e.currentTarget.style.background = 'linear-gradient(135deg, rgba(124,58,237,0.15), rgba(6,182,212,0.1))'; }}
+                            onMouseOver={e => { e.currentTarget.style.background = 'rgba(124,58,237,0.22)'; }}
+                            onMouseOut={e => { e.currentTarget.style.background = 'rgba(124,58,237,0.1)'; }}
                         >
                             <WalletIcon />
-                            <span className="be4t-wallet-label">Conectar Wallet</span>
+                            <span className="be4t-wallet-label">Fondear</span>
                         </button>
 
                         {/* Profile / Login */}

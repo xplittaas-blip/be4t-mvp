@@ -24,7 +24,8 @@
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
     "react-i18next": "^16.5.8",
-    "resend": "^6.9.3"
+    "resend": "^6.9.3",
+    "thirdweb": "^5.119.4"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.4",

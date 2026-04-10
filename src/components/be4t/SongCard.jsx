@@ -3,6 +3,7 @@ import { audioManager } from '../../services/audioManager';
 import { fetchPreviewUrl } from '../../services/previewService';
 import { fetchSongMetrics } from '../../services/metricsService';
 import { isProduction } from '../../core/env';
+import AcquisitionModal from './AcquisitionModal';
 
 // ── Format helpers ────────────────────────────────────────────────────────────
 const fmt = (n) => {
@@ -118,9 +119,10 @@ export const SongCardSkeleton = () => (
 
 // ── Main SongCard ─────────────────────────────────────────────────────────────
 const SongCard = ({ song, userMode, index = 0, onDetailClick }) => {
-    const [hovered, setHovered]     = useState(false);
-    const [isPlaying, setIsPlaying] = useState(false);
-    const [isLoading, setIsLoading] = useState(false);
+    const [hovered, setHovered]                   = useState(false);
+    const [isPlaying, setIsPlaying]               = useState(false);
+    const [isLoading, setIsLoading]               = useState(false);
+    const [showAcquisitionModal, setShowAcquisitionModal] = useState(false);
     const audioRef   = useRef(null);
     const previewRef = useRef(song.preview_url || null);
 
@@ -561,19 +563,11 @@ const SongCard = ({ song, userMode, index = 0, onDetailClick }) => {
                     id={`detail-btn-${song.id}`}
                     onClick={(e) => {
                         e.stopPropagation();
-                        if (isProduction) {
-                            // Production: open detail view — wallet connect triggered inside AssetDetailView
-                            onDetailClick && onDetailClick(song._raw);
-                        } else {
-                            // Showcase: open detail view in demo mode (no blockchain)
-                            onDetailClick && onDetailClick(song._raw);
-                        }
+                        setShowAcquisitionModal(true);
                     }}
                     style={{
                         width: '100%', padding: '0.78rem 0.6rem',
-                        background: isProduction
-                            ? 'linear-gradient(135deg, #065f46, #10b981)'
-                            : 'linear-gradient(135deg, #065f46, #10b981)',
+                        background: 'linear-gradient(135deg, #065f46, #10b981)',
                         border: 'none', borderRadius: '10px',
                         color: 'white', fontWeight: '700', fontSize: '0.865rem',
                         cursor: 'pointer', transition: 'all 0.3s ease',
@@ -591,7 +585,7 @@ const SongCard = ({ song, userMode, index = 0, onDetailClick }) => {
                         e.currentTarget.style.filter = 'brightness(1)';
                     }}
                 >
-                    {isProduction ? 'Adquirir participación de regalías' : 'Adquirir participación de regalías'}
+                    Adquirir participación de regalías
                 </button>
             </div>
 
@@ -607,6 +601,14 @@ const SongCard = ({ song, userMode, index = 0, onDetailClick }) => {
                 }
                 @keyframes spin { to { transform: rotate(360deg); } }
             `}</style>
+
+            {/* Acquisition Modal */}
+            {showAcquisitionModal && (
+                <AcquisitionModal
+                    asset={song}
+                    onClose={() => setShowAcquisitionModal(false)}
+                />
+            )}
         </div>
     );
 };
