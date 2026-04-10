@@ -3,7 +3,7 @@ import { audioManager } from '../../services/audioManager';
 import { fetchPreviewUrl } from '../../services/previewService';
 import { fetchSongMetrics } from '../../services/metricsService';
 import { isProduction } from '../../core/env';
-import AcquisitionModal from './AcquisitionModal';
+import AssetDetailModal from './AssetDetailModal';
 
 // ── Format helpers ─────────────────────────────────────────────────────────────
 const fmt = (n) => {
@@ -486,7 +486,7 @@ const SongCard = ({ song, userMode, index = 0, onDetailClick }) => {
                         </div>
                     </div>
 
-                    {/* ── CTA ── */}
+                    {/* ── PRIMARY CTA — opens detail/calculator modal ── */}
                     <button
                         id={`acquire-btn-${song.id}`}
                         onClick={(e) => { e.stopPropagation(); setShowAcquisitionModal(true); }}
@@ -512,19 +512,31 @@ const SongCard = ({ song, userMode, index = 0, onDetailClick }) => {
                         }}
                     >
                         Adquirir participación de regalías
-                        {isProduction && (
-                            <span style={{ display: 'block', fontSize: '0.58rem', fontWeight: '600',
-                                color: 'rgba(255,255,255,0.65)', marginTop: '2px', letterSpacing: '0.3px' }}>
-                                Conectar wallet · Firmar en Base Sepolia
-                            </span>
-                        )}
+                        <span style={{ display: 'block', fontSize: '0.58rem', fontWeight: '600',
+                            color: 'rgba(255,255,255,0.62)', marginTop: '2px', letterSpacing: '0.3px' }}>
+                            {isProduction ? 'Conectar wallet · Calcular retorno' : 'Ver calculadora de retorno'}
+                        </span>
+                    </button>
+
+                    {/* Secondary link — opens metrics tab */}
+                    <button
+                        id={`detail-link-${song.id}`}
+                        onClick={(e) => { e.stopPropagation(); setShowAcquisitionModal(true); }}
+                        style={{ width: '100%', background: 'none', border: 'none', padding: '0.3rem 0',
+                            color: 'rgba(255,255,255,0.28)', fontSize: '0.65rem', cursor: 'pointer',
+                            textDecoration: 'underline', textDecorationColor: 'rgba(255,255,255,0.15)',
+                            textUnderlineOffset: '2px', transition: 'color 0.2s', }}
+                        onMouseOver={e => e.currentTarget.style.color = 'rgba(255,255,255,0.55)'}
+                        onMouseOut={e => e.currentTarget.style.color = 'rgba(255,255,255,0.28)'}
+                    >
+                        Ver análisis completo y métricas
                     </button>
                 </div>
 
-                {/* Acquisition Modal */}
+                {/* Detail Modal (sales funnel) */}
                 {showAcquisitionModal && (
-                    <AcquisitionModal
-                        asset={song}
+                    <AssetDetailModal
+                        song={song}
                         onClose={() => setShowAcquisitionModal(false)}
                     />
                 )}
