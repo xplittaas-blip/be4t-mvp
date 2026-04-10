@@ -46,28 +46,28 @@ export const normalizeSong = (raw) => {
     const tokenPrice      = raw.token_price_usd || (totalVal / totalSupply) || 10;
     const marketCap       = totalVal || tokenPrice * totalSupply;
     const tokensAvailable = meta.tokens_available ?? raw.tokens_available
-                            ?? Math.floor(totalSupply * (0.25 + (seed % 50) / 100)); // 25-75% available
+                            ?? Math.floor(totalSupply * (0.25 + (seed % 50) / 100));
 
-    // ── Risk Tier classification (based on stream proxy) ─────────────────────
+    // ── Risk Tier: 3-tier classification based on stream proxy ─────────────────
     const proxyStreams = meta.spotify_streams || raw.spotify_streams
                         || Math.floor(totalVal * 12.5 + seed * 1000);
-    const isBlueChip  = proxyStreams >= 1_000_000;
-    const riskTier    = meta.risk_tier || raw.risk_tier
-                        || (isBlueChip ? 'BLUE_CHIP' : 'EMERGING');
 
-    // ── APY: Emerging commands higher potential yield than Blue Chip ──────────
-    const apyBase = riskTier === 'BLUE_CHIP'
-        ? 11 + (seed % 7)          // 11–18% — stable royalty income
-        : 22 + (seed % 12);        // 22–34% — high-risk, high-upside
-    const apy     = meta.apy ?? raw.apy ?? apyBase;
+    const computedTier = proxyStreams >= 50_000_000 ? 'AAA'
+                       : proxyStreams >=  5_000_000 ? 'B_PLUS'
+                       : 'VENTURE';
+    const riskTier = meta.risk_tier || raw.risk_tier || computedTier;
+
+    // ── APY per Tier: AAA stable, B+ growth, Venture speculative ───────────
+    const apyBase = riskTier === 'AAA'     ? 9  + (seed % 6)   // 9–15%  stable
+                 : riskTier === 'B_PLUS'  ? 16 + (seed % 10)  // 16–26% growth
+                 :                          28 + (seed % 15); // 28–43% speculative
+    const apy = meta.apy ?? raw.apy ?? apyBase;
 
     return {
         id:               raw.id,
         title:            raw.name || raw.title || 'Sin título',
         artist:           meta.artist || raw.artist_name || raw.artist || 'Artista',
-        // REGLA DE ORO: cover_url viene EXCLUSIVAMENTE de Spotify album images
         cover_url:        raw.cover_url || raw.image || meta.image || null,
-        // REGLA DE ORO: preview_url viene EXCLUSIVAMENTE de Spotify
         preview_url:      raw.preview_url || meta.preview_url || null,
         asset_type:       raw.asset_type === 'music' ? 'MUSIC' : 'RWA',
         tag:              raw.tag || (raw.asset_type === 'music' ? 'MUSIC' : 'RWA'),
@@ -78,7 +78,6 @@ export const normalizeSong = (raw) => {
                           || Math.floor(totalVal * 0.9 + seed * 100),
         growth:           `+${roi.toFixed(1)}%`,
         growth_positive:  roi >= 0,
-        // ── Financial asset fields ───────────────────────────────────────────
         market_cap:       marketCap,
         tokens_available: tokensAvailable,
         total_supply:     totalSupply,
@@ -298,32 +297,40 @@ const SongCard = ({ song, userMode, index = 0, onDetailClick }) => {
                 </div>
 
                 {/* Risk Tier badge + Trending */}
-                <div style={{ position: 'absolute', top: '12px', right: '12px', display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '4px', zIndex: 5 }}>
-                    {/* Risk Tier */}
-                    {song.risk_tier === 'BLUE_CHIP' ? (
+                <div style={{ position: 'absolute', top: '10px', right: '10px', display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '4px', zIndex: 5 }}>
+                    {/* Risk Tier — 3-tier system */}
+                    {song.risk_tier === 'AAA' ? (
                         <span style={{
-                            background: 'rgba(6,182,212,0.18)',
-                            border: '1px solid rgba(6,182,212,0.55)',
-                            borderRadius: '100px', padding: '3px 9px',
+                            background: 'rgba(16,185,129,0.15)',
+                            border: '1px solid rgba(16,185,129,0.55)',
+                            borderRadius: '6px', padding: '3px 8px',
+                            fontSize: '0.6rem', fontWeight: '800',
+                            color: '#10b981', letterSpacing: '0.8px',
+                            fontFamily: "'Courier New', monospace",
+                        }}>AAA</span>
+                    ) : song.risk_tier === 'B_PLUS' ? (
+                        <span style={{
+                            background: 'rgba(6,182,212,0.15)',
+                            border: '1px solid rgba(6,182,212,0.5)',
+                            borderRadius: '6px', padding: '3px 8px',
                             fontSize: '0.6rem', fontWeight: '800',
                             color: '#22d3ee', letterSpacing: '0.8px',
                             fontFamily: "'Courier New', monospace",
-                        }}>BLUE CHIP</span>
+                        }}>B+</span>
                     ) : (
                         <span style={{
-                            background: 'rgba(234,179,8,0.15)',
-                            border: '1px solid rgba(234,179,8,0.5)',
-                            borderRadius: '100px', padding: '3px 9px',
+                            background: 'rgba(234,179,8,0.12)',
+                            border: '1px solid rgba(234,179,8,0.45)',
+                            borderRadius: '6px', padding: '3px 8px',
                             fontSize: '0.6rem', fontWeight: '800',
                             color: '#fbbf24', letterSpacing: '0.8px',
                             fontFamily: "'Courier New', monospace",
-                        }}>EMERGING</span>
+                        }}>VENTURE</span>
                     )}
-                    {/* HOT badge */}
                     {song.is_trending && (
                         <span style={{
-                            background: 'rgba(239,68,68,0.9)', borderRadius: '100px', padding: '3px 9px',
-                            fontSize: '0.65rem', fontWeight: '800', color: 'white', letterSpacing: '0.5px',
+                            background: 'rgba(239,68,68,0.85)', borderRadius: '4px', padding: '2px 7px',
+                            fontSize: '0.58rem', fontWeight: '800', color: 'white', letterSpacing: '0.5px',
                         }}>HOT</span>
                     )}
                 </div>
@@ -485,92 +492,79 @@ const SongCard = ({ song, userMode, index = 0, onDetailClick }) => {
                     borderRadius: '12px',
                     overflow: 'hidden',
                 }}>
-                    {/* Row 1: Market Cap | Tokens — 2-col stacked */}
+                    {/* Row 1: Market Cap | Tokens */}
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
                         {[
-                            { label: 'Market Cap',     value: fmtUSD(song.market_cap) },
-                            { label: 'Tokens Disp.',   value: `${fmt(song.tokens_available)} / ${fmt(song.total_supply)}` },
+                            { label: 'Market Cap',   value: fmtUSD(song.market_cap) },
+                            { label: 'Tokens Disp.', value: `${fmt(song.tokens_available)} / ${fmt(song.total_supply)}` },
                         ].map(({ label, value }, i) => (
                             <div key={label} style={{
                                 padding: '0.7rem 0.85rem',
                                 borderRight: i === 0 ? '1px solid rgba(255,255,255,0.06)' : 'none',
                                 display: 'flex', flexDirection: 'column', gap: '0.2rem',
                             }}>
-                                <span style={{
-                                    fontSize: '0.55rem', color: 'rgba(255,255,255,0.3)',
-                                    textTransform: 'uppercase', letterSpacing: '1px',
-                                }}>
+                                <span style={{ fontSize: '0.55rem', color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: '1px' }}>
                                     {label}
                                 </span>
-                                <span style={{
-                                    fontSize: '0.88rem', fontWeight: '700',
-                                    color: 'rgba(255,255,255,0.85)', letterSpacing: '-0.02em',
-                                }}>
+                                <span style={{ fontSize: '0.88rem', fontWeight: '700', color: 'rgba(255,255,255,0.85)', letterSpacing: '-0.02em' }}>
                                     {value}
                                 </span>
                             </div>
                         ))}
                     </div>
 
-                    {/* Row 2: APY hero */}
-                    <div style={{
-                        padding: '0.65rem 0.85rem',
-                        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                    }}>
+                    {/* Row 2: Yield Proyectado (APY) hero */}
+                    <div style={{ padding: '0.65rem 0.85rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                            <span style={{
-                                fontSize: '0.55rem', color: 'rgba(255,255,255,0.3)',
-                                textTransform: 'uppercase', letterSpacing: '1px',
-                            }}>
-                                Est. APY
+                            <span style={{ fontSize: '0.55rem', color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: '1px' }}>
+                                Yield Proyectado (APY)
                             </span>
-                            <span style={{
-                                fontSize: '0.68rem', color: 'rgba(255,255,255,0.28)', lineHeight: 1.4,
-                            }}>
-                                {song.risk_tier === 'BLUE_CHIP'
-                                    ? 'Bajo riesgo · Retorno estable'
-                                    : 'Alto riesgo · Alto potencial'}
+                            <span style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.25)', lineHeight: 1.4 }}>
+                                {song.risk_tier === 'AAA'
+                                    ? 'Bajo riesgo · Ingresos históricos consistentes'
+                                    : song.risk_tier === 'B_PLUS'
+                                    ? 'Riesgo moderado · Alto potencial de apreciación'
+                                    : 'Inv. especulativa · Multiplicador masivo'}
                             </span>
                         </div>
                         <span style={{
-                            fontSize: '1.65rem', fontWeight: '900',
+                            fontSize: '1.7rem', fontWeight: '900',
                             color: '#10b981', letterSpacing: '-0.04em',
-                            textShadow: '0 0 16px rgba(16,185,129,0.45)',
-                            lineHeight: 1,
+                            textShadow: '0 0 18px rgba(16,185,129,0.4)', lineHeight: 1,
                         }}>
                             {Number(song.apy).toFixed(1)}%
                         </span>
                     </div>
                 </div>
 
-                {/* Price + APY footer row */}
+                {/* Price + Yield footer */}
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
                     <div>
                         <div style={{ fontSize: '0.58rem', color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '2px' }}>Precio / Token</div>
                         <div style={{ fontSize: '1.15rem', fontWeight: '800', letterSpacing: '-0.03em' }}>{fmtUSD(song.price)}</div>
                     </div>
                     <div style={{ textAlign: 'right' }}>
-                        <div style={{ fontSize: '0.58rem', color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '2px' }}>APY Est.</div>
+                        <div style={{ fontSize: '0.58rem', color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '2px' }}>Yield Proy.</div>
                         <div style={{ fontSize: '1.15rem', fontWeight: '900', color: '#10b981', letterSpacing: '-0.03em' }}>{Number(song.apy).toFixed(1)}%</div>
                     </div>
                 </div>
 
-                {/* CTA — Ver Detalle */}
+                {/* CTA — Ejecutar Adquisición */}
                 <button
                     id={`detail-btn-${song.id}`}
                     onClick={(e) => { e.stopPropagation(); onDetailClick && onDetailClick(song._raw); }}
                     style={{
-                        width: '100%', padding: '0.75rem',
-                        background: 'linear-gradient(135deg, #7c3aed, #a855f7)',
+                        width: '100%', padding: '0.78rem',
+                        background: 'linear-gradient(135deg, #065f46, #10b981)',
                         border: 'none', borderRadius: '10px',
                         color: 'white', fontWeight: '700', fontSize: '0.9rem',
                         cursor: 'pointer', transition: 'opacity 0.2s ease',
-                        marginTop: 'auto',
+                        marginTop: 'auto', letterSpacing: '-0.01em',
                     }}
-                    onMouseOver={e => e.currentTarget.style.opacity = '0.82'}
+                    onMouseOver={e => e.currentTarget.style.opacity = '0.85'}
                     onMouseOut={e => e.currentTarget.style.opacity = '1'}
                 >
-                    Ver Detalle
+                    Ver Ficha del Activo →
                 </button>
             </div>
 
