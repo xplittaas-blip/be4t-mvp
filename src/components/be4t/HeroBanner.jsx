@@ -3,40 +3,56 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 // ── Slide data ─────────────────────────────────────────────────────────────────
 const SLIDES = [
     {
-        id: 'b2b',
-        badge: 'PARA SELLOS & ARTISTAS',
-        badgeColor: '#06b6d4',
-        badgeBg: 'rgba(6,182,212,0.12)',
-        badgeBorder: 'rgba(6,182,212,0.3)',
-        title: 'El Futuro de la\nGestión Musical',
-        titleGradient: 'linear-gradient(135deg, #ffffff 0%, #06b6d4 60%, #a855f7 100%)',
-        subtitle: 'Todo comienza con la tokenización de activos musicales: integramos el valor de la música en la blockchain para empoderar a artistas, sellos discográficos y agentes autónomos. Optimizamos procesos operativos y desbloqueamos flujos de ingresos antes inaccesibles a través de la propiedad digital fraccionada.',
-        cta: { label: 'Agendar Demo →', action: () => alert('Demo institucional: partners@be4t.com') },
-        ctaStyle: 'border',        // white border pill
-        accent: '#06b6d4',
-        glow1: 'rgba(6,182,212,0.18)',
-        glow2: 'rgba(139,92,246,0.10)',
-        bgOverlay: 'radial-gradient(ellipse 80% 60% at 50% 80%, rgba(6,182,212,0.14) 0%, transparent 70%), radial-gradient(ellipse 60% 50% at 20% 20%, rgba(139,92,246,0.10) 0%, transparent 60%), #080812',
+        id: 'royalties',
+        badge: 'REGALÍAS MUSICALES',
+        badgeColor: '#10b981',
+        badgeBg: 'rgba(16,185,129,0.1)',
+        badgeBorder: 'rgba(16,185,129,0.3)',
+        title: 'Haz que la música\ntrabaje para ti',
+        titleGradient: 'linear-gradient(135deg, #ffffff 0%, #10b981 60%, #06b6d4 100%)',
+        subtitle: 'Compra derechos de canciones y recibe regalías trimestrales directamente en tu cuenta.',
+        cta: { label: 'Ver Activos →', action: null, page: 'explore' },
+        ctaStyle: 'gradient-green',
+        accent: '#10b981',
+        glow1: 'rgba(16,185,129,0.16)',
+        glow2: 'rgba(6,182,212,0.08)',
+        bgOverlay: 'radial-gradient(ellipse 80% 60% at 50% 80%, rgba(16,185,129,0.12) 0%, transparent 70%), radial-gradient(ellipse 60% 50% at 20% 20%, rgba(6,182,212,0.08) 0%, transparent 60%), #080812',
     },
     {
-        id: 'fans',
-        badge: 'PARA INVERSORES & FANS',
+        id: 'latam',
+        badge: 'MERCADO EN CRECIMIENTO',
+        badgeColor: '#06b6d4',
+        badgeBg: 'rgba(6,182,212,0.1)',
+        badgeBorder: 'rgba(6,182,212,0.3)',
+        title: 'Diversifica con\nel éxito de Latam',
+        titleGradient: 'linear-gradient(135deg, #ffffff 0%, #06b6d4 55%, #6366f1 100%)',
+        subtitle: 'Invierte en un mercado que crece al 19% anual y protege tu capital de la volatilidad.',
+        cta: { label: 'Explorar Yields →', action: null, page: 'explore' },
+        ctaStyle: 'gradient',
+        accent: '#06b6d4',
+        glow1: 'rgba(6,182,212,0.18)',
+        glow2: 'rgba(99,102,241,0.10)',
+        bgOverlay: 'radial-gradient(ellipse 80% 60% at 50% 80%, rgba(6,182,212,0.14) 0%, transparent 70%), radial-gradient(ellipse 50% 40% at 80% 15%, rgba(99,102,241,0.10) 0%, transparent 60%), #080812',
+    },
+    {
+        id: 'ip',
+        badge: 'PROPIEDAD INTELECTUAL',
         badgeColor: '#a855f7',
-        badgeBg: 'rgba(139,92,246,0.12)',
-        badgeBorder: 'rgba(139,92,246,0.3)',
-        title: 'Invierte en la\nMúsica que Amas',
+        badgeBg: 'rgba(168,85,247,0.1)',
+        badgeBorder: 'rgba(168,85,247,0.3)',
+        title: 'Sé dueño legal de\nla propiedad intelectual',
         titleGradient: 'linear-gradient(135deg, #ffffff 0%, #a855f7 55%, #06b6d4 100%)',
-        subtitle: 'Sé parte del éxito de tus artistas favoritos. En BE4T, transformamos los hits mundiales en activos invertibles. Participa en la economía de las regalías musicales y genera rendimientos con cada reproducción.',
-        cta: { label: 'Explorar Marketplace →', action: null, page: 'explore' },
-        ctaStyle: 'gradient',      // gradient fill pill
+        subtitle: 'Adquiere fracciones de derechos de artistas emergentes y participa de sus ganancias de por vida.',
+        cta: { label: 'Invertir ahora →', action: null, page: 'explore' },
+        ctaStyle: 'gradient',
         accent: '#a855f7',
-        glow1: 'rgba(139,92,246,0.18)',
+        glow1: 'rgba(168,85,247,0.18)',
         glow2: 'rgba(6,182,212,0.10)',
-        bgOverlay: 'radial-gradient(ellipse 80% 60% at 50% 80%, rgba(139,92,246,0.16) 0%, transparent 70%), radial-gradient(ellipse 50% 40% at 80% 15%, rgba(6,182,212,0.08) 0%, transparent 60%), #080812',
+        bgOverlay: 'radial-gradient(ellipse 80% 60% at 50% 80%, rgba(168,85,247,0.14) 0%, transparent 70%), radial-gradient(ellipse 50% 40% at 80% 15%, rgba(6,182,212,0.08) 0%, transparent 60%), #080812',
     },
 ];
 
-const INTERVAL = 8000; // 8 seconds — easy to read
+const INTERVAL = 9000; // 9 seconds — enough time to read subtitle
 
 // ── Subtle grid lines bg ──────────────────────────────────────────────────────
 const GridBg = () => (
@@ -284,7 +300,6 @@ const HeroBanner = ({ userMode, onNavigate }) => {
                     style={
                         slide.ctaStyle === 'border'
                             ? {
-                                // Revelator-style white border pill
                                 padding: '1rem 2.5rem', minHeight: '56px',
                                 background: 'rgba(255,255,255,0.1)',
                                 border: '1px solid rgba(255,255,255,0.55)',
@@ -295,8 +310,17 @@ const HeroBanner = ({ userMode, onNavigate }) => {
                                 boxShadow: '0 0 0 0 transparent',
                                 fontFamily: "'Inter Tight','Inter',sans-serif",
                             }
+                        : slide.ctaStyle === 'gradient-green'
+                            ? {
+                                padding: '1rem 2.5rem', minHeight: '56px',
+                                background: 'linear-gradient(135deg, #065f46, #10b981)',
+                                border: 'none', borderRadius: '100px',
+                                color: 'white', fontWeight: '800', fontSize: '1rem',
+                                cursor: 'pointer', letterSpacing: '-0.01em',
+                                boxShadow: '0 4px 32px rgba(16,185,129,0.4)',
+                                fontFamily: "'Inter Tight','Inter',sans-serif",
+                            }
                             : {
-                                // Gradient neon pill
                                 padding: '1rem 2.5rem', minHeight: '56px',
                                 background: 'linear-gradient(135deg, #7c3aed, #a855f7, #06b6d4)',
                                 border: 'none', borderRadius: '100px',
@@ -344,6 +368,24 @@ const HeroBanner = ({ userMode, onNavigate }) => {
                         {String(active + 1).padStart(2,'0')} / {String(SLIDES.length).padStart(2,'0')}
                     </span>
                 </div>
+            </div>
+            {/* ── Trust chip — Powered by Blockchain (bottom-right, very subtle) ── */}
+            <div style={{
+                position: 'absolute', bottom: '1.25rem', right: '1.5rem',
+                display: 'flex', alignItems: 'center', gap: '0.4rem',
+                background: 'rgba(255,255,255,0.04)',
+                border: '1px solid rgba(255,255,255,0.1)',
+                borderRadius: '100px', padding: '0.3rem 0.8rem',
+                zIndex: 2, pointerEvents: 'none',
+            }}>
+                {/* Chain link icon */}
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.4)" strokeWidth="2.5" strokeLinecap="round">
+                    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+                    <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+                </svg>
+                <span style={{ fontSize: '0.58rem', color: 'rgba(255,255,255,0.3)', fontWeight: '600', letterSpacing: '0.8px', textTransform: 'uppercase', fontFamily: 'monospace' }}>
+                    Powered by Blockchain &middot; Legal
+                </span>
             </div>
         </div>
     );
