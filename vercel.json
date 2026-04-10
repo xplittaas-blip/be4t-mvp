@@ -1,5 +1,5 @@
 {
-  "buildCommand": "vite build --mode production",
+  "buildCommand": "vite build --mode showcase",
   "outputDirectory": "dist",
   "framework": "vite",
   "rewrites": [
