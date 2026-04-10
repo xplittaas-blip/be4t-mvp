@@ -1,35 +1,38 @@
 /**
  * BE4T Environment Configuration
  * ─────────────────────────────────────────────────────────────────────────────
- * VITE_APP_MODE = 'showcase'   → demo mode (static data, no blockchain)
- * VITE_APP_MODE = 'production' → live mode (Supabase + Thirdweb/Base)
+ * APP_MODE is resolved at BUILD TIME by vite.config.js → define: { __APP_MODE__ }
+ *
+ * Resolution order (in vite.config.js):
+ *   1. VITE_APP_MODE env var (from Vercel dashboard or .env file)
+ *   2. Vite --mode flag     ('production' → 'production', else 'showcase')
+ *   3. Fallback             → 'showcase' (safe for demos / pitch)
  */
 
-/**
- * Read VITE_APP_MODE safely — works in both Vite and plain Node.
- * Falls back to 'showcase' if not set (safe for pitch deploys).
- */
-function getAppMode() {
+function resolveMode() {
+    // __APP_MODE__ is a build-time constant injected by vite.config.js define
+    // eslint-disable-next-line no-undef
+    if (typeof __APP_MODE__ !== 'undefined') return __APP_MODE__;
+
+    // Fallback: read at runtime (dev server, SSR, test env)
     try {
-        const mode = import.meta?.env?.VITE_APP_MODE;
-        return mode === 'production' ? 'production' : 'showcase';
+        return import.meta?.env?.VITE_APP_MODE || 'showcase';
     } catch {
         return 'showcase';
     }
 }
 
-export const APP_MODE    = getAppMode();
-export const isShowcase  = APP_MODE !== 'production';
-export const isProduction = APP_MODE === 'production';
+export const APP_MODE     = resolveMode();
+export const isProduction  = APP_MODE === 'production';
+export const isShowcase    = !isProduction;
 
-/* Credentials — safe to read in both modes */
-export const SUPABASE_URL      = (() => { try { return import.meta.env.VITE_SUPABASE_URL      || ''; } catch { return ''; } })();
-export const SUPABASE_ANON_KEY = (() => { try { return import.meta.env.VITE_SUPABASE_ANON_KEY || ''; } catch { return ''; } })();
+export const SUPABASE_URL       = (() => { try { return import.meta.env.VITE_SUPABASE_URL      || ''; } catch { return ''; } })();
+export const SUPABASE_ANON_KEY  = (() => { try { return import.meta.env.VITE_SUPABASE_ANON_KEY  || ''; } catch { return ''; } })();
 export const THIRDWEB_CLIENT_ID = (() => { try { return import.meta.env.VITE_THIRDWEB_CLIENT_ID || ''; } catch { return ''; } })();
 
-export const BASE_CHAIN_ID = 8453;
-export const ENV_LABEL = isProduction ? '⚡ LIVE' : '🎬 DEMO';
+export const BASE_CHAIN_ID  = 8453;
+export const ENV_LABEL      = isProduction ? '⚡ LIVE' : '🎬 DEMO';
 
 if (typeof window !== 'undefined') {
-    console.info(`[BE4T] Mode: ${APP_MODE.toUpperCase()} ${ENV_LABEL}`);
+    console.info(`[BE4T] Mode: ${APP_MODE.toUpperCase()} | ${ENV_LABEL}`);
 }
