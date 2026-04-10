@@ -555,22 +555,34 @@ const SongCard = ({ song, userMode, index = 0, onDetailClick }) => {
                     </div>
                 </div>
 
-                {/* CTA — Ver Detalle */}
+                {/* CTA — Adquirir participación de regalías */}
                 <button
                     id={`detail-btn-${song.id}`}
                     onClick={(e) => { e.stopPropagation(); onDetailClick && onDetailClick(song._raw); }}
                     style={{
-                        width: '100%', padding: '0.75rem',
-                        background: 'linear-gradient(135deg, #7c3aed, #a855f7)',
+                        width: '100%', padding: '0.78rem 0.6rem',
+                        background: 'linear-gradient(135deg, #065f46, #10b981)',
                         border: 'none', borderRadius: '10px',
-                        color: 'white', fontWeight: '700', fontSize: '0.9rem',
-                        cursor: 'pointer', transition: 'opacity 0.2s ease',
+                        color: 'white', fontWeight: '700', fontSize: '0.865rem',
+                        cursor: 'pointer',
+                        transition: 'all 0.3s ease',
                         marginTop: 'auto',
+                        lineHeight: 1.35,
+                        letterSpacing: '-0.01em',
+                        boxShadow: '0 2px 12px rgba(16,185,129,0.25)',
                     }}
-                    onMouseOver={e => e.currentTarget.style.opacity = '0.82'}
-                    onMouseOut={e => e.currentTarget.style.opacity = '1'}
+                    onMouseOver={e => {
+                        e.currentTarget.style.opacity = '0.92';
+                        e.currentTarget.style.boxShadow = '0 4px 22px rgba(16,185,129,0.5)';
+                        e.currentTarget.style.filter = 'brightness(1.1)';
+                    }}
+                    onMouseOut={e => {
+                        e.currentTarget.style.opacity = '1';
+                        e.currentTarget.style.boxShadow = '0 2px 12px rgba(16,185,129,0.25)';
+                        e.currentTarget.style.filter = 'brightness(1)';
+                    }}
                 >
-                    Ver Detalle
+                    Adquirir participación de regalías
                 </button>
             </div>
 
