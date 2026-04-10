@@ -5,7 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:demo": "vite --mode showcase",
+    "dev:real": "vite --mode production --port 3001",
     "build": "vite build",
+    "build:demo": "vite build --mode showcase",
+    "build:real": "vite build --mode production",
     "lint": "eslint .",
     "preview": "vite preview"
   },

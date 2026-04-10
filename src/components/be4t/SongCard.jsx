@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { audioManager } from '../../services/audioManager';
 import { fetchPreviewUrl } from '../../services/previewService';
 import { fetchSongMetrics } from '../../services/metricsService';
+import { isProduction } from '../../core/env';
 
 // ── Format helpers ────────────────────────────────────────────────────────────
 const fmt = (n) => {
@@ -555,20 +556,28 @@ const SongCard = ({ song, userMode, index = 0, onDetailClick }) => {
                     </div>
                 </div>
 
-                {/* CTA — Adquirir participación de regalías */}
+                {/* CTA — mode-aware */}
                 <button
                     id={`detail-btn-${song.id}`}
-                    onClick={(e) => { e.stopPropagation(); onDetailClick && onDetailClick(song._raw); }}
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        if (isProduction) {
+                            // Production: open detail view — wallet connect triggered inside AssetDetailView
+                            onDetailClick && onDetailClick(song._raw);
+                        } else {
+                            // Showcase: open detail view in demo mode (no blockchain)
+                            onDetailClick && onDetailClick(song._raw);
+                        }
+                    }}
                     style={{
                         width: '100%', padding: '0.78rem 0.6rem',
-                        background: 'linear-gradient(135deg, #065f46, #10b981)',
+                        background: isProduction
+                            ? 'linear-gradient(135deg, #065f46, #10b981)'
+                            : 'linear-gradient(135deg, #065f46, #10b981)',
                         border: 'none', borderRadius: '10px',
                         color: 'white', fontWeight: '700', fontSize: '0.865rem',
-                        cursor: 'pointer',
-                        transition: 'all 0.3s ease',
-                        marginTop: 'auto',
-                        lineHeight: 1.35,
-                        letterSpacing: '-0.01em',
+                        cursor: 'pointer', transition: 'all 0.3s ease',
+                        marginTop: 'auto', lineHeight: 1.35, letterSpacing: '-0.01em',
                         boxShadow: '0 2px 12px rgba(16,185,129,0.25)',
                     }}
                     onMouseOver={e => {
@@ -582,7 +591,7 @@ const SongCard = ({ song, userMode, index = 0, onDetailClick }) => {
                         e.currentTarget.style.filter = 'brightness(1)';
                     }}
                 >
-                    Adquirir participación de regalías
+                    {isProduction ? 'Adquirir participación de regalías' : 'Adquirir participación de regalías'}
                 </button>
             </div>
 
