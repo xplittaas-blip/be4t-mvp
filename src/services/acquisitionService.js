@@ -11,11 +11,10 @@
  *   const result = await acquireToken({ asset, account, quantity: 1 });
  */
 import { isProduction } from '../core/env';
-import { thirdwebClient, ACTIVE_CHAIN } from '../core/web3Client';
+import { getThirdwebClient } from '../core/web3Client';
 
 // ── Showcase simulation ───────────────────────────────────────────────────────
 async function simulateAcquisition(asset) {
-    // Fake 1.5s network delay for realism
     await new Promise(r => setTimeout(r, 1500));
     return {
         success: true,
@@ -29,20 +28,19 @@ async function simulateAcquisition(asset) {
 
 // ── Production: real ERC-1155 claim ──────────────────────────────────────────
 async function claimToken({ asset, account, quantity = 1 }) {
-    if (!thirdwebClient) throw new Error('Web3 client not initialised');
+    const web3 = await getThirdwebClient();
+    if (!web3) throw new Error('Web3 client not initialised');
     if (!asset.contract_address) throw new Error('No contract address for this asset');
     if (!account) throw new Error('Wallet not connected');
 
-    // Dynamic import — only loaded in production
     const { getContract, prepareContractCall, sendTransaction } = await import('thirdweb');
 
     const contract = getContract({
-        client:  thirdwebClient,
-        chain:   ACTIVE_CHAIN,
+        client:  web3.client,
+        chain:   web3.chain,
         address: asset.contract_address,
     });
 
-    // ERC-1155 claim(address _receiver, uint256 _tokenId, uint256 _quantity)
     const tx = prepareContractCall({
         contract,
         method: 'function claim(address _receiver, uint256 _tokenId, uint256 _quantity) external',

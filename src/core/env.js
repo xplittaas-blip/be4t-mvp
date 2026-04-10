@@ -3,27 +3,33 @@
  * ─────────────────────────────────────────────────────────────────────────────
  * VITE_APP_MODE = 'showcase'   → demo mode (static data, no blockchain)
  * VITE_APP_MODE = 'production' → live mode (Supabase + Thirdweb/Base)
- *
- * Usage anywhere in the app:
- *   import { APP_MODE, isShowcase, isProduction } from '@/core/env';
  */
 
-export const APP_MODE = import.meta.env.VITE_APP_MODE || 'showcase';
+/**
+ * Read VITE_APP_MODE safely — works in both Vite and plain Node.
+ * Falls back to 'showcase' if not set (safe for pitch deploys).
+ */
+function getAppMode() {
+    try {
+        const mode = import.meta?.env?.VITE_APP_MODE;
+        return mode === 'production' ? 'production' : 'showcase';
+    } catch {
+        return 'showcase';
+    }
+}
 
-export const isShowcase   = APP_MODE === 'showcase';
+export const APP_MODE    = getAppMode();
+export const isShowcase  = APP_MODE !== 'production';
 export const isProduction = APP_MODE === 'production';
 
-// Supabase — only meaningful in production
-export const SUPABASE_URL      = import.meta.env.VITE_SUPABASE_URL      || '';
-export const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
+/* Credentials — safe to read in both modes */
+export const SUPABASE_URL      = (() => { try { return import.meta.env.VITE_SUPABASE_URL      || ''; } catch { return ''; } })();
+export const SUPABASE_ANON_KEY = (() => { try { return import.meta.env.VITE_SUPABASE_ANON_KEY || ''; } catch { return ''; } })();
+export const THIRDWEB_CLIENT_ID = (() => { try { return import.meta.env.VITE_THIRDWEB_CLIENT_ID || ''; } catch { return ''; } })();
 
-// Thirdweb / Base network (production)
-export const THIRDWEB_CLIENT_ID = import.meta.env.VITE_THIRDWEB_CLIENT_ID || '';
-export const BASE_CHAIN_ID      = 8453; // Ethereum L2 — Base Mainnet
-
-// Handy label for UI badges / console logs
+export const BASE_CHAIN_ID = 8453;
 export const ENV_LABEL = isProduction ? '⚡ LIVE' : '🎬 DEMO';
 
-if (import.meta.env.DEV) {
-    console.info(`[BE4T] App mode: ${APP_MODE.toUpperCase()} ${ENV_LABEL}`);
+if (typeof window !== 'undefined') {
+    console.info(`[BE4T] Mode: ${APP_MODE.toUpperCase()} ${ENV_LABEL}`);
 }
