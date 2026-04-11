@@ -3,7 +3,6 @@ import { audioManager } from '../../services/audioManager';
 import { fetchPreviewUrl } from '../../services/previewService';
 import { fetchSongMetrics } from '../../services/metricsService';
 import { isProduction } from '../../core/env';
-import AssetDetailModal from './AssetDetailModal';
 
 // ── Format helpers ─────────────────────────────────────────────────────────────
 const fmt = (n) => {
@@ -142,12 +141,15 @@ const TokenBar = ({ available, total }) => {
 
 // ── Main SongCard ──────────────────────────────────────────────────────────────
 const SongCard = ({ song, userMode, index = 0, onDetailClick }) => {
-    const [hovered, setHovered]                         = useState(false);
-    const [isPlaying, setIsPlaying]                     = useState(false);
-    const [isLoading, setIsLoading]                     = useState(false);
-    const [showAcquisitionModal, setShowAcquisitionModal] = useState(false);
+    const [hovered, setHovered]   = useState(false);
+    const [isPlaying, setIsPlaying] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
     const audioRef   = useRef(null);
     const previewRef = useRef(song.preview_url || null);
+
+    const handleDetailClick = useCallback(() => {
+        if (onDetailClick) onDetailClick(song._raw || song);
+    }, [onDetailClick, song]);
 
     // ── Live metrics from Deezer/Spotify API ────────────────────────────────
     const [metrics, setMetrics] = useState(null);
@@ -486,10 +488,10 @@ const SongCard = ({ song, userMode, index = 0, onDetailClick }) => {
                         </div>
                     </div>
 
-                    {/* ── PRIMARY CTA — opens detail/calculator modal ── */}
+                    {/* ── PRIMARY CTA — navigates to SongDetail page ── */}
                     <button
                         id={`acquire-btn-${song.id}`}
-                        onClick={(e) => { e.stopPropagation(); setShowAcquisitionModal(true); }}
+                        onClick={(e) => { e.stopPropagation(); handleDetailClick(); }}
                         style={{
                             width: '100%', padding: '0.88rem 0.6rem',
                             background: 'linear-gradient(135deg, #065f46 0%, #10b981 100%)',
@@ -518,10 +520,10 @@ const SongCard = ({ song, userMode, index = 0, onDetailClick }) => {
                         </span>
                     </button>
 
-                    {/* Secondary link — opens metrics tab */}
+                    {/* Secondary link */}
                     <button
                         id={`detail-link-${song.id}`}
-                        onClick={(e) => { e.stopPropagation(); setShowAcquisitionModal(true); }}
+                        onClick={(e) => { e.stopPropagation(); handleDetailClick(); }}
                         style={{ width: '100%', background: 'none', border: 'none', padding: '0.3rem 0',
                             color: 'rgba(255,255,255,0.28)', fontSize: '0.65rem', cursor: 'pointer',
                             textDecoration: 'underline', textDecorationColor: 'rgba(255,255,255,0.15)',
@@ -532,14 +534,6 @@ const SongCard = ({ song, userMode, index = 0, onDetailClick }) => {
                         Ver análisis completo y métricas
                     </button>
                 </div>
-
-                {/* Detail Modal (sales funnel) */}
-                {showAcquisitionModal && (
-                    <AssetDetailModal
-                        song={song}
-                        onClose={() => setShowAcquisitionModal(false)}
-                    />
-                )}
             </div>
         </>
     );

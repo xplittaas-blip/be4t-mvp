@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import HeroBanner from '../components/be4t/HeroBanner';
 import SongCard, { normalizeSong, SongCardSkeleton } from '../components/be4t/SongCard';
-import AssetDetailView from '../components/be4t/AssetDetailView';
 import TokenizationModal from '../components/be4t/TokenizationModal';
 import EarlyAccessModal from '../components/be4t/EarlyAccessModal';
 import { fetchDemoSongs20 } from '../services/spotifyService';
@@ -324,36 +323,8 @@ const Marketplace = ({ session, onNavigate }) => {
         return list;
     }, [rawAssets, searchQuery, sortBy, genreFilter]);
 
-    // ── Detail View navigation ────────────────────────────────────────────
-    if (detailAsset) {
-        return (
-            <>
-                <style>{globalStyles}</style>
-                <AssetDetailView
-                    asset={detailAsset}
-                    allAssets={rawAssets.map(s => s._raw).filter(Boolean)}
-                    onBack={(newAsset) => {
-                        if (newAsset && newAsset.id !== detailAsset.id) {
-                            // Navigate to clicked related song
-                            setDetailAsset(newAsset);
-                        } else {
-                            setDetailAsset(null);
-                        }
-                    }}
-                />
-                {tokenizingAsset && (
-                    <TokenizationModal
-                        asset={tokenizingAsset}
-                        onClose={() => setTokenizingAsset(null)}
-                        onSuccess={(updated) => {
-                            setRawAssets(prev => prev.map(a => a.id === updated.id ? normalizeSong(updated) : a));
-                            setTokenizingAsset(null);
-                        }}
-                    />
-                )}
-            </>
-        );
-    }
+    // ── Detail View navigation ─ now uses full SongDetail page ──────────────
+    // No inline detail rendering — onNavigate('song-detail', id) handles this
 
     // ── Loading Skeleton Grid ─────────────────────────────────────────────
     const renderSkeletons = () => (
@@ -450,7 +421,9 @@ const Marketplace = ({ session, onNavigate }) => {
                                         song={song}
                                         userMode={userMode}
                                         index={i}
-                                        onDetailClick={(raw) => setDetailAsset(raw)}
+                                        onDetailClick={(raw) => {
+                                            if (onNavigate) onNavigate('song-detail', raw?.id ?? raw?._raw?.id);
+                                        }}
                                     />
                                 ))}
                             </div>

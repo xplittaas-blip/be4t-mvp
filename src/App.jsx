@@ -7,6 +7,7 @@ import AssetUploader from './components/be4t/AssetUploader';
 import Marketplace from './pages/Marketplace';
 import Portfolio from './pages/Portfolio';
 import WaitlistPage from './pages/WaitlistPage';
+import SongDetail from './pages/SongDetail';
 import HowItWorks from './components/be4t/HowItWorks';
 import { supabase } from './core/xplit/supabaseClient';
 
@@ -254,6 +255,7 @@ function App() {
     const [currentPage, setCurrentPage] = useState('explore');
     const [session, setSession]         = useState(null);
     const [showAuthModal, setShowAuthModal] = useState(false);
+    const [activeSongId, setActiveSongId]   = useState(null);
 
     // ── Auth ─────────────────────────────────────────────────────────────────
     useEffect(() => {
@@ -272,7 +274,10 @@ function App() {
         return () => document.removeEventListener('navigate', handler);
     }, []);
 
-    const navigate = (page) => setCurrentPage(page);
+    const navigate = (page, songId) => {
+        if (songId) setActiveSongId(songId);
+        setCurrentPage(page);
+    };
 
     return (
         <div style={{ background: '#0F1117', minHeight: '100vh', color: 'white' }}>
@@ -299,6 +304,16 @@ function App() {
                 {/* Explorar: Marketplace with Spotify Top 20 */}
                 {currentPage === 'explore' && (
                     <Marketplace session={session} onNavigate={navigate} />
+                )}
+
+                {/* Song Detail: Full-page view */}
+                {currentPage === 'song-detail' && (
+                    <SongDetail
+                        songId={activeSongId}
+                        isAuthenticated={!!session}
+                        onBack={() => navigate('explore')}
+                        onRequireAuth={() => setShowAuthModal(true)}
+                    />
                 )}
 
                 {/* Mis Canciones: Portfolio / Dashboard */}
