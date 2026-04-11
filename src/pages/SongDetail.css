@@ -1,3 +1,9 @@
+/* ── Live data badge animations ──────────────────────────────────────────── */
+@keyframes sd-live-pulse {
+    0%, 100% { opacity: 1; box-shadow: 0 0 6px #22c55e; }
+    50%       { opacity: 0.4; box-shadow: 0 0 2px #22c55e; }
+}
+
 /* Custom Resets & Utilities */
 .mb-2 {
     margin-bottom: 0.5rem;

@@ -391,27 +391,60 @@ const SongCard = ({ song, userMode, index = 0, onDetailClick }) => {
                     </div>
 
                     {/* Platform metrics — 3-col grid */}
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.42rem' }}>
-                        {[
-                            { Icon: SpotifyIcon, color: '#1DB954', label: 'STREAMS', value: fmt(displayStreams),  sub: 'Spotify'  },
-                            { Icon: YouTubeIcon, color: '#FF0000', label: 'VIEWS',   value: fmt(displayViews),    sub: 'YouTube'  },
-                            { Icon: TikTokIcon,  color: '#2DD4BF', label: 'CREAT.',  value: fmt(displayTikTok),   sub: 'TikTok'   },
-                        ].map(({ Icon, color, label, value, sub }) => (
-                            <div key={label} style={{
-                                background: 'rgba(255,255,255,0.028)',
-                                border: '1px solid rgba(255,255,255,0.055)',
-                                borderRadius: '8px', padding: '0.38rem 0.45rem',
-                                display: 'flex', flexDirection: 'column', gap: '0.12rem',
-                            }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
-                                    <Icon size={9} />
-                                    <span style={{ fontSize: '0.5rem', color: 'rgba(255,255,255,0.3)',
-                                        textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: '700' }}>{label}</span>
+                    <div>
+                        {/* Header row: label + LIVE indicator */}
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.35rem' }}>
+                            <span style={{ fontSize: '0.5rem', color: 'rgba(255,255,255,0.2)', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: '700' }}>Plataformas</span>
+                            {metrics ? (
+                                isLiveMetrics ? (
+                                    <span style={{
+                                        display: 'inline-flex', alignItems: 'center', gap: '3px',
+                                        background: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.3)',
+                                        borderRadius: '100px', padding: '1px 7px', fontSize: '0.48rem',
+                                        color: '#4ade80', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.8px',
+                                    }}>
+                                        <span style={{ width: '4px', height: '4px', borderRadius: '50%', background: '#22c55e',
+                                            display: 'inline-block', animation: 'be4t-dot-pulse 1.8s ease-in-out infinite' }} />
+                                        LIVE
+                                    </span>
+                                ) : (
+                                    <span style={{
+                                        display: 'inline-flex', alignItems: 'center', gap: '3px',
+                                        background: 'rgba(234,179,8,0.08)', border: '1px solid rgba(234,179,8,0.25)',
+                                        borderRadius: '100px', padding: '1px 7px', fontSize: '0.48rem',
+                                        color: '#fbbf24', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.8px',
+                                    }}>
+                                        <span style={{ width: '4px', height: '4px', borderRadius: '50%', background: '#f59e0b',
+                                            display: 'inline-block' }} />
+                                        Est.
+                                    </span>
+                                )
+                            ) : (
+                                <span style={{ fontSize: '0.44rem', color: 'rgba(255,255,255,0.18)', fontStyle: 'italic' }}>cargando…</span>
+                            )}
+                        </div>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.42rem' }}>
+                            {[
+                                { Icon: SpotifyIcon, color: '#1DB954', label: 'STREAMS', value: fmt(displayStreams),  sub: 'Spotify'  },
+                                { Icon: YouTubeIcon, color: '#FF0000', label: 'VIEWS',   value: fmt(displayViews),    sub: 'YouTube'  },
+                                { Icon: TikTokIcon,  color: '#2DD4BF', label: 'CREAT.',  value: fmt(displayTikTok),   sub: 'TikTok'   },
+                            ].map(({ Icon, color, label, value, sub }) => (
+                                <div key={label} style={{
+                                    background: 'rgba(255,255,255,0.028)',
+                                    border: '1px solid rgba(255,255,255,0.055)',
+                                    borderRadius: '8px', padding: '0.38rem 0.45rem',
+                                    display: 'flex', flexDirection: 'column', gap: '0.12rem',
+                                }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
+                                        <Icon size={9} />
+                                        <span style={{ fontSize: '0.5rem', color: 'rgba(255,255,255,0.3)',
+                                            textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: '700' }}>{label}</span>
+                                    </div>
+                                    <span style={{ fontSize: '0.88rem', fontWeight: '800', color: 'white', letterSpacing: '-0.02em' }}>{value}</span>
+                                    <span style={{ fontSize: '0.48rem', color: 'rgba(255,255,255,0.2)' }}>{sub}</span>
                                 </div>
-                                <span style={{ fontSize: '0.88rem', fontWeight: '800', color: 'white', letterSpacing: '-0.02em' }}>{value}</span>
-                                <span style={{ fontSize: '0.48rem', color: 'rgba(255,255,255,0.2)' }}>{sub}</span>
-                            </div>
-                        ))}
+                            ))}
+                        </div>
                     </div>
 
                     {/* Growth sparkline row */}

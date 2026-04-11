@@ -166,9 +166,16 @@ const SongDetail = ({ onBack, songId, onRequireAuth, isAuthenticated, onInvest }
                 // Fetch real metrics from metricsService in parallel
                 // Build a minimal song-like object that metricsService understands
                 const songProxy = {
-                    id:       targetId,
-                    _raw:     { deezer_id: baseSong.deezer_id, metadata: { popularity: baseSong.popularity } },
-                    roi_est:  baseSong.royalties_shared ?? 18,
+                    id:         targetId,
+                    name:       baseSong.name   || baseSong.title,
+                    artist:     baseSong.artist,
+                    spotify_id: baseSong.spotify_id || baseSong.metadata?.spotify_id || null,
+                    _raw: {
+                        deezer_id: baseSong.deezer_id,
+                        spotify_id: baseSong.spotify_id || baseSong.metadata?.spotify_id || null,
+                        metadata:  { popularity: baseSong.popularity },
+                    },
+                    roi_est: baseSong.royalties_shared ?? 18,
                 };
                 const [liveMetrics, ytResponse] = await Promise.all([
                     fetchSongMetrics(songProxy).catch(() => null),
@@ -267,11 +274,42 @@ const SongDetail = ({ onBack, songId, onRequireAuth, isAuthenticated, onInvest }
                     <section className="detail-section glass-panel mt-5">
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
                             <h2 className="section-title" style={{ margin: 0 }}>MÉTRICAS DE PLATAFORMAS</h2>
-                            {metrics?.source === 'live' && (
-                                <span style={{ fontSize: '0.58rem', color: '#22c55e', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '1px', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                    <span style={{ display: 'inline-block', width: '5px', height: '5px', borderRadius: '50%', background: '#22c55e', boxShadow: '0 0 5px #22c55e' }} />
-                                    Datos en Vivo
-                                </span>
+                            {metrics ? (
+                                metrics.source === 'live' ? (
+                                    <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                        <span style={{
+                                            display: 'inline-flex', alignItems: 'center', gap: '4px',
+                                            background: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.3)',
+                                            borderRadius: '100px', padding: '3px 10px',
+                                            fontSize: '0.6rem', color: '#4ade80', fontWeight: '700',
+                                            textTransform: 'uppercase', letterSpacing: '1px',
+                                        }}>
+                                            <span style={{
+                                                width: '5px', height: '5px', borderRadius: '50%',
+                                                background: '#22c55e', boxShadow: '0 0 6px #22c55e',
+                                                animation: 'sd-live-pulse 1.8s ease-in-out infinite',
+                                                display: 'inline-block',
+                                            }} />
+                                            LIVE
+                                        </span>
+                                        <span style={{ fontSize: '0.6rem', color: 'rgba(255,255,255,0.25)' }}>
+                                            Actualizado hace {Math.round((Date.now() - (metrics.ts || Date.now())) / 3_600_000) || '<1'}h
+                                        </span>
+                                    </span>
+                                ) : (
+                                    <span style={{
+                                        display: 'inline-flex', alignItems: 'center', gap: '4px',
+                                        background: 'rgba(234,179,8,0.08)', border: '1px solid rgba(234,179,8,0.25)',
+                                        borderRadius: '100px', padding: '3px 10px',
+                                        fontSize: '0.6rem', color: '#fbbf24', fontWeight: '700',
+                                        textTransform: 'uppercase', letterSpacing: '1px',
+                                    }}>
+                                        <span style={{ width: '5px', height: '5px', borderRadius: '50%', background: '#f59e0b', display: 'inline-block' }} />
+                                        Calibrado
+                                    </span>
+                                )
+                            ) : (
+                                <span style={{ fontSize: '0.62rem', color: 'rgba(255,255,255,0.2)', fontStyle: 'italic' }}>cargando datos…</span>
                             )}
                         </div>
 
