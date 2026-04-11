@@ -257,39 +257,6 @@ const ReturnCalculator = ({ streamCount, roiEst, isTrending, paymentFreq = 'mont
                 </div>
             </div>
 
-            {/* ── Proyección 12/24/36 meses ── */}
-            <div style={{ background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '14px', padding: '1rem' }}>
-                <div style={{ fontSize: '0.62rem', color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: '700', marginBottom: '1rem' }}>Ganancia Proyectada (con reinversión)</div>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '6px' }}>
-                    {[{ label: '12 meses', val: proj12 }, { label: '24 meses', val: proj24 }, { label: '36 meses', val: proj36 }].map(({ label, val }, i) => {
-                        const maxVal = proj36 || 1;
-                        const barH   = Math.max(20, (val / maxVal) * 64);
-                        return (
-                            <div key={label} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px' }}>
-                                {/* Bar */}
-                                <div style={{ width: '100%', height: '68px', display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}>
-                                    <div className="proj-bar" style={{
-                                        width: '60%',
-                                        height: `${barH}px`,
-                                        borderRadius: '6px 6px 0 0',
-                                        background: i === 0
-                                            ? 'linear-gradient(to top, rgba(139,92,246,0.6), rgba(139,92,246,0.3))'
-                                            : i === 1
-                                            ? 'linear-gradient(to top, rgba(99,102,241,0.7), rgba(139,92,246,0.4))'
-                                            : 'linear-gradient(to top, rgba(59,130,246,0.8), rgba(139,92,246,0.5))',
-                                        boxShadow: '0 0 10px rgba(139,92,246,0.2)',
-                                    }} />
-                                </div>
-                                <div style={{ fontWeight: '800', fontSize: '0.88rem', color: '#c4b5fd' }} className="calc-anim">
-                                    +{sym}{val.toFixed(0)}
-                                </div>
-                                <div style={{ fontSize: '0.58rem', color: 'rgba(255,255,255,0.3)', textAlign: 'center' }}>{label}</div>
-                            </div>
-                        );
-                    })}
-                </div>
-            </div>
-
             {/* ── Bond comparison ── */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '0.75rem 1rem', background: 'rgba(251,191,36,0.06)', border: '1px solid rgba(251,191,36,0.18)', borderRadius: '12px' }}>
                 <span style={{ fontSize: '1.1rem' }}>🏆</span>
@@ -679,7 +646,7 @@ const SongDetail = ({ onBack, songId, songData, onRequireAuth, isAuthenticated, 
                         streamCount={liveStreamCount}
                         roiEst={roiEst}
                         isTrending={song.is_trending || metrics?.source === 'live'}
-                        paymentFreq="monthly"
+                        paymentFreq="quarterly"
                         tokensTotal={song.total_supply ?? 10_000}
                         tokensAvailable={song.tokens_available ?? song.tokensAvailable ?? 7_500}
                         tokenPrice={song.price ?? song.token_price_usd ?? 10}
