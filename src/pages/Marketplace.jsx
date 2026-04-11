@@ -422,7 +422,9 @@ const Marketplace = ({ session, onNavigate }) => {
                                         userMode={userMode}
                                         index={i}
                                         onDetailClick={(raw) => {
-                                            if (onNavigate) onNavigate('song-detail', raw?.id ?? raw?._raw?.id);
+                                            const songObj = raw?._raw || raw || {};
+                                            const songId  = songObj.id || raw?.id;
+                                            if (onNavigate) onNavigate('song-detail', songId, songObj);
                                         }}
                                     />
                                 ))}

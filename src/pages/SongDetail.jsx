@@ -117,8 +117,8 @@ const ReturnCalculator = ({ streamCount, roiEst }) => {
     );
 };
 
-// ── Main SongDetail ───────────────────────────────────────────────────────────
-const SongDetail = ({ onBack, songId, onRequireAuth, isAuthenticated, onInvest }) => {
+// ── Main SongDetail ───────────────────────────────────────────────────────────────
+const SongDetail = ({ onBack, songId, songData, onRequireAuth, isAuthenticated, onInvest }) => {
     const { t: tSong } = useTranslation('song');
     const { t: tCalc } = useTranslation('calculator');
 
@@ -132,50 +132,82 @@ const SongDetail = ({ onBack, songId, onRequireAuth, isAuthenticated, onInvest }
     const isPlaying = globalIsPlaying && currentTrack?.id === song?.id;
     const calculatorRef = useRef(null);
 
-    // ── Fetch song + enrich with real metrics ──────────────────────────────────
+    // ── Fetch song + enrich with real metrics ─────────────────────────────────────────
     useEffect(() => {
         let cancelled = false;
         const run = async () => {
             try {
-                const allSongs = await getMarketplaceData();
-                const targetId = songId || allSongs[0]?.id;
-                const baseSong = allSongs.find(s => s.id === targetId) || allSongs[0];
+                let baseSong = null;
 
-                const finalData = {
-                    id:               targetId,
-                    title:            baseSong.title,
-                    artist:           baseSong.artist,
-                    image:            baseSong.cover_image,
-                    preview_url:      baseSong.preview_url,
-                    fansParticipating: (baseSong.fans_joined || 1248).toLocaleString(),
-                    fundingProgress:  baseSong.funding_progress,
-                    royaltiesShared:  `${baseSong.royalties_shared}%`,
-                    popularity:       baseSong.popularity ?? 90,
-                    streams_estimate: baseSong.streams_estimate,
-                    roi_est:          baseSong.royalties_shared ?? 18,
-                    // Fallback metrics (overridden by live data below)
-                    spotify:   fmtMetric(Math.round(baseSong.streams_estimate * 0.60)),
-                    youtube:   fmtMetric(Math.round(baseSong.streams_estimate * 0.62)),
-                    tiktok:    fmtMetric(getSocialGrowth(baseSong.streams_estimate, baseSong.popularity)),
-                    saves:     ((baseSong.popularity ?? 90) * 1200).toLocaleString(),
-                    artistListeners: formatViews(baseSong.streams_estimate * 1.5),
-                };
+                if (songData) {
+                    // ── Fast path: use the full object passed from Marketplace ──────
+                    // songData is the _raw object from spotifyService.normalize():
+                    // { id, name, cover_url, deezer_id, spotify_id, metadata: { artist, ... } }
+                    baseSong = {
+                        id:               songData.id,
+                        title:            songData.name || songData.title,
+                        artist:           songData.metadata?.artist || songData.artist_name || songData.artist || 'Artista',
+                        image:            songData.cover_url || songData.image || null,
+                        preview_url:      songData.preview_url || songData.metadata?.preview_url || null,
+                        deezer_id:        songData.deezer_id || songData.metadata?.deezer_id,
+                        spotify_id:       songData.spotify_id || songData.metadata?.spotify_id || null,
+                        fansParticipating:(songData.fans_joined || 490).toLocaleString(),
+                        fundingProgress:  songData.funding_percent || songData.metadata?.funding_percent || 72,
+                        royaltiesShared:  songData.metadata?.yield_estimate
+                            ? parseFloat(songData.metadata.yield_estimate)
+                            : 18,
+                        popularity:       songData.metadata?.popularity || songData.popularity || 90,
+                        streams_estimate: songData.metadata?.spotify_streams || 0,
+                        roi_est:          parseFloat((songData.metadata?.yield_estimate || '18').replace('%', '')) || 18,
+                        // Pre-fill metrics from catalog (overridden by live data below)
+                        spotify:   fmtMetric(songData.metadata?.spotify_streams || 0),
+                        youtube:   fmtMetric(songData.metadata?.youtube_views   || 0),
+                        tiktok:    fmtMetric(songData.metadata?.tiktok_creations || 0),
+                        saves:     ((songData.metadata?.popularity || 90) * 1200).toLocaleString(),
+                        artistListeners: fmtMetric((songData.metadata?.spotify_streams || 0) * 1.5),
+                    };
+                } else {
+                    // ── Fallback: fetch from legacy marketplace data by ID ──────────
+                    const allSongs = await getMarketplaceData();
+                    const targetId = songId || allSongs[0]?.id;
+                    const raw      = allSongs.find(s => s.id === targetId) || allSongs[0];
+                    baseSong = {
+                        id:               raw.id,
+                        title:            raw.title,
+                        artist:           raw.artist,
+                        image:            raw.cover_image,
+                        preview_url:      raw.preview_url,
+                        deezer_id:        raw.deezer_id,
+                        spotify_id:       raw.spotify_id || null,
+                        fansParticipating:(raw.fans_joined || 1248).toLocaleString(),
+                        fundingProgress:  raw.funding_progress,
+                        royaltiesShared:  `${raw.royalties_shared}%`,
+                        popularity:       raw.popularity ?? 90,
+                        streams_estimate: raw.streams_estimate,
+                        roi_est:          raw.royalties_shared ?? 18,
+                        spotify:   fmtMetric(Math.round(raw.streams_estimate * 0.60)),
+                        youtube:   fmtMetric(Math.round(raw.streams_estimate * 0.62)),
+                        tiktok:    fmtMetric(getSocialGrowth(raw.streams_estimate, raw.popularity)),
+                        saves:     ((raw.popularity ?? 90) * 1200).toLocaleString(),
+                        artistListeners: formatViews(raw.streams_estimate * 1.5),
+                    };
+                }
 
-                if (!cancelled) setSong(finalData);
+                if (!cancelled) setSong(baseSong);
 
-                // Fetch real metrics from metricsService in parallel
-                // Build a minimal song-like object that metricsService understands
+                // ── Enrich with real metrics from metricsService ────────────────
+                const targetId = baseSong.id;
                 const songProxy = {
                     id:         targetId,
-                    name:       baseSong.name   || baseSong.title,
+                    name:       baseSong.title,
                     artist:     baseSong.artist,
-                    spotify_id: baseSong.spotify_id || baseSong.metadata?.spotify_id || null,
+                    spotify_id: baseSong.spotify_id,
                     _raw: {
-                        deezer_id: baseSong.deezer_id,
-                        spotify_id: baseSong.spotify_id || baseSong.metadata?.spotify_id || null,
-                        metadata:  { popularity: baseSong.popularity },
+                        deezer_id:  baseSong.deezer_id,
+                        spotify_id: baseSong.spotify_id,
+                        metadata:   { popularity: baseSong.popularity },
                     },
-                    roi_est: baseSong.royalties_shared ?? 18,
+                    roi_est: baseSong.roi_est ?? 18,
                 };
                 const [liveMetrics, ytResponse] = await Promise.all([
                     fetchSongMetrics(songProxy).catch(() => null),
@@ -185,7 +217,6 @@ const SongDetail = ({ onBack, songId, onRequireAuth, isAuthenticated, onInvest }
                 if (!cancelled) {
                     if (liveMetrics) {
                         setMetrics(liveMetrics);
-                        // Upgrade the song object with live numbers
                         setSong(prev => prev ? {
                             ...prev,
                             spotify:  fmtMetric(liveMetrics.spotify_streams),
@@ -204,7 +235,7 @@ const SongDetail = ({ onBack, songId, onRequireAuth, isAuthenticated, onInvest }
         };
         run();
         return () => { cancelled = true; };
-    }, [songId]);
+    }, [songId, songData]);
 
     // Growth data
     const growthData     = metrics?.growth ?? getWeeklyGrowth(songId ?? 'default', 18);

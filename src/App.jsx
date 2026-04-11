@@ -256,6 +256,7 @@ function App() {
     const [session, setSession]         = useState(null);
     const [showAuthModal, setShowAuthModal] = useState(false);
     const [activeSongId, setActiveSongId]   = useState(null);
+    const [activeSong, setActiveSong]       = useState(null); // full song object
 
     // ── Auth ─────────────────────────────────────────────────────────────────
     useEffect(() => {
@@ -274,8 +275,9 @@ function App() {
         return () => document.removeEventListener('navigate', handler);
     }, []);
 
-    const navigate = (page, songId) => {
+    const navigate = (page, songId, songData) => {
         if (songId) setActiveSongId(songId);
+        if (songData) setActiveSong(songData);
         setCurrentPage(page);
     };
 
@@ -310,6 +312,7 @@ function App() {
                 {currentPage === 'song-detail' && (
                     <SongDetail
                         songId={activeSongId}
+                        songData={activeSong}
                         isAuthenticated={!!session}
                         onBack={() => navigate('explore')}
                         onRequireAuth={() => setShowAuthModal(true)}
