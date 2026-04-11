@@ -53,7 +53,8 @@ function calcPaybackMonths(investment, monthlyReturn) {
 }
 
 // ── Main ReturnCalculator ───────────────────────────────────────────────────
-const ReturnCalculator = ({ streamCount, roiEst, isTrending, paymentFreq = 'monthly' }) => {
+const ReturnCalculator = ({ streamCount, roiEst, isTrending, paymentFreq = 'monthly',
+    tokensTotal = 10_000, tokensAvailable = 7_500, tokenPrice = 10 }) => {
     const [amount, setAmount]       = useState(250);
     const [currency, setCurrency]   = useState('USD');
     const cur = CURRENCIES[currency];
@@ -114,7 +115,17 @@ const ReturnCalculator = ({ streamCount, roiEst, isTrending, paymentFreq = 'mont
     const bondAnnual    = amount * GOV_BOND_RATE * fxr;
     const bondMultiplier = bondAnnual > 0 ? (annualReturn / bondAnnual).toFixed(1) : '—';
 
-    const PRESETS = [100, 250, 500, 1000].map(v => Math.round(v * fxr)); // adjust to currency
+    // Tokens that will be purchased with current amount (in USD)
+    const tokensBought = Math.floor(amountUSD / (tokenPrice || 10));
+    const tokensPct    = tokensTotal > 0 ? (tokensAvailable / tokensTotal) * 100 : 100;
+    const tokensLow    = tokensPct < 20;
+    const tokensMid    = tokensPct >= 20 && tokensPct < 50;
+    const tokenBarColor = tokensLow  ? '#f97316'
+                        : tokensMid  ? '#eab308'
+                        :              '#10b981';
+    const tokensTextColor = tokensLow ? '#fb923c' : tokensMid ? '#fbbf24' : '#4ade80';
+
+    const PRESETS   = [100, 250, 500, 1000].map(v => Math.round(v * fxr));
     const sliderMax = Math.round(5000 * fxr);
 
     return (
@@ -218,22 +229,31 @@ const ReturnCalculator = ({ streamCount, roiEst, isTrending, paymentFreq = 'mont
                     </div>
                 </div>
 
-                {/* Recuperación */}
-                <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '14px', padding: '0.9rem 1rem' }}>
-                    <div style={{ fontSize: '0.58rem', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: '700', marginBottom: '4px' }}>Recuperación</div>
-                    <div style={{ fontSize: '1.2rem', fontWeight: '800', color: 'white', letterSpacing: '-0.02em' }} className="calc-anim">
-                        {paybackLabel}
+                {/* Tokens Disponibles */}
+                <div style={{ background: 'rgba(255,255,255,0.03)', border: `1px solid ${tokensLow ? 'rgba(249,115,22,0.3)' : 'rgba(255,255,255,0.08)'}`, borderRadius: '14px', padding: '0.9rem 1rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
+                        <div style={{ fontSize: '0.58rem', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: '700' }}>Tokens Disp.</div>
+                        {tokensLow && <span style={{ fontSize: '0.48rem', background: 'rgba(249,115,22,0.15)', color: '#fb923c', border: '1px solid rgba(249,115,22,0.3)', borderRadius: '100px', padding: '1px 5px', fontWeight: '700' }}>CASI AGOTADO</span>}
                     </div>
-                    <div style={{ fontSize: '0.55rem', color: 'rgba(255,255,255,0.3)', marginTop: '2px' }}>recuperas tu inversión</div>
+                    <div style={{ fontSize: '1.2rem', fontWeight: '800', letterSpacing: '-0.02em', color: tokensTextColor }} className="calc-anim">
+                        {tokensAvailable.toLocaleString('es-ES')}
+                    </div>
+                    <div style={{ fontSize: '0.52rem', color: 'rgba(255,255,255,0.25)', marginTop: '2px', marginBottom: '6px' }}>de {tokensTotal.toLocaleString('es-ES')} totales</div>
+                    {/* Scarcity bar */}
+                    <div style={{ height: '3px', background: 'rgba(255,255,255,0.07)', borderRadius: '100px', overflow: 'hidden' }}>
+                        <div style={{ height: '100%', width: `${Math.min(100, 100 - tokensPct)}%`, background: tokenBarColor, borderRadius: '100px', boxShadow: `0 0 5px ${tokenBarColor}88`, transition: 'width 0.5s ease' }} />
+                    </div>
                 </div>
 
-                {/* Regalías */}
-                <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '14px', padding: '0.9rem 1rem' }}>
-                    <div style={{ fontSize: '0.58rem', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: '700', marginBottom: '4px' }}>Regalías</div>
-                    <div style={{ fontSize: '1.2rem', fontWeight: '800', color: 'white' }}>
-                        {(ROYALTY_SHARE * 100).toFixed(0)}% pool
+                {/* Tokens que compras */}
+                <div style={{ background: 'linear-gradient(135deg, rgba(99,102,241,0.12) 0%, rgba(139,92,246,0.07) 100%)', border: '1px solid rgba(99,102,241,0.25)', borderRadius: '14px', padding: '0.9rem 1rem' }}>
+                    <div style={{ fontSize: '0.58rem', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: '700', marginBottom: '4px' }}>Compras</div>
+                    <div style={{ fontSize: '1.4rem', fontWeight: '900', color: '#818cf8', letterSpacing: '-0.03em' }} className="calc-anim">
+                        {tokensBought.toLocaleString('es-ES')}
                     </div>
-                    <div style={{ fontSize: '0.55rem', color: 'rgba(255,255,255,0.3)', marginTop: '2px' }}>de derechos tokenizados</div>
+                    <div style={{ fontSize: '0.52rem', color: 'rgba(255,255,255,0.3)', marginTop: '2px' }}>
+                        tokens · {sym}{(tokenPrice * fxr).toFixed(2)} c/u
+                    </div>
                 </div>
             </div>
 
@@ -335,6 +355,12 @@ const SongDetail = ({ onBack, songId, songData, onRequireAuth, isAuthenticated, 
                         popularity:       songData.metadata?.popularity || songData.popularity || 90,
                         streams_estimate: songData.metadata?.spotify_streams || 0,
                         roi_est:          parseFloat((songData.metadata?.yield_estimate || '18').replace('%', '')) || 18,
+                        // Token data
+                        total_supply:     songData.total_supply || songData.metadata?.total_supply || 10_000,
+                        tokens_available: songData.tokens_available ?? songData.metadata?.tokens_available ??
+                            Math.floor((songData.total_supply || 10_000) * 0.72),
+                        price:            songData.token_price_usd || songData.price_per_token || songData.metadata?.token_price_usd || 10,
+                        is_trending:      songData.is_trending || songData.metadata?.is_trending || false,
                         // Pre-fill metrics from catalog (overridden by live data below)
                         spotify:   fmtMetric(songData.metadata?.spotify_streams || 0),
                         youtube:   fmtMetric(songData.metadata?.youtube_views   || 0),
@@ -361,6 +387,10 @@ const SongDetail = ({ onBack, songId, songData, onRequireAuth, isAuthenticated, 
                         popularity:       raw.popularity ?? 90,
                         streams_estimate: raw.streams_estimate,
                         roi_est:          raw.royalties_shared ?? 18,
+                        total_supply:     raw.total_supply || 10_000,
+                        tokens_available: raw.tokens_available ?? Math.floor((raw.total_supply || 10_000) * 0.72),
+                        price:            raw.token_price_usd || raw.price_per_token || 10,
+                        is_trending:      raw.is_trending || false,
                         spotify:   fmtMetric(Math.round(raw.streams_estimate * 0.60)),
                         youtube:   fmtMetric(Math.round(raw.streams_estimate * 0.62)),
                         tiktok:    fmtMetric(getSocialGrowth(raw.streams_estimate, raw.popularity)),
@@ -650,6 +680,9 @@ const SongDetail = ({ onBack, songId, songData, onRequireAuth, isAuthenticated, 
                         roiEst={roiEst}
                         isTrending={song.is_trending || metrics?.source === 'live'}
                         paymentFreq="monthly"
+                        tokensTotal={song.total_supply ?? 10_000}
+                        tokensAvailable={song.tokens_available ?? song.tokensAvailable ?? 7_500}
+                        tokenPrice={song.price ?? song.token_price_usd ?? 10}
                     />
 
                     {/* Social proof */}
