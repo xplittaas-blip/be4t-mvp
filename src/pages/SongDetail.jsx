@@ -31,86 +31,262 @@ const TikTokIcon = () => (
     </svg>
 );
 
-// ── Return Calculator — fed by real stream data ───────────────────────────────
-const ROYALTY_PER_STREAM = 0.004;     // industry avg: $0.003–$0.005
-const ROYALTY_SHARE      = 0.22;      // 22% of rights tokenized in BE4T
+// ── Currency config ───────────────────────────────────────────────────────────────
+const CURRENCIES = {
+    USD: { symbol: '$', rate: 1,    label: 'USD', flag: '🇺🇸' },
+    EUR: { symbol: '€', rate: 0.92, label: 'EUR', flag: '🇪🇺' },
+};
+const ROYALTY_PER_STREAM = 0.004;  // industry avg $0.003–0.005
+const ROYALTY_SHARE      = 0.22;   // 22% of rights tokenized
+const GOV_BOND_RATE      = 0.04;   // ~4% — Spain/US 10yr avg 2024
 
-const ReturnCalculator = ({ streamCount, roiEst }) => {
-    const PRESETS = [50, 100, 250, 500];
-    const [amount, setAmount] = useState(50);
-    const [sliderVal, setSliderVal] = useState(50);
+// ── Animated number helper ────────────────────────────────────────────────────
+function fmtCurrency(val, sym, decimals = 2) {
+    if (!isFinite(val)) return `${sym}0.00`;
+    return `${sym}${val.toLocaleString('es-ES', { minimumFractionDigits: decimals, maximumFractionDigits: decimals })}`;
+}
 
-    // Total annual royalty pool derived from real stream count
-    const annualPool = useMemo(() => {
-        const monthlySt = Math.max(streamCount ?? 0, 1_000_000);
-        return monthlySt * 12 * ROYALTY_PER_STREAM * ROYALTY_SHARE;
-    }, [streamCount]);
+// ── Payback period in months ────────────────────────────────────────────────
+function calcPaybackMonths(investment, monthlyReturn) {
+    if (!monthlyReturn || monthlyReturn <= 0) return null;
+    return Math.ceil(investment / monthlyReturn);
+}
 
-    // Estimated total asset valuation (used to compute participation %)
-    const totalValuation = useMemo(() => {
+// ── Main ReturnCalculator ───────────────────────────────────────────────────
+const ReturnCalculator = ({ streamCount, roiEst, isTrending, paymentFreq = 'monthly' }) => {
+    const [amount, setAmount]       = useState(250);
+    const [currency, setCurrency]   = useState('USD');
+    const cur = CURRENCIES[currency];
+    const sym = cur.symbol;
+    const fxr = cur.rate;
+
+    // Trending boost: if song is trending, pool is growing ~8% extra
+    const trendBoost = isTrending ? 1.08 : 1.0;
+
+    // Annual royalty pool (in USD)
+    const annualPoolUSD = useMemo(() => {
+        const monthlySt = Math.max(streamCount ?? 0, 1_500_000);
+        return monthlySt * 12 * ROYALTY_PER_STREAM * ROYALTY_SHARE * trendBoost;
+    }, [streamCount, trendBoost]);
+
+    // Total asset valuation (USD)
+    const totalValuationUSD = useMemo(() => {
         const roiDec = (roiEst ?? 18) / 100;
-        return roiDec > 0 ? annualPool / roiDec : annualPool * 5;
-    }, [annualPool, roiEst]);
+        return roiDec > 0 ? annualPoolUSD / roiDec : annualPoolUSD * 5;
+    }, [annualPoolUSD, roiEst]);
 
-    const participationPct = totalValuation > 0
-        ? ((amount / totalValuation) * 100).toFixed(3)
-        : '0.000';
+    // Convert amount to USD always (slider is in selected currency)
+    const amountUSD = amount / fxr;
 
-    const annualReturn = ((amount / totalValuation) * annualPool).toFixed(2);
-    const roi          = amount > 0 ? (((parseFloat(annualReturn)) / amount) * 100).toFixed(1) : '0.0';
-    const royaltiesPct = (ROYALTY_SHARE * 100).toFixed(0);
+    // Participation %
+    const participationPct = totalValuationUSD > 0
+        ? (amountUSD / totalValuationUSD) * 100
+        : 0;
+
+    // Annual return in USD → convert to display currency
+    const annualReturnUSD    = (amountUSD / totalValuationUSD) * annualPoolUSD;
+    const annualReturn       = annualReturnUSD * fxr;
+    const monthlyReturn      = annualReturn / 12;
+    const quarterlyReturn    = annualReturn / 4;
+    const displayReturn      = paymentFreq === 'monthly' ? monthlyReturn : quarterlyReturn;
+    const displayFreqLabel   = paymentFreq === 'monthly' ? 'Mensual' : 'Trimestral';
+
+    // ROI %
+    const teaRate = amount > 0 ? (annualReturn / amount) * 100 : 0;
+
+    // Payback months
+    const paybackMonths = calcPaybackMonths(amount, displayReturn);
+    const paybackLabel  = !paybackMonths ? 'N/D'
+        : paybackMonths < 13 ? `${paybackMonths} meses`
+        : `${(paybackMonths / 12).toFixed(1)} años`;
+
+    // 12 / 24 / 36 month projections (compounded at roiEst)
+    const project = (months) => {
+        const roiDec    = teaRate / 100;
+        const projected = amount * Math.pow(1 + roiDec / 12, months);
+        return (projected - amount) * fxr; // returns only the gain
+    };
+    const proj12 = project(12);
+    const proj24 = project(24);
+    const proj36 = project(36);
+
+    // Bond comparison multiplier
+    const bondAnnual    = amount * GOV_BOND_RATE * fxr;
+    const bondMultiplier = bondAnnual > 0 ? (annualReturn / bondAnnual).toFixed(1) : '—';
+
+    const PRESETS = [100, 250, 500, 1000].map(v => Math.round(v * fxr)); // adjust to currency
+    const sliderMax = Math.round(5000 * fxr);
 
     return (
-        <div style={{ padding: '0' }}>
-            {/* Slider row */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-                <span style={{ fontSize: '0.82rem', color: 'rgba(255,255,255,0.5)' }}>Monto a Invertir</span>
-                <span style={{ fontSize: '1.5rem', fontWeight: '900', letterSpacing: '-0.03em' }}>
-                    ${sliderVal.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
+            <style>{`
+                @keyframes calc-slide-in { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+                .calc-anim { animation: calc-slide-in 0.25s ease; }
+                .currency-toggle button { transition: all 0.2s ease; }
+                .proj-bar { transition: height 0.4s cubic-bezier(0.25,0.8,0.25,1); }
+            `}</style>
+
+            {/* ── Currency Toggle ── */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <span style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: '700' }}>
+                    Moneda de proyección
                 </span>
-            </div>
-            <input
-                type="range" min={10} max={5000} step={10} value={sliderVal}
-                onChange={e => { const v = Number(e.target.value); setSliderVal(v); setAmount(v); }}
-                style={{ width: '100%', accentColor: '#8B5CF6', marginBottom: '0.4rem' }}
-            />
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.7rem', color: 'rgba(255,255,255,0.3)', marginBottom: '1rem' }}>
-                <span>Mín: $10.00</span><span>Máx: $5,000.00</span>
+                <div className="currency-toggle" style={{ display: 'flex', gap: '4px', background: 'rgba(255,255,255,0.06)', borderRadius: '100px', padding: '3px' }}>
+                    {Object.entries(CURRENCIES).map(([code, c]) => (
+                        <button key={code} onClick={() => setCurrency(code)}
+                            style={{
+                                padding: '4px 12px', borderRadius: '100px', border: 'none', cursor: 'pointer',
+                                fontSize: '0.72rem', fontWeight: '700',
+                                background: currency === code ? 'rgba(139,92,246,0.85)' : 'transparent',
+                                color: currency === code ? 'white' : 'rgba(255,255,255,0.45)',
+                                boxShadow: currency === code ? '0 1px 6px rgba(139,92,246,0.4)' : 'none',
+                            }}
+                        >
+                            {c.flag} {c.label}
+                        </button>
+                    ))}
+                </div>
             </div>
 
-            {/* Preset btns */}
-            <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.25rem' }}>
+            {/* ── Slider ── */}
+            <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '0.4rem' }}>
+                    <div>
+                        <div style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '2px' }}>Monto a Invertir</div>
+                        <div style={{ fontSize: '2rem', fontWeight: '900', letterSpacing: '-0.04em', lineHeight: 1 }} className="calc-anim">
+                            {sym}{amount.toLocaleString('es-ES')}
+                        </div>
+                    </div>
+                    <div style={{ textAlign: 'right' }}>
+                        <div style={{ fontSize: '0.62rem', color: 'rgba(255,255,255,0.25)', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '2px' }}>Tu participación</div>
+                        <div style={{ fontSize: '1.1rem', fontWeight: '800', color: '#c4b5fd' }} className="calc-anim">
+                            {participationPct >= 0.001
+                                ? `${participationPct.toFixed(participationPct < 0.01 ? 4 : 3)}%`
+                                : '<0.001%'
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <input type="range" min={10} max={sliderMax} step={Math.round(10 * fxr)}
+                    value={amount} onChange={e => setAmount(Number(e.target.value))}
+                    style={{ width: '100%', accentColor: '#8B5CF6', cursor: 'pointer' }}
+                />
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.65rem', color: 'rgba(255,255,255,0.25)', marginTop: '2px' }}>
+                    <span>Mín: {sym}{Math.round(10 * fxr).toLocaleString('es-ES')}</span>
+                    <span>Máx: {sym}{sliderMax.toLocaleString('es-ES')}</span>
+                </div>
+            </div>
+
+            {/* ── Preset buttons ── */}
+            <div style={{ display: 'flex', gap: '6px' }}>
                 {PRESETS.map(p => (
-                    <button key={p} onClick={() => { setAmount(p); setSliderVal(p); }}
-                        style={{
-                            flex: 1, padding: '0.5rem 0', borderRadius: '10px', fontWeight: '700', fontSize: '0.85rem',
-                            border: amount === p ? '1px solid #8B5CF6' : '1px solid rgba(255,255,255,0.1)',
-                            background: amount === p ? 'rgba(139,92,246,0.2)' : 'rgba(255,255,255,0.04)',
-                            color: amount === p ? '#c4b5fd' : 'rgba(255,255,255,0.6)',
-                            cursor: 'pointer',
-                        }}>
-                        ${p}
+                    <button key={p} onClick={() => setAmount(p)} style={{
+                        flex: 1, padding: '0.45rem 0', borderRadius: '10px',
+                        fontWeight: '700', fontSize: '0.82rem', cursor: 'pointer',
+                        border: amount === p ? '1px solid #8B5CF6' : '1px solid rgba(255,255,255,0.09)',
+                        background: amount === p ? 'rgba(139,92,246,0.2)' : 'rgba(255,255,255,0.03)',
+                        color: amount === p ? '#c4b5fd' : 'rgba(255,255,255,0.5)',
+                    }}>
+                        {sym}{p >= 1000 ? `${p / 1000}K` : p}
                     </button>
                 ))}
             </div>
 
-            {/* Results rows */}
-            {[
-                { label: '% Tu participación',    value: `${participationPct}%`,       color: 'white'   },
-                { label: '↗ Retorno Est. (Anual)', value: `$${annualReturn}`,           color: '#22c55e' },
-                { label: '$ Regalías Incluidas',   value: `${royaltiesPct}% del total`, color: 'white'   },
-            ].map(({ label, value, color }) => (
-                <div key={label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.5rem 0', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-                    <span style={{ fontSize: '0.83rem', color: 'rgba(255,255,255,0.55)' }}>{label}</span>
-                    <span style={{ fontWeight: '700', color }}>{value}</span>
+            {/* ── Key metrics 2x2 ── */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                {/* TEA */}
+                <div style={{ background: 'linear-gradient(135deg, rgba(139,92,246,0.15) 0%, rgba(59,130,246,0.08) 100%)', border: '1px solid rgba(139,92,246,0.25)', borderRadius: '14px', padding: '0.9rem 1rem' }}>
+                    <div style={{ fontSize: '0.58rem', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: '700', marginBottom: '4px' }}>TEA (APY)</div>
+                    <div style={{ fontSize: '1.6rem', fontWeight: '900', color: '#a78bfa', letterSpacing: '-0.04em' }} className="calc-anim">
+                        {teaRate.toFixed(1)}%
+                    </div>
+                    {isTrending && <div style={{ fontSize: '0.55rem', color: '#4ade80', marginTop: '2px', fontWeight: '700' }}>⚡ +8% por tendencia</div>}
                 </div>
-            ))}
 
-            {/* ROI disclaimer */}
-            <div style={{ marginTop: '1rem', padding: '0.85rem', background: 'rgba(255,255,255,0.03)', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.06)' }}>
-                <p style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.35)', margin: 0, lineHeight: 1.6 }}>
-                    El ROI estimado de <strong style={{ color: '#c4b5fd' }}>{roi}%</strong> se basa en el rendimiento
-                    histórico de streams y regalías. Los retornos pasados no garantizan retornos futuros.
+                {/* Cobro peridico */}
+                <div style={{ background: 'linear-gradient(135deg, rgba(34,197,94,0.12) 0%, rgba(16,185,129,0.06) 100%)', border: '1px solid rgba(34,197,94,0.2)', borderRadius: '14px', padding: '0.9rem 1rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
+                        <div style={{ fontSize: '0.58rem', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: '700' }}>Pago {displayFreqLabel}</div>
+                        <span style={{ fontSize: '0.48rem', background: 'rgba(34,197,94,0.15)', color: '#4ade80', border: '1px solid rgba(34,197,94,0.25)', borderRadius: '100px', padding: '1px 5px', fontWeight: '700', letterSpacing: '0.5px' }}>{displayFreqLabel.toUpperCase()}</span>
+                    </div>
+                    <div style={{ fontSize: '1.4rem', fontWeight: '900', color: '#4ade80', letterSpacing: '-0.03em' }} className="calc-anim">
+                        {sym}{displayReturn.toFixed(2)}
+                    </div>
+                    <div style={{ fontSize: '0.55rem', color: 'rgba(255,255,255,0.3)', marginTop: '2px' }}>
+                        {sym}{annualReturn.toFixed(2)} / año
+                    </div>
+                </div>
+
+                {/* Recuperación */}
+                <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '14px', padding: '0.9rem 1rem' }}>
+                    <div style={{ fontSize: '0.58rem', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: '700', marginBottom: '4px' }}>Recuperación</div>
+                    <div style={{ fontSize: '1.2rem', fontWeight: '800', color: 'white', letterSpacing: '-0.02em' }} className="calc-anim">
+                        {paybackLabel}
+                    </div>
+                    <div style={{ fontSize: '0.55rem', color: 'rgba(255,255,255,0.3)', marginTop: '2px' }}>recuperas tu inversión</div>
+                </div>
+
+                {/* Regalías */}
+                <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '14px', padding: '0.9rem 1rem' }}>
+                    <div style={{ fontSize: '0.58rem', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: '700', marginBottom: '4px' }}>Regalías</div>
+                    <div style={{ fontSize: '1.2rem', fontWeight: '800', color: 'white' }}>
+                        {(ROYALTY_SHARE * 100).toFixed(0)}% pool
+                    </div>
+                    <div style={{ fontSize: '0.55rem', color: 'rgba(255,255,255,0.3)', marginTop: '2px' }}>de derechos tokenizados</div>
+                </div>
+            </div>
+
+            {/* ── Proyección 12/24/36 meses ── */}
+            <div style={{ background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '14px', padding: '1rem' }}>
+                <div style={{ fontSize: '0.62rem', color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: '700', marginBottom: '1rem' }}>Ganancia Proyectada (con reinversión)</div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '6px' }}>
+                    {[{ label: '12 meses', val: proj12 }, { label: '24 meses', val: proj24 }, { label: '36 meses', val: proj36 }].map(({ label, val }, i) => {
+                        const maxVal = proj36 || 1;
+                        const barH   = Math.max(20, (val / maxVal) * 64);
+                        return (
+                            <div key={label} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px' }}>
+                                {/* Bar */}
+                                <div style={{ width: '100%', height: '68px', display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}>
+                                    <div className="proj-bar" style={{
+                                        width: '60%',
+                                        height: `${barH}px`,
+                                        borderRadius: '6px 6px 0 0',
+                                        background: i === 0
+                                            ? 'linear-gradient(to top, rgba(139,92,246,0.6), rgba(139,92,246,0.3))'
+                                            : i === 1
+                                            ? 'linear-gradient(to top, rgba(99,102,241,0.7), rgba(139,92,246,0.4))'
+                                            : 'linear-gradient(to top, rgba(59,130,246,0.8), rgba(139,92,246,0.5))',
+                                        boxShadow: '0 0 10px rgba(139,92,246,0.2)',
+                                    }} />
+                                </div>
+                                <div style={{ fontWeight: '800', fontSize: '0.88rem', color: '#c4b5fd' }} className="calc-anim">
+                                    +{sym}{val.toFixed(0)}
+                                </div>
+                                <div style={{ fontSize: '0.58rem', color: 'rgba(255,255,255,0.3)', textAlign: 'center' }}>{label}</div>
+                            </div>
+                        );
+                    })}
+                </div>
+            </div>
+
+            {/* ── Bond comparison ── */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '0.75rem 1rem', background: 'rgba(251,191,36,0.06)', border: '1px solid rgba(251,191,36,0.18)', borderRadius: '12px' }}>
+                <span style={{ fontSize: '1.1rem' }}>🏆</span>
+                <span style={{ fontSize: '0.78rem', color: 'rgba(255,255,255,0.65)', lineHeight: 1.4 }}>
+                    Esta rentabilidad es{' '}
+                    <strong style={{ color: '#fbbf24', fontSize: '0.92rem' }}>{bondMultiplier}×</strong>
+                    {' '}mayor que el promedio de <strong>bonos del Estado</strong> ({(GOV_BOND_RATE * 100).toFixed(0)}% TEA)
+                </span>
+            </div>
+
+            {/* ── Disclaimer ── */}
+            <div style={{ padding: '0.75rem', background: 'rgba(255,255,255,0.025)', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.055)' }}>
+                <p style={{ fontSize: '0.68rem', color: 'rgba(255,255,255,0.28)', margin: 0, lineHeight: 1.6 }}>
+                    TEA estimada: <strong style={{ color: '#c4b5fd' }}>{teaRate.toFixed(1)}%</strong>.
+                    Proyección basada en {((streamCount ?? 0) / 1_000_000).toFixed(0)}M streams actuales
+                    {isTrending ? ' con boost del 8% por tendencia activa' : ''}.
+                    Los retornos pasados no garantizan futuros. Inversión sujeta a riesgo.
                 </p>
             </div>
         </div>
@@ -441,29 +617,56 @@ const SongDetail = ({ onBack, songId, songData, onRequireAuth, isAuthenticated, 
                     </section>
                 </div>
 
-                {/* ── 5. RETURN CALCULATOR — fed by real streams ── */}
+                {/* ── 5. RETURN CALCULATOR ── */}
                 <section ref={calculatorRef} className="detail-section calculator-section glass-panel highlight-border">
-                    <div className="calculator-header text-center" style={{ marginBottom: '1.5rem' }}>
-                        <h2 className="section-title text-gradient">Calculadora de Retorno</h2>
-                        <p className="text-secondary mt-1" style={{ fontSize: '0.82rem' }}>
-                            Proyección en tiempo real basada en {fmtMetric(liveStreamCount)} streams
+
+                    {/* Header */}
+                    <div style={{ marginBottom: '1.5rem' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.3rem' }}>
+                            <h2 className="section-title text-gradient" style={{ margin: 0 }}>Calculadora</h2>
+                            {song.is_trending && (
+                                <span style={{
+                                    display: 'inline-flex', alignItems: 'center', gap: '4px',
+                                    background: 'rgba(239,68,68,0.12)', border: '1px solid rgba(239,68,68,0.3)',
+                                    borderRadius: '100px', padding: '3px 10px',
+                                    fontSize: '0.6rem', color: '#f87171', fontWeight: '700',
+                                    textTransform: 'uppercase', letterSpacing: '0.8px',
+                                }}>
+                                    ⚡ En Tendencia
+                                </span>
+                            )}
+                        </div>
+                        <p className="text-secondary" style={{ fontSize: '0.78rem', margin: 0 }}>
+                            Planificador de flujo de caja basado en{' '}
+                            <strong style={{ color: '#c4b5fd' }}>{fmtMetric(liveStreamCount)}</strong> streams reales
+                            {metrics?.source === 'live' && (
+                                <span style={{ marginLeft: '6px', fontSize: '0.65rem', color: '#22c55e', fontWeight: '700' }}>● live</span>
+                            )}
                         </p>
                     </div>
 
-                    <ReturnCalculator streamCount={liveStreamCount} roiEst={roiEst} />
+                    <ReturnCalculator
+                        streamCount={liveStreamCount}
+                        roiEst={roiEst}
+                        isTrending={song.is_trending || metrics?.source === 'live'}
+                        paymentFreq="monthly"
+                    />
 
                     {/* Social proof */}
-                    <div className="social-proof text-center mt-4">
-                        <p className="fw-600">{tCalc('social_proof', { count: song.fansParticipating })}</p>
+                    <div style={{ marginTop: '1.5rem', textAlign: 'center', padding: '0.75rem', background: 'rgba(139,92,246,0.06)', borderRadius: '12px', border: '1px solid rgba(139,92,246,0.12)' }}>
+                        <p style={{ fontWeight: '700', margin: 0, fontSize: '0.9rem' }}>
+                            {tCalc('social_proof', { count: song.fansParticipating })}
+                        </p>
+                        <p style={{ color: '#f97316', fontSize: '0.8rem', margin: '0.3rem 0 0', fontWeight: '600' }}>
+                            {tCalc('micro_fomo')}
+                        </p>
                     </div>
-                    <p className="micro-fomo text-center text-sm mt-3" style={{ color: 'var(--accent-primary)' }}>
-                        {tCalc('micro_fomo')}
-                    </p>
 
-                    <button className="btn-primary full-width cta-main mt-2" onClick={handleParticipate}>
+                    <button className="btn-primary full-width cta-main mt-4" onClick={handleParticipate}
+                        style={{ fontSize: '1rem', padding: '1rem', letterSpacing: '0.02em', fontWeight: '800' }}>
                         Invertir en esta Canción
                     </button>
-                    <p style={{ textAlign: 'center', fontSize: '0.65rem', color: 'rgba(255,255,255,0.2)', marginTop: '0.5rem' }}>
+                    <p style={{ textAlign: 'center', fontSize: '0.62rem', color: 'rgba(255,255,255,0.18)', marginTop: '0.5rem' }}>
                         Al invertir aceptas los términos y condiciones de BE4T.
                     </p>
                 </section>
