@@ -538,11 +538,23 @@ const SongDetail = ({ onBack, songId, songData, onRequireAuth, isAuthenticated, 
                             ))}
                         </div>
 
+                        {/* Streams / Mes row */}
+                        <div style={{ marginTop: '0.75rem', padding: '0.65rem 0.9rem', background: 'linear-gradient(90deg, rgba(29,185,84,0.07) 0%, rgba(255,255,255,0.02) 100%)', border: '1px solid rgba(29,185,84,0.15)', borderRadius: '10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '7px' }}>
+                                <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: '#1DB954', display: 'inline-block', boxShadow: '0 0 5px #1DB95488' }} />
+                                <span style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Streams / Mes (prom.)</span>
+                            </div>
+                            <span style={{ fontWeight: '800', fontSize: '1rem', color: '#4ade80', letterSpacing: '-0.02em' }}>
+                                {fmtMetric(Math.round(liveStreamCount / 12))}
+                            </span>
+                        </div>
+
                         {/* Saves row */}
                         <div style={{ marginTop: '0.75rem', padding: '0.65rem 0.9rem', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                             <span style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Guardados en playlist</span>
                             <span style={{ fontWeight: '700', fontSize: '0.9rem' }}>{song.saves}</span>
                         </div>
+
 
                         {/* YouTube embed link */}
                         {ytVideoId && (

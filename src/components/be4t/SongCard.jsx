@@ -62,11 +62,11 @@ export const normalizeSong = (raw) => {
         asset_type:       raw.asset_type === 'music' ? 'MUSIC' : 'RWA',
         tag:              raw.tag || (raw.asset_type === 'music' ? 'MUSIC' : 'RWA'),
         spotify_streams:  proxyStreams,
+        monthly_streams:  Math.round(proxyStreams / 12),   // avg monthly streams
         youtube_views:    meta.youtube_views || raw.youtube_views || Math.floor(totalVal * 8.2 + seed * 500),
         tiktok_creations: meta.tiktok_creations || raw.tiktok_creations || Math.floor(totalVal * 0.9 + seed * 100),
         growth:           `+${roi.toFixed(1)}%`,
         growth_positive:  roi >= 0,
-        market_cap:       marketCap,
         tokens_available: tokensAvailable,
         total_supply:     totalSupply,
         risk_tier:        riskTier,
@@ -467,11 +467,11 @@ const SongCard = ({ song, userMode, index = 0, onDetailClick }) => {
                         border: '1px solid rgba(255,255,255,0.065)',
                         borderRadius: '12px', overflow: 'hidden',
                     }}>
-                        {/* Row 1: Market Cap | Precio/Token */}
+                        {/* Row 1: Streams/Mes | Precio/Token */}
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr',
                             borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
                             {[
-                                { label: 'Market Cap',    value: fmtUSD(song.market_cap) },
+                                { label: 'Streams / Mes', value: fmt(song.monthly_streams ?? Math.round((song.spotify_streams ?? 0) / 12)) },
                                 { label: 'Precio / Token', value: fmtUSD(song.price) },
                             ].map(({ label, value }, i) => (
                                 <div key={label} style={{
