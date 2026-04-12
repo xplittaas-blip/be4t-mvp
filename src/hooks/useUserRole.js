@@ -18,6 +18,7 @@ const ADMIN_EMAILS = [
     'juan@be4t.io',
     'admin@be4t.io',
     'xplittaas@gmail.com',
+    'juanjosetrade@gmail.com',
 ];
 
 export function useUserRole(session) {

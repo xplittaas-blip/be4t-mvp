@@ -1,30 +1,31 @@
 /**
  * BE4T ConnectWalletButton
  * ─────────────────────────────────────────────────────────────────────────────
- * Renders the Thirdweb ConnectButton inside its own ThirdwebProvider.
- * Safe: mounts ThirdwebProvider only when isProduction is true.
- * In showcase mode returns null — no runtime import of thirdweb at all.
+ * Renders in BOTH envs (pitch + real-test) as long as THIRDWEB_CLIENT_ID exists.
+ * The CLIENT_ID is a public-safe domain-scoped key — safe to expose in frontend.
+ *
+ * Lazy-loads ConnectWalletButtonImpl so thirdweb is only bundled when used.
  */
 import React, { Suspense, lazy } from 'react';
-import { isProduction, THIRDWEB_CLIENT_ID } from '../../core/env';
+import { THIRDWEB_CLIENT_ID } from '../../core/env';
 
-// Lazy-load the real implementation so thirdweb is never bundled in showcase
 const ConnectButtonImpl = lazy(() => import('./ConnectWalletButtonImpl'));
 
 const ConnectWalletButton = () => {
-    if (!isProduction || !THIRDWEB_CLIENT_ID) return null;
+    if (!THIRDWEB_CLIENT_ID) return null;
     return (
         <Suspense fallback={
-            <button style={{
-                padding: '0.4rem 1rem',
-                background: 'rgba(16,185,129,0.1)',
-                border: '1px solid rgba(16,185,129,0.3)',
+            <span style={{
+                padding: '0.35rem 0.85rem',
+                background: 'rgba(16,185,129,0.08)',
+                border: '1px solid rgba(16,185,129,0.2)',
                 borderRadius: '100px',
-                color: '#10b981',
-                fontSize: '0.72rem', fontWeight: '700', cursor: 'default',
+                color: 'rgba(16,185,129,0.5)',
+                fontSize: '0.68rem', fontWeight: '600',
+                cursor: 'default', whiteSpace: 'nowrap',
             }}>
-                Cargando…
-            </button>
+                Acceso…
+            </span>
         }>
             <ConnectButtonImpl />
         </Suspense>

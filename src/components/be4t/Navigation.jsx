@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import WalletFundingModal from './WalletFundingModal';
 import ConnectWalletButton from './ConnectWalletButton';
-import { isProduction } from '../../core/env';
+import { isProduction, THIRDWEB_CLIENT_ID } from '../../core/env';
 
 // ── BE4T Brand Logo (uses /public/be4t-logo.svg) ────────────────────────────
 const BE4TWordmark = ({ onClick }) => (
@@ -190,8 +190,8 @@ const Navigation = ({ currentPage, setCurrentPage, session, onLoginClick, isAdmi
 
                     {/* Right actions */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexShrink: 0 }}>
-                        {/* Web3 Wallet Connect (production only) */}
-                        {isProduction && <ConnectWalletButton />}
+                        {/* Social Login / Wallet Connect (both envs if Thirdweb key exists) */}
+                        {THIRDWEB_CLIENT_ID && <ConnectWalletButton />}
 
                         {/* Mode Badge: LIVE vs DEMO — always visible */}
                         <div style={{
@@ -245,7 +245,7 @@ const Navigation = ({ currentPage, setCurrentPage, session, onLoginClick, isAdmi
                                 {/* Admin: Panel de Control button */}
                                 {isAdmin && (
                                     <button
-                                        onClick={() => navigate('disqueras')}
+                                        onClick={() => isProduction ? window.history.pushState({}, '', '/admin') || window.dispatchEvent(new PopStateEvent('popstate')) : navigate('disqueras')}
                                         title="Panel de Control — Solo Admin"
                                         style={{
                                             display: 'flex', alignItems: 'center', gap: '6px',

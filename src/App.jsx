@@ -9,6 +9,7 @@ import Portfolio from './pages/Portfolio';
 import WaitlistPage from './pages/WaitlistPage';
 import SongDetail from './pages/SongDetail';
 import HowItWorks from './components/be4t/HowItWorks';
+import AdminPanel from './pages/AdminPanel';
 import { supabase } from './core/xplit/supabaseClient';
 import { useUserRole } from './hooks/useUserRole';
 
@@ -291,10 +292,25 @@ function App() {
         return () => document.removeEventListener('navigate', handler);
     }, []);
 
+    // ── URL-based /admin routing (─────────────────────────────────────────────────
+    const getUrlPage = () => window.location.pathname === '/admin' ? 'admin' : null;
+    const [urlPage, setUrlPage] = useState(getUrlPage);
+
+    useEffect(() => {
+        const handler = () => setUrlPage(getUrlPage());
+        window.addEventListener('popstate', handler);
+        return () => window.removeEventListener('popstate', handler);
+    }, []);
+
     const navigate = (page, songId, songData) => {
         if (songId) setActiveSongId(songId);
         if (songData) setActiveSong(songData);
+        // If leaving admin, restore URL
+        if (window.location.pathname === '/admin' && page !== 'admin') {
+            window.history.pushState({}, '', '/');
+        }
         setCurrentPage(page);
+        setUrlPage(null);
     };
 
     return (
@@ -373,8 +389,13 @@ function App() {
                     <WaitlistPage onNavigate={navigate} />
                 )}
 
+                {/* Admin Panel: /admin route — protected, production only */}
+                {(urlPage === 'admin' || currentPage === 'admin') && (
+                    <AdminPanel session={session} isAdmin={isAdmin} />
+                )}
+
                 {/* Home: redirect to explore */}
-                {currentPage === 'home' && <Marketplace session={session} />}
+                {!urlPage && currentPage === 'home' && <Marketplace session={session} />}
             </main>
 
             <MiniPlayer />
