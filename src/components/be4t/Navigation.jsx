@@ -52,7 +52,7 @@ const HamburgerIcon = ({ open }) => (
     </svg>
 );
 
-const Navigation = ({ currentPage, setCurrentPage, session, onLoginClick }) => {
+const Navigation = ({ currentPage, setCurrentPage, session, onLoginClick, isAdmin = false, userRole = 'investor' }) => {
     const [mobileOpen, setMobileOpen] = useState(false);
     const [walletOpen, setWalletOpen] = useState(false);
 
@@ -241,17 +241,61 @@ const Navigation = ({ currentPage, setCurrentPage, session, onLoginClick }) => {
 
                         {/* Profile / Login */}
                         {session ? (
-                            <button onClick={() => navigate('perfil')} title="Mi Perfil"
-                                style={{
-                                    width: '44px', height: '44px', borderRadius: '50%',
-                                    background: 'linear-gradient(135deg, #7c3aed, #a855f7)',
-                                    border: '2px solid rgba(168,85,247,0.4)',
-                                    color: 'white', fontWeight: '800', fontSize: '0.85rem',
-                                    cursor: 'pointer', flexShrink: 0,
-                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                }}>
-                                {(session.user?.email?.[0] || 'U').toUpperCase()}
-                            </button>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                {/* Admin: Panel de Control button */}
+                                {isAdmin && (
+                                    <button
+                                        onClick={() => navigate('disqueras')}
+                                        title="Panel de Control — Solo Admin"
+                                        style={{
+                                            display: 'flex', alignItems: 'center', gap: '6px',
+                                            padding: '0.45rem 0.9rem',
+                                            background: 'linear-gradient(135deg, rgba(139,92,246,0.2), rgba(124,58,237,0.12))',
+                                            border: '1px solid rgba(139,92,246,0.45)',
+                                            borderRadius: '100px',
+                                            color: '#c4b5fd',
+                                            fontSize: '0.72rem', fontWeight: '800',
+                                            cursor: 'pointer', whiteSpace: 'nowrap',
+                                            letterSpacing: '-0.01em',
+                                            boxShadow: '0 0 12px rgba(139,92,246,0.15)',
+                                            transition: 'all 0.2s ease',
+                                        }}
+                                        onMouseOver={e => { e.currentTarget.style.background = 'linear-gradient(135deg, rgba(139,92,246,0.35), rgba(124,58,237,0.25))'; e.currentTarget.style.boxShadow = '0 0 20px rgba(139,92,246,0.3)'; }}
+                                        onMouseOut={e => { e.currentTarget.style.background = 'linear-gradient(135deg, rgba(139,92,246,0.2), rgba(124,58,237,0.12))'; e.currentTarget.style.boxShadow = '0 0 12px rgba(139,92,246,0.15)'; }}
+                                    >
+                                        <span style={{ fontSize: '0.85rem' }}>🛡️</span>
+                                        Panel de Control
+                                    </button>
+                                )}
+
+                                {/* Avatar with role border */}
+                                <button onClick={() => navigate('perfil')} title="Mi Perfil"
+                                    style={{
+                                        width: '44px', height: '44px', borderRadius: '50%',
+                                        background: isAdmin
+                                            ? 'linear-gradient(135deg, #4c1d95, #8B5CF6)'
+                                            : 'linear-gradient(135deg, #7c3aed, #a855f7)',
+                                        border: isAdmin
+                                            ? '2px solid rgba(196,181,253,0.6)'
+                                            : '2px solid rgba(168,85,247,0.4)',
+                                        color: 'white', fontWeight: '800', fontSize: '0.85rem',
+                                        cursor: 'pointer', flexShrink: 0,
+                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                        boxShadow: isAdmin ? '0 0 0 1px rgba(196,181,253,0.2)' : 'none',
+                                        position: 'relative',
+                                    }}>
+                                    {(session.user?.email?.[0] || 'U').toUpperCase()}
+                                    {/* Admin indicator dot */}
+                                    {isAdmin && (
+                                        <span style={{
+                                            position: 'absolute', bottom: '1px', right: '1px',
+                                            width: '9px', height: '9px', borderRadius: '50%',
+                                            background: '#c4b5fd',
+                                            border: '2px solid #0f1117',
+                                        }} />
+                                    )}
+                                </button>
+                            </div>
                         ) : (
                             <button onClick={onLoginClick}
                                 style={{
@@ -356,6 +400,22 @@ const Navigation = ({ currentPage, setCurrentPage, session, onLoginClick }) => {
                         }}>
                         <WalletIcon /> Conectar Wallet
                     </button>
+                    {/* Admin: Panel de Control (mobile) */}
+                    {isAdmin && session && (
+                        <button
+                            onClick={() => { navigate('disqueras'); }}
+                            style={{
+                                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.6rem',
+                                padding: '0.85rem', minHeight: '52px',
+                                background: 'linear-gradient(135deg, rgba(139,92,246,0.25), rgba(124,58,237,0.15))',
+                                border: '1px solid rgba(139,92,246,0.5)', borderRadius: '12px',
+                                color: '#c4b5fd', fontWeight: '800', fontSize: '0.9rem', cursor: 'pointer',
+                                boxShadow: '0 0 16px rgba(139,92,246,0.15)',
+                            }}
+                        >
+                            🛡️ Panel de Control
+                        </button>
+                    )}
                     {!session && (
                         <button onClick={() => { onLoginClick?.(); setMobileOpen(false); }}
                             style={{

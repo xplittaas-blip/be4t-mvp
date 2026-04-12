@@ -10,17 +10,30 @@ import WaitlistPage from './pages/WaitlistPage';
 import SongDetail from './pages/SongDetail';
 import HowItWorks from './components/be4t/HowItWorks';
 import { supabase } from './core/xplit/supabaseClient';
+import { useUserRole } from './hooks/useUserRole';
 
 // ── Lazy pages ────────────────────────────────────────────────────────────────
 // Profile page (simple placeholder if no dedicated page)
-const ProfilePage = ({ session, onLogout }) => (
+const ProfilePage = ({ session, onLogout, isAdmin }) => (
     <div style={{ maxWidth: '600px', margin: '4rem auto', padding: '0 1.5rem', color: 'white' }}>
         <h1 style={{ fontSize: '2rem', fontWeight: '800', marginBottom: '0.5rem' }}>Mi Perfil</h1>
         <p style={{ color: 'rgba(255,255,255,0.45)', marginBottom: '2.5rem' }}>Configuración de tu cuenta BE4T</p>
         <div style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '20px', padding: '2rem', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-            <div>
-                <label style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '1px' }}>Email</label>
-                <div style={{ fontWeight: '600', marginTop: '0.3rem' }}>{session?.user?.email || '—'}</div>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div>
+                    <label style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '1px' }}>Email</label>
+                    <div style={{ fontWeight: '600', marginTop: '0.3rem' }}>{session?.user?.email || '—'}</div>
+                </div>
+                {/* Role badge */}
+                <span style={{
+                    fontSize: '0.6rem', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '1.5px',
+                    padding: '0.3rem 0.85rem', borderRadius: '100px',
+                    background: isAdmin ? 'rgba(139,92,246,0.15)' : 'rgba(16,185,129,0.1)',
+                    border: `1px solid ${isAdmin ? 'rgba(139,92,246,0.35)' : 'rgba(16,185,129,0.3)'}`,
+                    color: isAdmin ? '#c4b5fd' : '#4ade80',
+                }}>
+                    {isAdmin ? '🛡️ Admin' : '💼 Investor'}
+                </span>
             </div>
             <div>
                 <label style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '1px' }}>UID</label>
@@ -258,6 +271,9 @@ function App() {
     const [activeSongId, setActiveSongId]   = useState(null);
     const [activeSong, setActiveSong]       = useState(null); // full song object
 
+    // ── Role detection ────────────────────────────────────────────────────────
+    const { isAdmin, role: userRole } = useUserRole(session);
+
     // ── Auth ─────────────────────────────────────────────────────────────────
     useEffect(() => {
         supabase.auth.getSession().then(({ data: { session } }) => setSession(session));
@@ -300,6 +316,8 @@ function App() {
                 setCurrentPage={navigate}
                 session={session}
                 onLoginClick={() => setShowAuthModal(true)}
+                isAdmin={isAdmin}
+                userRole={userRole}
             />
 
             <main>
@@ -334,7 +352,7 @@ function App() {
 
                 {/* Perfil: User settings */}
                 {currentPage === 'perfil' && session && (
-                    <ProfilePage session={session} onLogout={() => setCurrentPage('explore')} />
+                    <ProfilePage session={session} onLogout={() => setCurrentPage('explore')} isAdmin={isAdmin} />
                 )}
 
                 {/* Waitlist (Fan / Artista / Disquera) */}
