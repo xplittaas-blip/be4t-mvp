@@ -13,6 +13,9 @@ import {
     YOUTUBE_VIDEO_IDS,
 } from '../services/metricsService';
 import './SongDetail.css';
+import { lazy, Suspense } from 'react';
+import { isProduction } from '../core/env';
+const AcquisitionModal = lazy(() => import('../components/be4t/AcquisitionModal'));
 
 // ── Minimal mono-color platform icons (Anti-Notion: single fill color) ───────
 const SpotifyIcon = () => (
@@ -285,11 +288,12 @@ const SongDetail = ({ onBack, songId, songData, onRequireAuth, isAuthenticated, 
     const { t: tSong } = useTranslation('song');
     const { t: tCalc } = useTranslation('calculator');
 
-    const [song, setSong]         = useState(null);
-    const [metrics, setMetrics]   = useState(null);   // live metrics
-    const [ytData, setYtData]     = useState(null);
-    const [isLoading, setIsLoading] = useState(true);
-    const [showSuccessModal, setShowSuccessModal] = useState(false);
+    const [song, setSong]               = useState(null);
+    const [metrics, setMetrics]         = useState(null);   // live metrics
+    const [ytData, setYtData]           = useState(null);
+    const [isLoading, setIsLoading]     = useState(true);
+    const [showSuccessModal, setShowSuccessModal]       = useState(false);
+    const [showAcquisitionModal, setShowAcquisitionModal] = useState(false);
 
     const { playTrack, togglePlay, currentTrack, isPlaying: globalIsPlaying } = useGlobalPlayer();
     const isPlaying = globalIsPlaying && currentTrack?.id === song?.id;
@@ -423,7 +427,13 @@ const SongDetail = ({ onBack, songId, songData, onRequireAuth, isAuthenticated, 
 
     const handleParticipate = () => {
         if (!isAuthenticated) { onRequireAuth(); return; }
-        setShowSuccessModal(true);
+        if (isProduction) {
+            // Production: real blockchain flow via AcquisitionModal
+            setShowAcquisitionModal(true);
+        } else {
+            // Showcase: simulated success modal
+            setShowSuccessModal(true);
+        }
     };
 
     if (isLoading || !song) {
@@ -707,6 +717,26 @@ const SongDetail = ({ onBack, songId, songData, onRequireAuth, isAuthenticated, 
                         </div>
                     </div>
                 </div>,
+                document.body
+            )}
+
+            {/* ── AcquisitionModal (real blockchain flow) ── */}
+            {showAcquisitionModal && song && createPortal(
+                <Suspense fallback={null}>
+                    <AcquisitionModal
+                        asset={{
+                            ...(song._raw || {}),
+                            // Merge normalized fields the modal needs
+                            name:              song.title,
+                            token_price_usd:   song.price ?? 10,
+                            total_supply:      song.total_supply ?? 10_000,
+                            tokens_available:  song.tokens_available ?? 7_500,
+                            roi_est:           song.roi_est ?? 18,
+                            spotify_streams:   liveStreamCount,
+                        }}
+                        onClose={() => setShowAcquisitionModal(false)}
+                    />
+                </Suspense>,
                 document.body
             )}
         </div>

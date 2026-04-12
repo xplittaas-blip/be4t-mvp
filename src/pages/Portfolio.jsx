@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, lazy, Suspense } from 'react';
+import { createPortal } from 'react-dom';
+const TransferModal = lazy(() => import('../components/be4t/TransferModal'));
 
 // ── Format helpers ─────────────────────────────────────────────────────────────
 const fmtUSD = (v) =>
@@ -117,6 +119,7 @@ const KpiCard = ({ label, value, sub, color = 'white' }) => (
 // ── Main Component ────────────────────────────────────────────────────────────
 const Portfolio = () => {
     const [claimable] = useState(8.75);
+    const [transferTarget, setTransferTarget] = useState(null);
 
     const totalValue       = HOLDINGS.reduce((sum, h) => sum + h.tokens * h.token_price, 0);
     const totalRoyalties   = HOLDINGS.reduce((sum, h) => sum + h.royalties_earned, 0);
@@ -268,15 +271,29 @@ const Portfolio = () => {
                                 +{fmtUSD(h.royalties_earned)}
                             </span>
 
-                            {/* APY */}
-                            <span style={{
-                                fontSize: '1rem', fontWeight: '900', color: '#10b981',
-                                letterSpacing: '-0.02em',
-                                textShadow: '0 0 10px rgba(16,185,129,0.4)',
-                                fontFamily: "'Courier New', monospace",
-                            }}>
-                                {h.apy.toFixed(1)}%
-                            </span>
+                            {/* APY + Transferir */}
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                <span style={{
+                                    fontSize: '1rem', fontWeight: '900', color: '#10b981',
+                                    letterSpacing: '-0.02em',
+                                    textShadow: '0 0 10px rgba(16,185,129,0.4)',
+                                    fontFamily: "'Courier New', monospace",
+                                }}>
+                                    {h.apy.toFixed(1)}%
+                                </span>
+                                <button
+                                    onClick={() => setTransferTarget(h)}
+                                    style={{
+                                        padding: '3px 8px',
+                                        background: 'rgba(139,92,246,0.1)',
+                                        border: '1px solid rgba(139,92,246,0.3)',
+                                        borderRadius: '6px',
+                                        color: '#a78bfa',
+                                        fontSize: '0.6rem', fontWeight: '700', cursor: 'pointer',
+                                        letterSpacing: '0.3px',
+                                    }}
+                                >Transferir →</button>
+                            </div>
                         </div>
                     );
                 })}
@@ -299,6 +316,16 @@ const Portfolio = () => {
                     No constituye asesoría financiera. BE4T © 2025.
                 </p>
             </div>
+            {/* ── TransferModal ── */}
+            {transferTarget && createPortal(
+                <Suspense fallback={null}>
+                    <TransferModal
+                        holding={transferTarget}
+                        onClose={() => setTransferTarget(null)}
+                    />
+                </Suspense>,
+                document.body
+            )}
         </div>
     );
 };
