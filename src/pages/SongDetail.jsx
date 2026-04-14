@@ -15,6 +15,7 @@ import {
 import './SongDetail.css';
 import { lazy, Suspense } from 'react';
 import { isProduction } from '../core/env';
+import CommunityImpactWidget from '../components/be4t/CommunityImpactWidget';
 const AcquisitionModal = lazy(() => import('../components/be4t/AcquisitionModal'));
 
 // ── Minimal mono-color platform icons (Anti-Notion: single fill color) ───────
@@ -635,6 +636,12 @@ const SongDetail = ({ onBack, songId, songData, onRequireAuth, isAuthenticated, 
                         </div>
                     </section>
                 </div>
+
+                {/* ── 4b. COMMUNITY IMPACT + SHARE TO EARN ── */}
+                <CommunityImpactWidget
+                    song={{ id: song.id, title: song.title, artist: song.artist }}
+                    investorsCount={parseInt(song.fansParticipating?.replace?.(/[^0-9]/g, '') || '0', 10) || undefined}
+                />
 
                 {/* ── 5. RETURN CALCULATOR ── */}
                 <section ref={calculatorRef} className="detail-section calculator-section glass-panel highlight-border">

@@ -239,7 +239,122 @@ const DisquerasPage = ({ session, onLoginNeeded }) => {
                         </button>
                     </div>
 
+                    {/* ── Label Dashboard (Simulación) ── */}
+                    <div style={{
+                        background: 'linear-gradient(135deg, rgba(6,182,212,0.06), rgba(124,58,237,0.05))',
+                        border: '1px solid rgba(6,182,212,0.2)',
+                        borderRadius: '20px', padding: '2rem', marginBottom: '3rem',
+                        position: 'relative', overflow: 'hidden',
+                    }}>
+                        {/* Top accent line */}
+                        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '2px', background: 'linear-gradient(90deg, transparent, #06b6d4, transparent)' }} />
+
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.25rem' }}>
+                            <span style={{
+                                display: 'inline-flex', alignItems: 'center', gap: '0.4rem',
+                                background: 'rgba(6,182,212,0.08)', border: '1px solid rgba(6,182,212,0.25)',
+                                borderRadius: '100px', padding: '0.25rem 0.85rem',
+                            }}>
+                                <span style={{ width: '5px', height: '5px', borderRadius: '50%', background: '#06b6d4', display: 'inline-block', boxShadow: '0 0 6px #06b6d4' }} />
+                                <span style={{ fontSize: '0.62rem', color: '#06b6d4', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '1.2px' }}>
+                                    Dashboard — Simulación de Impacto
+                                </span>
+                            </span>
+                        </div>
+
+                        <h2 style={{ fontSize: 'clamp(1.3rem, 3vw, 1.9rem)', fontWeight: '900', letterSpacing: '-0.04em', margin: '0 0 0.5rem', lineHeight: 1.1, color: 'white' }}>
+                            Lo que BE4T hace por tu{' '}
+                            <span style={{ background: 'linear-gradient(135deg, #06b6d4, #a855f7)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+                                catálogo
+                            </span>
+                        </h2>
+                        <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.85rem', margin: '0 0 1.75rem', lineHeight: 1.6, maxWidth: '560px' }}>
+                            Simulación basada en un catálogo de 10 tracks con 500M de streams agregados.
+                        </p>
+
+                        {/* KPI Showcase Grid */}
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1rem', marginBottom: '1.5rem' }}>
+                            {[
+                                {
+                                    icon: '💰', label: 'Capital Liberado',
+                                    value: '$2,400,000',
+                                    sub: 'vía tokenización de regalías futuras',
+                                    color: '#10b981', border: 'rgba(16,185,129,0.2)', bg: 'rgba(16,185,129,0.06)',
+                                },
+                                {
+                                    icon: '📣', label: 'Ahorro en Marketing',
+                                    value: '$320,000',
+                                    sub: 'generado por fans-inversores en 6 meses',
+                                    color: '#f97316', border: 'rgba(249,115,22,0.2)', bg: 'rgba(249,115,22,0.06)',
+                                },
+                                {
+                                    icon: '👥', label: 'Inversores Activos',
+                                    value: '3,872',
+                                    sub: 'fans que se convirtieron en promotores',
+                                    color: '#a855f7', border: 'rgba(168,85,247,0.2)', bg: 'rgba(168,85,247,0.06)',
+                                },
+                                {
+                                    icon: '📈', label: 'Crecimiento de Streams',
+                                    value: '+41%',
+                                    sub: 'vs catálogos sin tokenización',
+                                    color: '#06b6d4', border: 'rgba(6,182,212,0.2)', bg: 'rgba(6,182,212,0.06)',
+                                },
+                            ].map(({ icon, label, value, sub, color, border, bg }) => (
+                                <div key={label} style={{
+                                    background: bg, border: `1px solid ${border}`,
+                                    borderRadius: '14px', padding: '1.25rem',
+                                }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                                        <span style={{ fontSize: '1.1rem' }}>{icon}</span>
+                                        <span style={{ fontSize: '0.62rem', color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: '700' }}>
+                                            {label}
+                                        </span>
+                                    </div>
+                                    <div style={{ fontSize: '1.7rem', fontWeight: '900', color, letterSpacing: '-0.04em', lineHeight: 1, marginBottom: '4px', fontFamily: "'Courier New', monospace" }}>
+                                        {value}
+                                    </div>
+                                    <div style={{ fontSize: '0.68rem', color: 'rgba(255,255,255,0.35)', lineHeight: 1.4 }}>{sub}</div>
+                                </div>
+                            ))}
+                        </div>
+
+                        {/* Flow diagram */}
+                        <div style={{
+                            background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)',
+                            borderRadius: '12px', padding: '1rem 1.25rem',
+                            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                            gap: '0.5rem', flexWrap: 'wrap',
+                        }}>
+                            {[
+                                { emoji: '🎵', label: 'Tu Catálogo' },
+                                { arrow: true },
+                                { emoji: '🔗', label: 'Tokenización BE4T' },
+                                { arrow: true },
+                                { emoji: '👥', label: 'Inversores/Fans' },
+                                { arrow: true },
+                                { emoji: '📣', label: 'Marketing Viral' },
+                                { arrow: true },
+                                { emoji: '💸', label: 'Más Streams' },
+                                { arrow: true },
+                                { emoji: '🚀', label: 'Mayor ROI' },
+                            ].map((item, i) => item.arrow
+                                ? <span key={i} style={{ color: 'rgba(255,255,255,0.2)', fontSize: '1.1rem', flexShrink: 0 }}>→</span>
+                                : (
+                                    <div key={i} style={{ textAlign: 'center', flexShrink: 0 }}>
+                                        <div style={{ fontSize: '1.25rem' }}>{item.emoji}</div>
+                                        <div style={{ fontSize: '0.55rem', color: 'rgba(255,255,255,0.4)', fontWeight: '700', marginTop: '2px', whiteSpace: 'nowrap' }}>{item.label}</div>
+                                    </div>
+                                )
+                            )}
+                        </div>
+
+                        <p style={{ fontSize: '0.62rem', color: 'rgba(255,255,255,0.2)', margin: '0.85rem 0 0', textAlign: 'center', lineHeight: 1.5 }}>
+                            Datos proyectados para una distribuidora con 10 tracks activos · Modelo conservador (12% APY, 3 meses de operación)
+                        </p>
+                    </div>
+
                     {/* ── CTA Bottom ── */}
+
                     <div style={{ textAlign: 'center', padding: '2.5rem', background: 'rgba(16,185,129,0.04)', border: '1px solid rgba(16,185,129,0.15)', borderRadius: '20px' }}>
                         <h3 style={{ fontSize: '1.3rem', fontWeight: '800', marginBottom: '0.75rem', letterSpacing: '-0.02em', color: 'white' }}>¿Listo para escalar tu operación como distribuidora?</h3>
                         <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.9rem', lineHeight: 1.7, maxWidth: '520px', margin: '0 auto 1.75rem' }}>
