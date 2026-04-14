@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import WalletFundingModal from './WalletFundingModal';
-import ConnectWalletButton from './ConnectWalletButton';
-import { isProduction, THIRDWEB_CLIENT_ID } from '../../core/env';
+import NavCTA from './NavCTA';
+import { isProduction } from '../../core/env';
 
 // ── BE4T Brand Logo (uses /public/be4t-logo.svg) ────────────────────────────
 const BE4TWordmark = ({ onClick }) => (
@@ -54,7 +53,6 @@ const HamburgerIcon = ({ open }) => (
 
 const Navigation = ({ currentPage, setCurrentPage, session, onLoginClick, isAdmin = false, userRole = 'investor' }) => {
     const [mobileOpen, setMobileOpen] = useState(false);
-    const [walletOpen, setWalletOpen] = useState(false);
 
     // Close menu on page change or resize to desktop
     useEffect(() => {
@@ -188,143 +186,93 @@ const Navigation = ({ currentPage, setCurrentPage, session, onLoginClick, isAdmi
                     {/* Spacer on mobile */}
                     <div style={{ flex: 1 }} />
 
-                    {/* Right actions */}
+                    {/* Right actions — single NavCTA + admin + hamburger */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexShrink: 0 }}>
-                        {/* Social Login / Wallet Connect (both envs if Thirdweb key exists) */}
-                        {THIRDWEB_CLIENT_ID && <ConnectWalletButton />}
 
-                        {/* Mode Badge: LIVE vs DEMO — always visible */}
-                        <div style={{
-                            display: 'inline-flex', alignItems: 'center', gap: '0.35rem',
-                            padding: '0.38rem 0.75rem',
-                            background: isProduction
-                                ? 'rgba(16,185,129,0.1)'
-                                : 'rgba(245,158,11,0.08)',
-                            border: `1px solid ${isProduction ? 'rgba(16,185,129,0.35)' : 'rgba(245,158,11,0.3)'}`,
-                            borderRadius: '100px',
-                            fontSize: '0.65rem', fontWeight: '800',
-                            letterSpacing: '0.8px', textTransform: 'uppercase',
-                            color: isProduction ? '#10b981' : '#f59e0b',
-                            whiteSpace: 'nowrap',
-                            flexShrink: 0,
-                        }}>
-                            <span style={{
-                                width: '5px', height: '5px', borderRadius: '50%',
-                                background: isProduction ? '#10b981' : '#f59e0b',
-                                display: 'inline-block',
-                                animation: isProduction ? 'be4t-nav-pulse 1.8s ease infinite' : 'none',
-                            }} />
-                            {isProduction ? 'LIVE' : 'DEMO'}
-                        </div>
-
-                        {/* BE4T Funding Modal (Supabase auth) */}
-                        <button
-                            onClick={() => setWalletOpen(true)}
-                            title="Fondear cuenta"
-                            style={{
-                                display: 'flex', alignItems: 'center', gap: '0.45rem',
-                                padding: '0.5rem 0.9rem',
-                                background: 'rgba(124,58,237,0.1)',
-                                border: '1px solid rgba(139,92,246,0.3)',
+                        {/* Mode badge (slim) */}
+                        {!isProduction && (
+                            <div style={{
+                                display: 'inline-flex', alignItems: 'center', gap: '0.3rem',
+                                padding: '0.28rem 0.6rem',
+                                background: 'rgba(245,158,11,0.08)',
+                                border: '1px solid rgba(245,158,11,0.25)',
                                 borderRadius: '100px',
-                                color: '#c4b5fd', fontSize: '0.78rem', fontWeight: '600',
-                                cursor: 'pointer', whiteSpace: 'nowrap',
-                                transition: 'all 0.2s ease',
-                                minHeight: '44px', minWidth: '44px',
-                            }}
-                            onMouseOver={e => { e.currentTarget.style.background = 'rgba(124,58,237,0.22)'; }}
-                            onMouseOut={e => { e.currentTarget.style.background = 'rgba(124,58,237,0.1)'; }}
-                        >
-                            <WalletIcon />
-                            <span className="be4t-wallet-label">Fondear</span>
-                        </button>
-
-                        {/* Profile / Login */}
-                        {session ? (
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                {/* Admin: Panel de Control button */}
-                                {isAdmin && (
-                                    <button
-                                        onClick={() => isProduction ? window.history.pushState({}, '', '/admin') || window.dispatchEvent(new PopStateEvent('popstate')) : navigate('disqueras')}
-                                        title="Panel de Control — Solo Admin"
-                                        style={{
-                                            display: 'flex', alignItems: 'center', gap: '6px',
-                                            padding: '0.45rem 0.9rem',
-                                            background: 'linear-gradient(135deg, rgba(139,92,246,0.2), rgba(124,58,237,0.12))',
-                                            border: '1px solid rgba(139,92,246,0.45)',
-                                            borderRadius: '100px',
-                                            color: '#c4b5fd',
-                                            fontSize: '0.72rem', fontWeight: '800',
-                                            cursor: 'pointer', whiteSpace: 'nowrap',
-                                            letterSpacing: '-0.01em',
-                                            boxShadow: '0 0 12px rgba(139,92,246,0.15)',
-                                            transition: 'all 0.2s ease',
-                                        }}
-                                        onMouseOver={e => { e.currentTarget.style.background = 'linear-gradient(135deg, rgba(139,92,246,0.35), rgba(124,58,237,0.25))'; e.currentTarget.style.boxShadow = '0 0 20px rgba(139,92,246,0.3)'; }}
-                                        onMouseOut={e => { e.currentTarget.style.background = 'linear-gradient(135deg, rgba(139,92,246,0.2), rgba(124,58,237,0.12))'; e.currentTarget.style.boxShadow = '0 0 12px rgba(139,92,246,0.15)'; }}
-                                    >
-                                        <span style={{ fontSize: '0.85rem' }}>🛡️</span>
-                                        Panel de Control
-                                    </button>
-                                )}
-
-                                {/* Avatar with role border */}
-                                <button onClick={() => navigate('perfil')} title="Mi Perfil"
-                                    style={{
-                                        width: '44px', height: '44px', borderRadius: '50%',
-                                        background: isAdmin
-                                            ? 'linear-gradient(135deg, #4c1d95, #8B5CF6)'
-                                            : 'linear-gradient(135deg, #7c3aed, #a855f7)',
-                                        border: isAdmin
-                                            ? '2px solid rgba(196,181,253,0.6)'
-                                            : '2px solid rgba(168,85,247,0.4)',
-                                        color: 'white', fontWeight: '800', fontSize: '0.85rem',
-                                        cursor: 'pointer', flexShrink: 0,
-                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                        boxShadow: isAdmin ? '0 0 0 1px rgba(196,181,253,0.2)' : 'none',
-                                        position: 'relative',
-                                    }}>
-                                    {(session.user?.email?.[0] || 'U').toUpperCase()}
-                                    {/* Admin indicator dot */}
-                                    {isAdmin && (
-                                        <span style={{
-                                            position: 'absolute', bottom: '1px', right: '1px',
-                                            width: '9px', height: '9px', borderRadius: '50%',
-                                            background: '#c4b5fd',
-                                            border: '2px solid #0f1117',
-                                        }} />
-                                    )}
-                                </button>
+                                fontSize: '0.6rem', fontWeight: '800',
+                                letterSpacing: '0.8px', textTransform: 'uppercase',
+                                color: '#f59e0b', whiteSpace: 'nowrap', flexShrink: 0,
+                            }}>
+                                DEMO
                             </div>
-                        ) : (
-                            <button onClick={onLoginClick}
+                        )}
+
+                        {/* Admin button (if admin logged in via Supabase) */}
+                        {isAdmin && session && (
+                            <button
+                                onClick={() => isProduction
+                                    ? (window.history.pushState({}, '', '/admin'), window.dispatchEvent(new PopStateEvent('popstate')))
+                                    : navigate('disqueras')}
+                                title="Panel de Control"
                                 style={{
-                                    padding: '0.5rem 1.1rem', minHeight: '44px',
-                                    background: 'linear-gradient(135deg, #7c3aed, #a855f7, #06b6d4)',
-                                    backgroundSize: '200% auto',
-                                    border: 'none', borderRadius: '100px',
-                                    color: 'white', fontWeight: '800', fontSize: '0.78rem',
-                                    cursor: 'pointer', whiteSpace: 'nowrap', letterSpacing: '-0.01em',
-                                    boxShadow: '0 2px 14px rgba(124,58,237,0.4)',
+                                    display: 'flex', alignItems: 'center', gap: '5px',
+                                    padding: '0.4rem 0.8rem',
+                                    background: 'rgba(139,92,246,0.15)',
+                                    border: '1px solid rgba(139,92,246,0.4)',
+                                    borderRadius: '100px',
+                                    color: '#c4b5fd', fontSize: '0.7rem', fontWeight: '800',
+                                    cursor: 'pointer', whiteSpace: 'nowrap',
+                                    transition: 'all 0.2s ease',
                                 }}
                             >
-                                Acceso Anticipado
+                                🛡️ Admin
                             </button>
                         )}
 
-                        {/* ── Hamburger (mobile only) ── */}
+                        {/* THE unified CTA — handles all auth states */}
+                        <NavCTA
+                            session={session}
+                            onNavigate={navigate}
+                            onLoginClick={onLoginClick}
+                        />
+
+                        {/* Avatar (shown when Supabase session exists — quick profile nav) */}
+                        {session && (
+                            <button onClick={() => navigate('perfil')} title="Mi Perfil"
+                                style={{
+                                    width: '34px', height: '34px', borderRadius: '50%',
+                                    background: isAdmin
+                                        ? 'linear-gradient(135deg, #4c1d95, #8B5CF6)'
+                                        : 'linear-gradient(135deg, #7c3aed, #a855f7)',
+                                    border: isAdmin
+                                        ? '2px solid rgba(196,181,253,0.5)'
+                                        : '2px solid rgba(168,85,247,0.35)',
+                                    color: 'white', fontWeight: '800', fontSize: '0.78rem',
+                                    cursor: 'pointer', flexShrink: 0,
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                    position: 'relative',
+                                }}>
+                                {(session.user?.email?.[0] || 'U').toUpperCase()}
+                                {isAdmin && (
+                                    <span style={{
+                                        position: 'absolute', bottom: '0', right: '0',
+                                        width: '8px', height: '8px', borderRadius: '50%',
+                                        background: '#c4b5fd', border: '2px solid #0f1117',
+                                    }} />
+                                )}
+                            </button>
+                        )}
+
+                        {/* Hamburger (mobile only) */}
                         <button
                             className="be4t-hamburger"
                             onClick={() => setMobileOpen(o => !o)}
                             aria-label="Abrir menú"
                             style={{
-                                display: 'none', // overridden by CSS @media
+                                display: 'none',
                                 alignItems: 'center', justifyContent: 'center',
-                                width: '44px', height: '44px',
+                                width: '40px', height: '40px',
                                 background: mobileOpen ? 'rgba(139,92,246,0.2)' : 'rgba(255,255,255,0.06)',
                                 border: `1px solid ${mobileOpen ? 'rgba(139,92,246,0.5)' : 'rgba(255,255,255,0.1)'}`,
-                                borderRadius: '10px',
-                                color: 'white', cursor: 'pointer',
+                                borderRadius: '10px', color: 'white', cursor: 'pointer',
                                 transition: 'all 0.2s ease', flexShrink: 0,
                             }}>
                             <HamburgerIcon open={mobileOpen} />
@@ -389,47 +337,27 @@ const Navigation = ({ currentPage, setCurrentPage, session, onLoginClick, isAdmi
 
                 {/* Bottom actions */}
                 <div style={{ marginTop: 'auto', padding: '1rem 1rem 2rem', borderTop: '1px solid rgba(255,255,255,0.06)', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                    <button
-                        onClick={() => { setWalletOpen(true); setMobileOpen(false); }}
-                        style={{
-                            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.6rem',
-                            padding: '0.85rem', minHeight: '52px',
-                            background: 'linear-gradient(135deg, rgba(124,58,237,0.2), rgba(6,182,212,0.15))',
-                            border: '1px solid rgba(139,92,246,0.4)', borderRadius: '12px',
-                            color: '#c4b5fd', fontWeight: '700', fontSize: '0.9rem', cursor: 'pointer',
-                        }}>
-                        <WalletIcon /> Conectar Wallet
-                    </button>
+                    {/* NavCTA in mobile sidebar */}
+                    <div style={{ display: 'flex', justifyContent: 'center' }}>
+                        <NavCTA session={session} onNavigate={(page) => { navigate(page); setMobileOpen(false); }} onLoginClick={() => { onLoginClick?.(); setMobileOpen(false); }} />
+                    </div>
                     {/* Admin: Panel de Control (mobile) */}
                     {isAdmin && session && (
                         <button
-                            onClick={() => { navigate('disqueras'); }}
+                            onClick={() => { navigate('disqueras'); setMobileOpen(false); }}
                             style={{
                                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.6rem',
                                 padding: '0.85rem', minHeight: '52px',
                                 background: 'linear-gradient(135deg, rgba(139,92,246,0.25), rgba(124,58,237,0.15))',
                                 border: '1px solid rgba(139,92,246,0.5)', borderRadius: '12px',
                                 color: '#c4b5fd', fontWeight: '800', fontSize: '0.9rem', cursor: 'pointer',
-                                boxShadow: '0 0 16px rgba(139,92,246,0.15)',
                             }}
                         >
                             🛡️ Panel de Control
                         </button>
                     )}
-                    {!session && (
-                        <button onClick={() => { onLoginClick?.(); setMobileOpen(false); }}
-                            style={{
-                                padding: '0.85rem', minHeight: '52px',
-                                background: 'linear-gradient(135deg, #7c3aed, #a855f7)',
-                                border: 'none', borderRadius: '12px',
-                                color: 'white', fontWeight: '700', fontSize: '0.9rem', cursor: 'pointer',
-                            }}>
-                            Obtener Acceso Anticipado
-                        </button>
-                    )}
                 </div>
             </div>
-            <WalletFundingModal isOpen={walletOpen} onClose={() => setWalletOpen(false)} />
         </>
     );
 };

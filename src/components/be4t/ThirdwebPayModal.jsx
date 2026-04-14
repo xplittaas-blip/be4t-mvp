@@ -18,7 +18,7 @@
 import React, { useEffect } from 'react';
 import { PayEmbed } from 'thirdweb/react';
 import { baseSepolia } from 'thirdweb/chains';
-import { client } from '../core/thirdwebClient';
+import { client } from '../../core/thirdwebClient';
 
 const OVERLAY_STYLE = {
     position: 'fixed',
