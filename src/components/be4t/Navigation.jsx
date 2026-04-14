@@ -189,21 +189,26 @@ const Navigation = ({ currentPage, setCurrentPage, session, onLoginClick, isAdmi
                     {/* Right actions — single NavCTA + admin + hamburger */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexShrink: 0 }}>
 
-                        {/* Mode badge (slim) */}
-                        {!isProduction && (
-                            <div style={{
-                                display: 'inline-flex', alignItems: 'center', gap: '0.3rem',
-                                padding: '0.28rem 0.6rem',
-                                background: 'rgba(245,158,11,0.08)',
-                                border: '1px solid rgba(245,158,11,0.25)',
-                                borderRadius: '100px',
-                                fontSize: '0.6rem', fontWeight: '800',
-                                letterSpacing: '0.8px', textTransform: 'uppercase',
-                                color: '#f59e0b', whiteSpace: 'nowrap', flexShrink: 0,
-                            }}>
-                                DEMO
-                            </div>
-                        )}
+                        {/* Mode badge — always visible */}
+                        <div style={{
+                            display: 'inline-flex', alignItems: 'center', gap: '0.3rem',
+                            padding: '0.28rem 0.6rem',
+                            background: isProduction ? 'rgba(16,185,129,0.08)' : 'rgba(245,158,11,0.08)',
+                            border: `1px solid ${isProduction ? 'rgba(16,185,129,0.25)' : 'rgba(245,158,11,0.25)'}`,
+                            borderRadius: '100px',
+                            fontSize: '0.6rem', fontWeight: '800',
+                            letterSpacing: '0.8px', textTransform: 'uppercase',
+                            color: isProduction ? '#10b981' : '#f59e0b',
+                            whiteSpace: 'nowrap', flexShrink: 0,
+                        }}>
+                            <span style={{
+                                width: '5px', height: '5px', borderRadius: '50%',
+                                background: isProduction ? '#10b981' : '#f59e0b',
+                                display: 'inline-block',
+                                animation: isProduction ? 'be4t-nav-pulse 1.8s ease infinite' : 'none',
+                            }} />
+                            {isProduction ? 'REAL' : 'DEMO'}
+                        </div>
 
                         {/* Admin button (if admin logged in via Supabase) */}
                         {isAdmin && session && (
