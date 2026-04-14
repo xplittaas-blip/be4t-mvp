@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import HeroBanner from '../components/be4t/HeroBanner';
+
 import SongCard, { normalizeSong, SongCardSkeleton } from '../components/be4t/SongCard';
 import TokenizationModal from '../components/be4t/TokenizationModal';
 import EarlyAccessModal from '../components/be4t/EarlyAccessModal';
@@ -355,13 +355,6 @@ const Marketplace = ({ session, onNavigate }) => {
             <style>{globalStyles}</style>
 
             <main style={{ maxWidth: '1280px', margin: '0 auto', paddingBottom: '5rem' }}>
-                {/* ── Hero Banner ── */}
-                <HeroBanner userMode={userMode} onNavigate={onNavigate} />
-
-                {/* ── Waitlist Banner (entre hero y catálogo) ── */}
-                {userMode !== 'disquera' && (
-                    <WaitlistBanner onOpenModal={() => setWaitlistOpen(true)} />
-                )}
 
                 {/* ── Spotify loading status ── */}
                 {spotifyStatus === 'loading' && (
