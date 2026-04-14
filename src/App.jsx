@@ -373,7 +373,7 @@ function App() {
 
                 {/* Waitlist (Fan / Artista / Disquera) */}
                 {currentPage === 'waitlist' && (
-                    <WaitlistPage onNavigate={navigate} />
+                    <WaitlistPage onNavigate={navigate} session={session} />
                 )}
 
                 {/* Cómo Funciona: HowItWorks full page */}
@@ -383,10 +383,10 @@ function App() {
 
                 {/* Legacy routes (kept for compatibility) */}
                 {currentPage === 'artist-invite' && (
-                    <WaitlistPage onNavigate={navigate} />
+                    <WaitlistPage onNavigate={navigate} session={session} />
                 )}
                 {currentPage === 'investor-waitlist' && (
-                    <WaitlistPage onNavigate={navigate} />
+                    <WaitlistPage onNavigate={navigate} session={session} />
                 )}
 
                 {/* Admin Panel: /admin route — protected, production only */}
