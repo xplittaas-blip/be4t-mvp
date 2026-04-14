@@ -50,14 +50,31 @@ const globalStyles = `
         margin: 0;
     }
 
-    /* ── Mobile (≤ 480px) ── */
+    /* ── Mobile (≤ 480px) — Swipe Carousel ── */
     @media (max-width: 480px) {
         .be4t-song-grid {
-            grid-template-columns: 1fr;
-            gap: 1rem;
+            display: flex !important;
+            flex-wrap: nowrap !important;
+            overflow-x: auto;
+            overflow-y: hidden;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            scroll-snap-type: x mandatory;
+            scroll-padding: 0 1rem;
+            gap: 0.75rem;
+            padding: 0.25rem 1rem 1.25rem;
+            touch-action: pan-x;
+        }
+        .be4t-song-grid::-webkit-scrollbar { display: none; }
+        .be4t-song-grid > * {
+            flex-shrink: 0;
+            width: calc(85vw - 1.5rem);
+            max-width: 300px;
+            scroll-snap-align: center;
+            scroll-snap-stop: always;
         }
         .be4t-grid-outer {
-            padding: 0 0.75rem;
+            padding: 0;
         }
         .be4t-filters {
             padding: 1rem 0.75rem 0.75rem;
@@ -414,7 +431,26 @@ const Marketplace = ({ session, onNavigate }) => {
                                 </p>
                             </div>
                         ) : (
-                            <div className="be4t-song-grid">
+                            <>
+                                {/* Swipe hint — mobile only, fades out */}
+                                <style>{`
+                                    @keyframes be4t-fade-hint {
+                                        0%,70% { opacity: 1; }
+                                        100%    { opacity: 0; }
+                                    }
+                                    @media (min-width: 641px) { .be4t-swipe-hint { display: none !important; } }
+                                `}</style>
+                                <div className="be4t-swipe-hint" style={{
+                                    display: 'flex', alignItems: 'center', gap: '0.4rem',
+                                    paddingLeft: '1rem', marginBottom: '0.5rem',
+                                    fontSize: '0.73rem', color: 'rgba(255,255,255,0.35)',
+                                    animation: 'be4t-fade-hint 3s ease-out 1.5s forwards',
+                                    opacity: 1,
+                                }}>
+                                    <span style={{ fontSize: '0.9rem' }}>👆</span>
+                                    Desliza para explorar el catálogo
+                                </div>
+                                <div className="be4t-song-grid">
                                 {filteredSongs.map((song, i) => (
                                     <SongCard
                                         key={song.id}
@@ -428,7 +464,8 @@ const Marketplace = ({ session, onNavigate }) => {
                                         }}
                                     />
                                 ))}
-                            </div>
+                                </div>
+                            </>
                         )}
                     </div>
                 )}

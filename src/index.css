@@ -132,3 +132,122 @@ button {
 ::-webkit-scrollbar-thumb:hover {
   background: var(--border-light);
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   BE4T — Mobile Touch / Swipe Utilities
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/**
+ * .be4t-scroll-x
+ * Base class for any horizontal scroll container.
+ * Adds momentum, hides scrollbar, prevents layout shift.
+ */
+.be4t-scroll-x {
+  display: flex;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch; /* iOS momentum */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  will-change: scroll-position;
+}
+.be4t-scroll-x::-webkit-scrollbar { display: none; }
+
+/**
+ * .be4t-snap-track
+ * Scroll-snap container — items lock to center after swipe.
+ * Use on the outer flex row.
+ */
+.be4t-snap-track {
+  scroll-snap-type: x mandatory;
+  scroll-padding: 0 1.5rem; /* respect peek offset */
+}
+
+/**
+ * .be4t-snap-item
+ * Apply to each direct child of a snap track.
+ */
+.be4t-snap-item {
+  scroll-snap-align: center;
+  scroll-snap-stop: always; /* no skipping cards */
+  flex-shrink: 0;
+}
+
+/**
+ * .be4t-no-select
+ * Prevent text selection during drag gestures.
+ */
+.be4t-no-select {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* ── Artist Stories Row — upgrade to snap ──────────────────────────────── */
+.artist-stories-row {
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+  touch-action: pan-x;
+}
+.artist-story-item {
+  scroll-snap-align: center;
+  scroll-snap-stop: always;
+}
+
+/* ── Nav tab bars — smooth touch scroll ───────────────────────────────── */
+.be4t-nav-tabs-scroll {
+  display: flex;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  scroll-snap-type: x proximity;
+  gap: 0.25rem;
+  padding-bottom: 2px; /* prevent focus ring clip */
+  touch-action: pan-x;
+}
+.be4t-nav-tabs-scroll::-webkit-scrollbar { display: none; }
+.be4t-nav-tabs-scroll button {
+  flex-shrink: 0;
+  scroll-snap-align: start;
+}
+
+/* ── Mobile: Song Grid → Horizontal Swipe Carousel ────────────────────── */
+@media (max-width: 640px) {
+  .be4t-song-grid {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    scroll-snap-type: x mandatory;
+    gap: 1rem;
+    padding: 0.5rem 1.5rem 1rem;
+    touch-action: pan-x;
+  }
+  .be4t-song-grid::-webkit-scrollbar { display: none; }
+
+  /* Each song card becomes a snap item */
+  .be4t-song-grid > * {
+    flex-shrink: 0;
+    width: calc(85vw - 2rem);
+    max-width: 320px;
+    scroll-snap-align: center;
+    scroll-snap-stop: always;
+  }
+
+  /* Grid outer — remove horizontal padding to allow full bleed */
+  .be4t-grid-outer {
+    padding: 0;
+  }
+}
+
+/* ── Tablet: Show 2 cards at once ─────────────────────────────────────── */
+@media (min-width: 641px) and (max-width: 900px) {
+  .be4t-song-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+}
