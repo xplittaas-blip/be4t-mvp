@@ -12,11 +12,11 @@
 function resolveMode() {
     // __APP_MODE__ is a build-time constant injected by vite.config.js define
     // eslint-disable-next-line no-undef
-    if (typeof __APP_MODE__ !== 'undefined') return __APP_MODE__;
+    if (typeof __APP_MODE__ !== 'undefined') return String(__APP_MODE__).trim();
 
     // Fallback: read at runtime (dev server, SSR, test env)
     try {
-        return import.meta?.env?.VITE_APP_MODE || 'showcase';
+        return (import.meta?.env?.VITE_APP_MODE || 'showcase').trim();
     } catch {
         return 'showcase';
     }

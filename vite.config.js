@@ -9,10 +9,11 @@ export default defineConfig(({ mode }) => {
   // Priority 1: VITE_APP_MODE from Vercel env vars (process.env) or .env file
   // Priority 2: Vite mode flag (--mode production → 'production')
   // Priority 3: fall back to 'showcase'
-  const appMode =
+  const appMode = (
     env.VITE_APP_MODE ||
     process.env.VITE_APP_MODE ||
     (mode === 'production' ? 'production' : 'showcase')
+  ).trim()
 
   console.log(`[BE4T] Building with APP_MODE=${appMode} (Vite mode: ${mode})`)
 
