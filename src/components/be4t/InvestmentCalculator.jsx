@@ -68,8 +68,8 @@ const InvestmentCalculator = ({ asset, session }) => {
     })();
 
     const btnGradient = isShowcase
-        ? 'linear-gradient(135deg, #7c3aed, #a855f7)'
-        : 'linear-gradient(135deg, #0ea5e9, #6366f1)';
+        ? 'linear-gradient(135deg, #7c3aed 0%, #a855f7 50%, #06b6d4 100%)'
+        : 'linear-gradient(135deg, #0ea5e9 0%, #6366f1 50%, #a855f7 100%)';
 
     const btnDisabled = txState === 'processing' || txState === 'success'
         || (isShowcase && (!canAfford || !!songAcquired));

@@ -1,14 +1,14 @@
 /**
  * useDemoBalance — BE4T Ghost Balance System
  * ─────────────────────────────────────────────────────────────────────────────
- * Provides a fictional $100 USD "demo credit" for the Pitch environment.
+ * Provides a fictional $50,000 USD "demo credit" for the Pitch environment.
  * Persists to localStorage so the balance survives page reloads.
  *
  * API:
  *   const { balance, acquire, acquired, reset } = useDemoBalance();
  *   acquire(songId, cost)  → deducts from balance, marks song acquired
  *   acquired(songId)       → returns true if song already acquired
- *   reset()                → resets to $100 (for testing)
+ *   reset()                → resets to $50,000 (for testing)
  *
  * Only meaningful in showcase mode — in production, returns production stubs.
  */
@@ -18,7 +18,7 @@ import { isShowcase } from '../core/env';
 
 const STORAGE_KEY = 'be4t_demo_balance';
 const ACQUIRED_KEY = 'be4t_demo_acquired';
-const INITIAL_BALANCE = 100; // $100 USD
+const INITIAL_BALANCE = 50_000; // $50,000 USD — strategic simulation budget
 
 function loadBalance() {
     try {

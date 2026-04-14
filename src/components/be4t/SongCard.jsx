@@ -526,30 +526,32 @@ const SongCard = ({ song, userMode, index = 0, onDetailClick }) => {
                         id={`acquire-btn-${song.id}`}
                         onClick={(e) => { e.stopPropagation(); handleDetailClick(); }}
                         style={{
-                            width: '100%', padding: '0.88rem 0.6rem',
-                            background: 'linear-gradient(135deg, #065f46 0%, #10b981 100%)',
+                            width: '100%', padding: '0.92rem 0.6rem',
+                            background: 'linear-gradient(135deg, #7c3aed 0%, #a855f7 50%, #06b6d4 100%)',
+                            backgroundSize: '200% auto',
                             border: 'none', borderRadius: '12px',
                             color: 'white', fontWeight: '800', fontSize: '0.88rem',
                             cursor: 'pointer', transition: 'all 0.3s ease',
                             lineHeight: 1.25, letterSpacing: '-0.01em',
-                            boxShadow: '0 3px 14px rgba(16,185,129,0.3)',
+                            boxShadow: '0 4px 20px rgba(124,58,237,0.45)',
                             marginTop: 'auto',
+                            position: 'relative', overflow: 'hidden',
                         }}
                         onMouseOver={e => {
-                            e.currentTarget.style.filter = 'brightness(1.12)';
-                            e.currentTarget.style.boxShadow = '0 6px 24px rgba(16,185,129,0.55)';
-                            e.currentTarget.style.transform = 'translateY(-1px)';
+                            e.currentTarget.style.backgroundPosition = 'right center';
+                            e.currentTarget.style.boxShadow = '0 8px 32px rgba(124,58,237,0.65)';
+                            e.currentTarget.style.transform = 'translateY(-2px) scale(1.01)';
                         }}
                         onMouseOut={e => {
-                            e.currentTarget.style.filter = 'brightness(1)';
-                            e.currentTarget.style.boxShadow = '0 3px 14px rgba(16,185,129,0.3)';
-                            e.currentTarget.style.transform = 'translateY(0)';
+                            e.currentTarget.style.backgroundPosition = 'left center';
+                            e.currentTarget.style.boxShadow = '0 4px 20px rgba(124,58,237,0.45)';
+                            e.currentTarget.style.transform = 'translateY(0) scale(1)';
                         }}
                     >
-                        Adquirir participación de regalías
+                        💰 Adquirir participación
                         <span style={{ display: 'block', fontSize: '0.58rem', fontWeight: '600',
-                            color: 'rgba(255,255,255,0.62)', marginTop: '2px', letterSpacing: '0.3px' }}>
-                            {isProduction ? 'Conectar wallet · Calcular retorno' : 'Ver calculadora de retorno'}
+                            color: 'rgba(255,255,255,0.7)', marginTop: '2px', letterSpacing: '0.3px' }}>
+                            {isProduction ? 'Fondear · Calcular retorno' : 'Simular con crédito demo'}
                         </span>
                     </button>
 
