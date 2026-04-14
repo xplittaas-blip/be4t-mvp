@@ -5,9 +5,10 @@
  * Persists to localStorage so the balance survives page reloads.
  *
  * API:
- *   const { balance, acquire, acquired, reset } = useDemoBalance();
- *   acquire(songId, cost)  → deducts from balance, marks song acquired
- *   acquired(songId)       → returns true if song already acquired
+ *   const { balance, acquire, acquired, portfolio, reset } = useDemoBalance();
+ *   acquire(songId, cost, fractions, songMeta) → deducts from balance, saves full record
+ *   acquired(songId)       → returns the investment record or false
+ *   portfolio              → array of all investments with ROI data
  *   reset()                → resets to $50,000 (for testing)
  *
  * Only meaningful in showcase mode — in production, returns production stubs.
@@ -58,13 +59,14 @@ export function useDemoBalance() {
     }, [acquiredMap]);
 
     /**
-     * Try to acquire `fractions` of a song.
-     * @param {string} songId   — unique song/asset identifier
-     * @param {number} cost     — total cost in USD
-     * @param {number} fractions
+     * Try to acquire fractions of a song.
+     * @param {string} songId     — unique song/asset identifier
+     * @param {number} cost       — total cost in USD
+     * @param {number} fractions  — number of tokens/fractions purchased
+     * @param {object} songMeta   — { name, artist, tokenPrice, totalSupply, apy, spotifyStreams }
      * @returns {{ ok: boolean, reason?: string }}
      */
-    const acquire = useCallback((songId, cost, fractions = 1) => {
+    const acquire = useCallback((songId, cost, fractions = 1, songMeta = {}) => {
         if (!isShowcase) return { ok: false, reason: 'not-showcase' };
         if (cost <= 0) return { ok: false, reason: 'invalid-cost' };
 
@@ -75,14 +77,27 @@ export function useDemoBalance() {
 
         const newBalance = parseFloat((current - cost).toFixed(2));
         setBalance(newBalance);
-        setAcquiredMap(prev => ({
-            ...prev,
-            [songId]: {
-                fractions: (prev[songId]?.fractions || 0) + fractions,
-                cost:      ((prev[songId]?.cost || 0) + cost),
-                acquiredAt: Date.now(),
-            },
-        }));
+        setAcquiredMap(prev => {
+            const existing = prev[songId] || {};
+            return {
+                ...prev,
+                [songId]: {
+                    // Accumulate fractions + cost if re-investing in same song
+                    fractions:    (existing.fractions || 0) + fractions,
+                    cost:         parseFloat(((existing.cost || 0) + cost).toFixed(2)),
+                    acquiredAt:   existing.acquiredAt || Date.now(), // keep original date
+                    lastAddedAt:  Date.now(),
+                    // Song metadata — lock in at first purchase, update if changed
+                    name:         songMeta.name   || existing.name   || 'Canción',
+                    artist:       songMeta.artist || existing.artist || 'Artista',
+                    tokenPrice:   songMeta.tokenPrice  || existing.tokenPrice  || 0,
+                    totalSupply:  songMeta.totalSupply || existing.totalSupply || 1000,
+                    apy:          songMeta.apy    || existing.apy    || 12,
+                    spotifyStreams: songMeta.spotifyStreams || existing.spotifyStreams || 0,
+                    coverUrl:     songMeta.coverUrl || existing.coverUrl || null,
+                },
+            };
+        });
 
         return { ok: true, newBalance };
     }, []);
@@ -103,8 +118,22 @@ export function useDemoBalance() {
         setAcquiredMap({});
     }, []);
 
-    /** List all acquired songs */
-    const portfolio = Object.entries(acquiredMap).map(([id, data]) => ({ id, ...data }));
+    /** List all acquired songs with real-time ROI calculation */
+    const portfolio = Object.entries(acquiredMap).map(([id, data]) => {
+        const daysSince    = (Date.now() - (data.acquiredAt || Date.now())) / (1000 * 60 * 60 * 24);
+        const dailyRate    = (data.apy || 12) / 100 / 365;
+        const earnedToDate = data.cost * dailyRate * daysSince;
+        const ownershipPct = (data.totalSupply > 0)
+            ? (data.fractions / data.totalSupply) * 100
+            : 0;
+        return {
+            id,
+            ...data,
+            daysSince:    Math.floor(daysSince),
+            earnedToDate: parseFloat(earnedToDate.toFixed(4)),
+            ownershipPct: parseFloat(ownershipPct.toFixed(4)),
+        };
+    });
 
     return {
         balance,

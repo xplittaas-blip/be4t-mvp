@@ -355,7 +355,7 @@ function App() {
 
                 {/* Mis Canciones: Portfolio / Dashboard */}
                 {currentPage === 'mis-canciones' && (
-                    <Portfolio session={session} />
+                    <Portfolio session={session} onNavigate={setCurrentPage} />
                 )}
 
                 {/* Para Disqueras: B2B + Emitir Activo */}

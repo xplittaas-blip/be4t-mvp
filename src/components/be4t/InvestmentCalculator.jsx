@@ -79,10 +79,21 @@ const InvestmentCalculator = ({ asset, session }) => {
         if (btnDisabled) return;
         setTxState('processing');
 
-        // Simulate network delay for premium feel
         setTimeout(() => {
             const songId = asset?.id || asset?.track_id || 'unknown';
-            const result = acquire(songId, investmentCost, fractions);
+
+            // Build rich metadata for Portfolio tracking
+            const songMeta = {
+                name:          asset?.name || asset?.title || 'Canción',
+                artist:        asset?.metadata?.artist || asset?.artist || 'Artista',
+                tokenPrice,
+                totalSupply,
+                apy:           parseFloat(apy.toFixed(2)),
+                spotifyStreams: asset?.metadata?.spotify_streams || 0,
+                coverUrl:      asset?.metadata?.cover_url || asset?.cover_url || null,
+            };
+
+            const result = acquire(songId, investmentCost, fractions, songMeta);
 
             if (result.ok) {
                 setTxState('success');
