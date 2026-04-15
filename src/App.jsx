@@ -12,6 +12,7 @@ import HowItWorks from './components/be4t/HowItWorks';
 import AdminPanel from './pages/AdminPanel';
 import { supabase } from './core/xplit/supabaseClient';
 import { useUserRole } from './hooks/useUserRole';
+import { isShowcase } from './core/env';
 
 // ── Lazy pages ────────────────────────────────────────────────────────────────
 // Profile page (simple placeholder if no dedicated page)
@@ -486,9 +487,11 @@ function App() {
                     <ProfilePage session={session} onLogout={() => setCurrentPage('explore')} isAdmin={isAdmin} />
                 )}
 
-                {/* Waitlist (Fan / Artista / Disquera) */}
+                {/* Waitlist — redirect to explore in showcase playground */}
                 {currentPage === 'waitlist' && (
-                    <WaitlistPage onNavigate={navigate} session={session} />
+                    isShowcase
+                        ? <Marketplace session={session} onNavigate={navigate} />
+                        : <WaitlistPage onNavigate={navigate} session={session} />
                 )}
 
                 {/* Cómo Funciona: HowItWorks full page */}
@@ -496,12 +499,16 @@ function App() {
                     <HowItWorks onNavigate={navigate} />
                 )}
 
-                {/* Legacy routes (kept for compatibility) */}
+                {/* Legacy routes */}
                 {currentPage === 'artist-invite' && (
-                    <WaitlistPage onNavigate={navigate} session={session} />
+                    isShowcase
+                        ? <Marketplace session={session} onNavigate={navigate} />
+                        : <WaitlistPage onNavigate={navigate} session={session} />
                 )}
                 {currentPage === 'investor-waitlist' && (
-                    <WaitlistPage onNavigate={navigate} session={session} />
+                    isShowcase
+                        ? <Marketplace session={session} onNavigate={navigate} />
+                        : <WaitlistPage onNavigate={navigate} session={session} />
                 )}
 
                 {/* Admin Panel: /admin route — protected, production only */}
@@ -515,10 +522,13 @@ function App() {
 
             <MiniPlayer />
             <Footer />
-            <EarlyAccessModal
-                isOpen={showAuthModal}
-                onClose={() => setShowAuthModal(false)}
-            />
+            {/* EarlyAccessModal — hidden in showcase playground (no lead capture) */}
+            {!isShowcase && (
+                <EarlyAccessModal
+                    isOpen={showAuthModal}
+                    onClose={() => setShowAuthModal(false)}
+                />
+            )}
         </div>
     );
 }

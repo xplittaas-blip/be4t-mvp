@@ -3,6 +3,7 @@ import HeroBanner from '../components/be4t/HeroBanner';
 import SongCard, { normalizeSong, SongCardSkeleton } from '../components/be4t/SongCard';
 import TokenizationModal from '../components/be4t/TokenizationModal';
 import EarlyAccessModal from '../components/be4t/EarlyAccessModal';
+import { isShowcase } from '../core/env';
 import { fetchDemoSongs20 } from '../services/spotifyService';
 import './Marketplace.css';
 
@@ -477,11 +478,11 @@ const Marketplace = ({ session, onNavigate }) => {
                 />
             )}
 
-            {/* ── Sticky mobile waitlist pill ── */}
-            <StickyWaitlistCTA onOpenModal={() => setWaitlistOpen(true)} />
+            {/* ── Sticky mobile waitlist pill ── Hide in showcase playground ── */}
+            {!isShowcase && <StickyWaitlistCTA onOpenModal={() => setWaitlistOpen(true)} />}
 
-            {/* ── Early Access Modal ── */}
-            <EarlyAccessModal isOpen={waitlistOpen} onClose={() => setWaitlistOpen(false)} />
+            {/* ── Early Access Modal ── Hide in showcase playground ── */}
+            {!isShowcase && <EarlyAccessModal isOpen={waitlistOpen} onClose={() => setWaitlistOpen(false)} />}
         </div>
     );
 };

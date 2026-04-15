@@ -58,7 +58,7 @@ const InvestmentCalculator = ({ asset, session }) => {
     // ── Button state ─────────────────────────────────────────────────────────
     const btnLabel = (() => {
         if (txState === 'processing') return '⏳ Procesando...';
-        if (txState === 'success')    return '✅ ¡Adquirido!';
+        if (txState === 'success')    return '✅ Activo Adquirido';
         if (isShowcase) {
             if (songAcquired)  return `✅ Ya tienes ${songAcquired.fractions} fracciones`;
             if (!canAfford)    return '💸 Saldo insuficiente';
@@ -264,20 +264,27 @@ const InvestmentCalculator = ({ asset, session }) => {
             {/* ── Success State ────────────────────────────────────────────────── */}
             {txState === 'success' && isShowcase && songAcquired && (
                 <div style={{
-                    display: 'flex', alignItems: 'center', gap: '0.75rem',
-                    background: 'rgba(16,185,129,0.1)',
-                    border: '1px solid rgba(16,185,129,0.3)',
-                    borderRadius: '12px', padding: '0.85rem 1rem',
+                    display: 'flex', alignItems: 'flex-start', gap: '0.75rem',
+                    background: 'linear-gradient(135deg, rgba(16,185,129,0.12), rgba(6,182,212,0.06))',
+                    border: '1px solid rgba(16,185,129,0.35)',
+                    borderRadius: '14px', padding: '1rem 1.1rem',
                     marginBottom: '0.75rem',
                     animation: 'fadeIn 0.4s ease',
+                    boxShadow: '0 4px 20px rgba(16,185,129,0.12)',
                 }}>
-                    <CheckCircle size={18} style={{ color: '#4ade80', flexShrink: 0 }} />
-                    <div>
-                        <div style={{ fontWeight: '700', color: '#4ade80', fontSize: '0.88rem' }}>
-                            ✅ Fracciones adquiridas
+                    <span style={{ fontSize: '1.5rem', flexShrink: 0, lineHeight: 1 }}>🎵</span>
+                    <div style={{ flex: 1 }}>
+                        <div style={{ fontWeight: '800', color: '#4ade80', fontSize: '0.95rem', marginBottom: '3px' }}>
+                            ✅ Activo musical adquirido con éxito
                         </div>
-                        <div style={{ fontSize: '0.73rem', color: 'rgba(255,255,255,0.5)', marginTop: '0.1rem' }}>
-                            {songAcquired.fractions} fracc. · Saldo restante: {formatCurrency(balance)}
+                        <div style={{ fontSize: '0.73rem', color: 'rgba(255,255,255,0.5)', lineHeight: 1.5 }}>
+                            {songAcquired.fractions} fracciones · Saldo restante:{' '}
+                            <strong style={{ color: '#4ade80' }}>{formatCurrency(balance)}</strong>
+                        </div>
+                        <div style={{ fontSize: '0.7rem', color: 'rgba(6,182,212,0.8)', marginTop: '6px', fontWeight: '600', cursor: 'pointer' }}
+                            onClick={() => document.dispatchEvent(new CustomEvent('navigate', { detail: 'mis-canciones' }))}
+                        >
+                            Ver en Mis Canciones →
                         </div>
                     </div>
                 </div>

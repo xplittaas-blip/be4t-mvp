@@ -122,13 +122,28 @@ function NavCTAInner({ session, onNavigate, onLoginClick }) {
 
     // ── STATE B: Connected + onboarding pending ───────────────────────────────
     if (!onboardingDone) {
+        // — SHOWCASE: zero friction — auto-complete onboarding, go straight to gallery —
+        if (isShowcase) {
+            localStorage.setItem('be4t_demo_onboarded', 'true');
+            // Trigger navigate on next tick so the component finishes rendering
+            setTimeout(() => onNavigate('explore'), 0);
+            // Render a brief "welcome" pill while navigating
+            return (
+                <div style={{
+                    ...CTABase,
+                    background: 'linear-gradient(135deg, rgba(16,185,129,0.12), rgba(6,182,212,0.08))',
+                    border: '1px solid rgba(16,185,129,0.3)',
+                    color: '#4ade80', boxShadow: 'none', cursor: 'default',
+                }}>
+                    <span style={{ width:'6px', height:'6px', borderRadius:'50%', background:'#4ade80', boxShadow:'0 0 6px #4ade80', animation:'be4t-cta-pulse 1.4s ease infinite' }} />
+                    ¡Bienvenido! $50,000 listos
+                </div>
+            );
+        }
+        // — PRODUCTION: show onboarding CTA —
         return (
             <button
-                onClick={() => {
-                    // Mark onboarding started; navigate to waitlist/onboarding
-                    if (isShowcase) localStorage.setItem('be4t_demo_onboarded', 'true');
-                    onNavigate('waitlist');
-                }}
+                onClick={() => onNavigate('waitlist')}
                 style={{
                     ...CTABase,
                     background: 'linear-gradient(135deg, #7c3aed, #a855f7)',
