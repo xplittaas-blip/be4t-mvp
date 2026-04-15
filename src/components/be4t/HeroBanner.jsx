@@ -209,9 +209,14 @@ const HeroBanner = ({ userMode, onNavigate }) => {
     }
 
     // ── Slide strip transform ──────────────────────────────────────────────────
-    // translateX moves the strip: -active * 100% + dragX offset
-    const stripX = `calc(${-active * 100}% + ${dragX}px)`;
-    const slide  = SLIDES[active];
+    // The strip is N*100% wide. Each slide occupies 100/N % of the strip.
+    // To show slide i: move strip left by i * (100/N)%
+    // dragX is in px; convert to %-of-strip: dragX / (containerWidth * N) * 100
+    const slideWidthPct = 100 / SLIDES.length; // e.g. 33.33% for 3 slides
+    const containerW   = containerRef.current?.offsetWidth || window.innerWidth;
+    const dragPct      = (dragX / (containerW * SLIDES.length)) * 100;
+    const stripX       = `calc(${-active * slideWidthPct + dragPct}%)`;
+    const slide        = SLIDES[active];
 
     return (
         <div

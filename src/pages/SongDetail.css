@@ -647,6 +647,11 @@
     .song-detail-page {
         padding-bottom: 8rem;
     }
+
+    /* Hide the inline button — sticky bar is used instead */
+    .sd-inline-invest {
+        display: none !important;
+    }
 }
 
 /* Hide sticky bar on larger screens */

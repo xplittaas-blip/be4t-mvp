@@ -766,41 +766,44 @@ const SongDetail = ({ onBack, songId, songData, onRequireAuth, isAuthenticated, 
                         </div>
                     )}
 
-                    <button
-                        disabled={txState === 'processing' || txState === 'success'}
-                        onClick={handleParticipate}
-                        style={{
-                            width: '100%',
-                            padding: '1.1rem',
-                            background: txState === 'processing'
-                                ? 'rgba(255,255,255,0.08)'
-                                : txState === 'success'
-                                    ? 'linear-gradient(135deg, #10b981, #059669)'
-                                    : txState === 'error'
-                                        ? 'rgba(239,68,68,0.2)'
-                                        : 'linear-gradient(135deg, #7c3aed 0%, #a855f7 50%, #06b6d4 100%)',
-                            backgroundSize: '200% auto',
-                            border: txState === 'error' ? '1px solid rgba(239,68,68,0.4)' : 'none',
-                            borderRadius: '14px',
-                            color: txState === 'processing' ? 'rgba(255,255,255,0.5)' : 'white',
-                            fontWeight: '800', fontSize: '1.05rem',
-                            cursor: (txState === 'processing' || txState === 'success') ? 'not-allowed' : 'pointer',
-                            letterSpacing: '-0.01em',
-                            boxShadow: txState === 'idle' ? '0 4px 24px rgba(124,58,237,0.45)' : 'none',
-                            transition: 'all 0.3s ease',
-                            marginTop: '1rem',
-                        }}
-                        onMouseOver={e => { if (txState === 'idle') { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 8px 32px rgba(124,58,237,0.65)'; }}}
-                        onMouseOut={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = txState === 'idle' ? '0 4px 24px rgba(124,58,237,0.45)' : 'none'; }}
-                    >
-                        {txState === 'processing' && '⏳ Procesando...'}
-                        {txState === 'success'    && '✅ Activo Adquirido'}
-                        {txState === 'error'      && '❌ Saldo insuficiente'}
-                        {txState === 'idle'       && '💰 Invertir en esta Canción'}
-                    </button>
-                    <p style={{ textAlign: 'center', fontSize: '0.62rem', color: 'rgba(255,255,255,0.18)', marginTop: '0.5rem' }}>
-                        {isShowcase ? `Saldo disponible: $${balance.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}` : 'Al invertir aceptas los términos y condiciones de BE4T.'}
-                    </p>
+                    {/* sd-inline-invest: hidden on mobile (< 480px) — sticky bar is used instead */}
+                    <div className="sd-inline-invest">
+                        <button
+                            disabled={txState === 'processing' || txState === 'success'}
+                            onClick={handleParticipate}
+                            style={{
+                                width: '100%',
+                                padding: '1.1rem',
+                                background: txState === 'processing'
+                                    ? 'rgba(255,255,255,0.08)'
+                                    : txState === 'success'
+                                        ? 'linear-gradient(135deg, #10b981, #059669)'
+                                        : txState === 'error'
+                                            ? 'rgba(239,68,68,0.2)'
+                                            : 'linear-gradient(135deg, #7c3aed 0%, #a855f7 50%, #06b6d4 100%)',
+                                backgroundSize: '200% auto',
+                                border: txState === 'error' ? '1px solid rgba(239,68,68,0.4)' : 'none',
+                                borderRadius: '14px',
+                                color: txState === 'processing' ? 'rgba(255,255,255,0.5)' : 'white',
+                                fontWeight: '800', fontSize: '1.05rem',
+                                cursor: (txState === 'processing' || txState === 'success') ? 'not-allowed' : 'pointer',
+                                letterSpacing: '-0.01em',
+                                boxShadow: txState === 'idle' ? '0 4px 24px rgba(124,58,237,0.45)' : 'none',
+                                transition: 'all 0.3s ease',
+                                marginTop: '1rem',
+                            }}
+                            onMouseOver={e => { if (txState === 'idle') { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 8px 32px rgba(124,58,237,0.65)'; }}}
+                            onMouseOut={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = txState === 'idle' ? '0 4px 24px rgba(124,58,237,0.45)' : 'none'; }}
+                        >
+                            {txState === 'processing' && '⏳ Procesando...'}
+                            {txState === 'success'    && '✅ Activo Adquirido'}
+                            {txState === 'error'      && '❌ Saldo insuficiente'}
+                            {txState === 'idle'       && '💰 Invertir en esta Canción'}
+                        </button>
+                        <p style={{ textAlign: 'center', fontSize: '0.62rem', color: 'rgba(255,255,255,0.18)', marginTop: '0.5rem' }}>
+                            {isShowcase ? `Saldo disponible: $${balance.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}` : 'Al invertir aceptas los términos y condiciones de BE4T.'}
+                        </p>
+                    </div>
                 </section>
             </div>
 
