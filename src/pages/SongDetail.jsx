@@ -478,7 +478,23 @@ const SongDetail = ({ onBack, songId, songData, onRequireAuth, isAuthenticated, 
                                 </span>
                             </div>
 
-                            <button className="btn-primary main-cta mt-4" onClick={() => calculatorRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })}>
+                            <button
+                                onClick={() => calculatorRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })}
+                                style={{
+                                    padding: '0.85rem 2.5rem',
+                                    background: 'linear-gradient(135deg, #7c3aed 0%, #a855f7 50%, #06b6d4 100%)',
+                                    backgroundSize: '200% auto',
+                                    border: 'none', borderRadius: '100px',
+                                    color: 'white', fontWeight: '800', fontSize: '1rem',
+                                    cursor: 'pointer', letterSpacing: '-0.01em',
+                                    boxShadow: '0 4px 24px rgba(124,58,237,0.5)',
+                                    transition: 'all 0.3s ease',
+                                    marginTop: '1.25rem',
+                                    display: 'inline-block',
+                                }}
+                                onMouseOver={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 8px 32px rgba(124,58,237,0.7)'; }}
+                                onMouseOut={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 4px 24px rgba(124,58,237,0.5)'; }}
+                            >
                                 {tSong('join_button')}
                             </button>
                         </div>
@@ -685,9 +701,24 @@ const SongDetail = ({ onBack, songId, songData, onRequireAuth, isAuthenticated, 
                         </p>
                     </div>
 
-                    <button className="btn-primary full-width cta-main mt-4" onClick={handleParticipate}
-                        style={{ fontSize: '1rem', padding: '1rem', letterSpacing: '0.02em', fontWeight: '800' }}>
-                        Invertir en esta Canción
+                    <button
+                        onClick={handleParticipate}
+                        style={{
+                            width: '100%',
+                            padding: '1.1rem',
+                            background: 'linear-gradient(135deg, #7c3aed 0%, #a855f7 50%, #06b6d4 100%)',
+                            backgroundSize: '200% auto',
+                            border: 'none', borderRadius: '14px',
+                            color: 'white', fontWeight: '800', fontSize: '1.05rem',
+                            cursor: 'pointer', letterSpacing: '-0.01em',
+                            boxShadow: '0 4px 24px rgba(124,58,237,0.45)',
+                            transition: 'all 0.3s ease',
+                            marginTop: '1rem',
+                        }}
+                        onMouseOver={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.backgroundPosition = 'right center'; e.currentTarget.style.boxShadow = '0 8px 32px rgba(124,58,237,0.65)'; }}
+                        onMouseOut={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.backgroundPosition = 'left center'; e.currentTarget.style.boxShadow = '0 4px 24px rgba(124,58,237,0.45)'; }}
+                    >
+                        💰 Invertir en esta Canción
                     </button>
                     <p style={{ textAlign: 'center', fontSize: '0.62rem', color: 'rgba(255,255,255,0.18)', marginTop: '0.5rem' }}>
                         Al invertir aceptas los términos y condiciones de BE4T.
