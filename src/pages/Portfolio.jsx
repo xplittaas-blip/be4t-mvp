@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { useDemoBalance } from '../hooks/useDemoBalance';
 import { isShowcase } from '../core/env';
 import { resolvePortfolio } from '../services/investmentService';
+import { Be4tTooltip } from '../components/be4t/Be4tTooltip';
 const TransferModal = lazy(() => import('../components/be4t/TransferModal'));
 
 // ── Constants ─────────────────────────────────────────────────────────────────
@@ -212,7 +213,10 @@ const InvestmentCard = ({ holding, isLast, onTransfer }) => {
                 borderTop: '1px solid rgba(255,255,255,0.05)',
             }}>
                 <div>
-                    <div style={{ fontSize: '0.58rem', color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '3px' }}>Invertido</div>
+                    <div style={{ fontSize: '0.58rem', color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '3px', display: 'flex', alignItems: 'center' }}>
+                        Invertido
+                        <Be4tTooltip content="Suma de todos los aportes de fans que se convierten en liquidez para la disquera." />
+                    </div>
                     <div style={{ fontWeight: '800', fontSize: '0.95rem' }}>{fmtUSD(cost)}</div>
                 </div>
                 <div>
@@ -222,7 +226,10 @@ const InvestmentCard = ({ holding, isLast, onTransfer }) => {
                     </div>
                 </div>
                 <div>
-                    <div style={{ fontSize: '0.58rem', color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '3px' }}>Regalías/mes</div>
+                    <div style={{ fontSize: '0.58rem', color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '3px', display: 'flex', alignItems: 'center' }}>
+                        Regalías/mes
+                        <Be4tTooltip content="Calculado proporcionalmente según tu cantidad de tokens y la TEA del activo." />
+                    </div>
                     <div style={{ fontWeight: '800', fontSize: '0.95rem', color: '#10b981' }}>
                         {fmtUSD(monthlyEarning)}
                     </div>

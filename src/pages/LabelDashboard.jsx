@@ -1,10 +1,11 @@
 import React, { useMemo, useEffect, useState } from 'react';
 import {
-    AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip,
+    AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip,
     ResponsiveContainer, BarChart, Bar, Cell,
 } from 'recharts';
 import { useDemoBalance } from '../hooks/useDemoBalance';
 import { isShowcase, isProduction } from '../core/env';
+import { Be4tTooltip } from '../components/be4t/Be4tTooltip';
 
 // ── Brand palette ──────────────────────────────────────────────────────────────
 const PURPLE = '#7c3aed';
@@ -87,7 +88,7 @@ const CustomTooltip = ({ active, payload, label }) => {
 };
 
 // ── KPI Card ───────────────────────────────────────────────────────────────────
-const KpiCard = ({ label, value, sub, color = PURPLE, icon }) => (
+const KpiCard = ({ label, value, sub, color = PURPLE, icon, tooltipText }) => (
     <div style={{
         background: 'rgba(255,255,255,0.025)',
         border: `1px solid ${color}33`,
@@ -101,7 +102,10 @@ const KpiCard = ({ label, value, sub, color = PURPLE, icon }) => (
             pointerEvents: 'none',
         }} />
         <div style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>{icon}</div>
-        <div style={{ fontSize: '0.6rem', color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '1.2px', fontWeight: '700', marginBottom: '0.35rem' }}>{label}</div>
+        <div style={{ fontSize: '0.6rem', color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '1.2px', fontWeight: '700', marginBottom: '0.35rem', display: 'flex', alignItems: 'center' }}>
+            {label}
+            {tooltipText && <Be4tTooltip content={tooltipText} />}
+        </div>
         <div style={{ fontSize: 'clamp(1.4rem,3vw,2rem)', fontWeight: '900', color, letterSpacing: '-0.04em', fontFamily: "'Courier New',monospace" }}>{value}</div>
         {sub && <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.35)', marginTop: '0.3rem' }}>{sub}</div>}
     </div>
@@ -289,11 +293,11 @@ const LabelDashboard = ({ session, onNavigate }) => {
 
                 {/* ── KPI Grid ── */}
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
-                    <KpiCard icon="💰" label="Capital Inyectado" value={fmtUSD(totalCapital)} sub={`${portfolio.length} activo${portfolio.length !== 1 ? 's' : ''} tokenizado${portfolio.length !== 1 ? 's' : ''}`} color={PURPLE} />
+                    <KpiCard icon="💰" label="Capital Inyectado" tooltipText="Suma de todos los aportes de fans que se convierten en liquidez para la disquera." value={fmtUSD(totalCapital)} sub={`${portfolio.length} activo${portfolio.length !== 1 ? 's' : ''} tokenizado${portfolio.length !== 1 ? 's' : ''}`} color={PURPLE} />
                     <KpiCard icon="🤝" label="Socios Inversores" value={uniqueInvestors.toLocaleString()} sub="fans co-propietarios" color={CYAN} />
                     <KpiCard icon="🎯" label="Tokens Emitidos" value={totalTokens.toLocaleString()} sub={`APY promedio: ${fmtPct(avgApy)}`} color={GREEN} />
-                    <KpiCard icon="📈" label="Ahorro Mktg. Est." value={fmtUSD(estimatedSave)} sub="vs. campañas tradicionales (15%)" color={ORANGE} />
-                    <KpiCard icon="💎" label="Regalías Acumuladas" value={`$${totalEarned.toFixed(2)}`} sub="generadas en esta sesión" color="#ec4899" />
+                    <KpiCard icon="📈" label="Ahorro Mktg. Est." tooltipText="Representa el 15% del capital inyectado que la disquera ya no gasta en publicidad tradicional." value={fmtUSD(estimatedSave)} sub="vs. campañas tradicionales (15%)" color={ORANGE} />
+                    <KpiCard icon="💎" label="Regalías Acumuladas" tooltipText="Calculado proporcionalmente según tu cantidad de tokens y la TEA del activo." value={`$${totalEarned.toFixed(2)}`} sub="generadas en esta sesión" color="#ec4899" />
                 </div>
 
                 {/* ── Capital Flow Chart ── */}
@@ -319,7 +323,7 @@ const LabelDashboard = ({ session, onNavigate }) => {
                                 <CartesianGrid stroke="rgba(255,255,255,0.04)" strokeDasharray="4 4" />
                                 <XAxis dataKey="date" tick={{ fill: 'rgba(255,255,255,0.25)', fontSize: 10 }} axisLine={false} tickLine={false} />
                                 <YAxis tickFormatter={v => fmtUSD(v)} tick={{ fill: 'rgba(255,255,255,0.25)', fontSize: 10 }} axisLine={false} tickLine={false} width={55} />
-                                <Tooltip content={<CustomTooltip />} />
+                                <RechartsTooltip content={<CustomTooltip />} />
                                 <Area type="monotone" dataKey="total" name="total" stroke={PURPLE} strokeWidth={2} fill="url(#cgTotal)" dot={false} />
                                 <Area type="monotone" dataKey="daily" name="daily" stroke={CYAN} strokeWidth={1.5} fill="url(#cgDaily)" dot={false} strokeDasharray="4 2" />
                             </AreaChart>
@@ -356,7 +360,7 @@ const LabelDashboard = ({ session, onNavigate }) => {
                                     <CartesianGrid stroke="rgba(255,255,255,0.04)" horizontal={false} />
                                     <XAxis type="number" tickFormatter={v => fmtUSD(v)} tick={{ fill: 'rgba(255,255,255,0.25)', fontSize: 10 }} axisLine={false} tickLine={false} />
                                     <YAxis type="category" dataKey="name" tick={{ fill: 'rgba(255,255,255,0.45)', fontSize: 11 }} axisLine={false} tickLine={false} width={90} />
-                                    <Tooltip content={<CustomTooltip />} />
+                                    <RechartsTooltip content={<CustomTooltip />} />
                                     <Bar dataKey="capital" name="total" radius={[0, 6, 6, 0]}>
                                         {barData.map((_, i) => (
                                             <Cell key={i} fill={BAR_COLORS[i % BAR_COLORS.length]} fillOpacity={0.85} />
