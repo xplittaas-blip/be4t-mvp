@@ -581,3 +581,77 @@
         justify-content: center;
     }
 }
+
+/* ── Mobile-First Fintech UX ────────────────────────────────────────────────── */
+
+/* Thumb-safe CTAs — minimum 52px tall so they're easy to tap */
+@media (max-width: 480px) {
+    .detail-section {
+        padding: 1.25rem 1rem;
+        border-radius: 16px;
+    }
+
+    .section-title {
+        font-size: 1.35rem;
+        letter-spacing: -0.3px;
+    }
+
+    .hero-title {
+        font-size: clamp(1.8rem, 8vw, 2.4rem);
+        letter-spacing: -1px;
+    }
+
+    .hero-artist {
+        font-size: 1.1rem;
+    }
+
+    .hero-hook {
+        font-size: 1rem;
+    }
+
+    /* Invest CTA — thumb-friendly, full-width pill */
+    .sd-invest-btn {
+        min-height: 56px !important;
+        font-size: 1.05rem !important;
+        padding: 1rem 1.5rem !important;
+        border-radius: 16px !important;
+        letter-spacing: -0.02em !important;
+        -webkit-tap-highlight-color: transparent;
+        touch-action: manipulation;
+    }
+
+    /* Balance tag below button */
+    .sd-balance-tag {
+        font-size: 0.68rem !important;
+        margin-top: 0.4rem;
+    }
+}
+
+/* Sticky invest bar on smallest screens only (< 480px) */
+@media (max-width: 480px) {
+    .sd-sticky-invest-bar {
+        position: fixed;
+        bottom: 0; left: 0; right: 0;
+        z-index: 900;
+        padding: 0.75rem 1rem calc(0.75rem + env(safe-area-inset-bottom));
+        background: linear-gradient(to top, rgba(8,8,18,0.98) 0%, rgba(8,8,18,0.85) 100%);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border-top: 1px solid rgba(255,255,255,0.06);
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    /* Add padding to page so sticky bar doesn't cover content */
+    .song-detail-page {
+        padding-bottom: 8rem;
+    }
+}
+
+/* Hide sticky bar on larger screens */
+@media (min-width: 481px) {
+    .sd-sticky-invest-bar {
+        display: none !important;
+    }
+}

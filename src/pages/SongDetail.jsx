@@ -895,6 +895,38 @@ const SongDetail = ({ onBack, songId, songData, onRequireAuth, isAuthenticated, 
                 </Suspense>,
                 document.body
             )}
+
+            {/* ── Sticky mobile invest bar (< 480px only — CSS hides it on desktop) ── */}
+            {song && isShowcase && txState !== 'success' && (
+                <div className="sd-sticky-invest-bar">
+                    <button
+                        className="sd-invest-btn"
+                        disabled={txState === 'processing'}
+                        onClick={handleParticipate}
+                        style={{
+                            width: '100%', padding: '1rem',
+                            background: txState === 'processing'
+                                ? 'rgba(255,255,255,0.08)'
+                                : txState === 'error'
+                                    ? 'rgba(239,68,68,0.2)'
+                                    : 'linear-gradient(135deg, #7c3aed 0%, #a855f7 50%, #06b6d4 100%)',
+                            border: 'none', borderRadius: '14px',
+                            color: txState === 'processing' ? 'rgba(255,255,255,0.5)' : 'white',
+                            fontWeight: '800', fontSize: '1rem', cursor: 'pointer',
+                            boxShadow: txState === 'idle' ? '0 4px 20px rgba(124,58,237,0.5)' : 'none',
+                            WebkitTapHighlightColor: 'transparent',
+                            touchAction: 'manipulation',
+                        }}
+                    >
+                        {txState === 'processing' && '⏳ Procesando...'}
+                        {txState === 'error'      && '❌ Saldo insuficiente'}
+                        {txState === 'idle'       && `💰 Invertir $${calcAmount.toLocaleString('en-US', { maximumFractionDigits: 0 })} ahora`}
+                    </button>
+                    <p className="sd-balance-tag" style={{ textAlign: 'center', fontSize: '0.65rem', color: 'rgba(255,255,255,0.3)', margin: 0 }}>
+                        Saldo: <strong style={{ color: '#4ade80' }}>${balance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong>
+                    </p>
+                </div>
+            )}
         </div>
     );
 };
