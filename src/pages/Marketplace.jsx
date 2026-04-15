@@ -284,7 +284,10 @@ const SELECT_STYLE = {
 };
 
 // ── Marketplace ───────────────────────────────────────────────────────────────
+import { useDemoBalance } from '../hooks/useDemoBalance';
+
 const Marketplace = ({ session, onNavigate }) => {
+    const [activeTab, setActiveTab]       = useState('primary'); // 'primary' | 'secondary'
     const [userMode, setUserMode]         = useState('fan');
     const [searchQuery, setSearchQuery]   = useState('');
     const [sortBy, setSortBy]             = useState('roi');
@@ -297,6 +300,8 @@ const Marketplace = ({ session, onNavigate }) => {
     const [waitlistOpen, setWaitlistOpen] = useState(false);
 
     // ── Load 20 songs directly from Spotify (no Supabase for demo) ────────
+    const { portfolio: localPortfolio } = useDemoBalance();
+
     useEffect(() => {
         const load = async () => {
             setIsLoading(true);
@@ -308,6 +313,8 @@ const Marketplace = ({ session, onNavigate }) => {
                 console.log(`🎵 Demo loaded: ${tracks.length} songs (10 Reggaetón + 10 Rock)`);
             } catch (err) {
                 console.error('Demo load failed:', err);
+                // Fallback en caso de API limits (ya lo maneja el service, pero por seguridad)
+                setIsLoading(false);
                 setSpotifyStatus('error');
             } finally {
                 setIsLoading(false);
@@ -316,9 +323,29 @@ const Marketplace = ({ session, onNavigate }) => {
         load();
     }, []);
 
-    // ── Filter + Sort ────────────────────────────────────────────────────
+    // ── P2P Mocks ──
+    const p2pOfferings = useMemo(() => {
+        const userListed = localPortfolio.filter(h => h.isListed).map(h => ({
+            ...h,
+            isP2P: true,
+            seller: 'Tú',
+            p2pPrice: h.listPrice
+        }));
+
+        const othersListed = rawAssets.length >= 8 ? [
+            { ...rawAssets[1], isP2P: true, seller: '0x3F8...2aE', p2pPrice: (rawAssets[1].cost * 1.2 || 120), fractions: 5 },
+            { ...rawAssets[4], isP2P: true, seller: 'User429', p2pPrice: (rawAssets[4].cost * 0.95 || 95), fractions: 2 },
+            { ...rawAssets[7], isP2P: true, seller: 'DJ_Miami', p2pPrice: (rawAssets[7].cost * 1.5 || 150), fractions: 10 },
+        ].filter(Boolean) : [];
+
+        return [...userListed, ...othersListed];
+    }, [rawAssets, localPortfolio]);
+
+    // ── Filtering & Sorting ──
+    const displayAssets = activeTab === 'primary' ? rawAssets : p2pOfferings;
+
     const filteredSongs = useMemo(() => {
-        let list = [...rawAssets];
+        let list = [...displayAssets];
 
         if (searchQuery.trim()) {
             const q = searchQuery.toLowerCase();
@@ -390,6 +417,33 @@ const Marketplace = ({ session, onNavigate }) => {
 
                 {/* ── Section title + filters ── */}
                 {userMode !== 'disquera' && (
+                    <div style={{ padding: '0 1.5rem', marginBottom: '1rem', display: 'flex', gap: '1rem', overflowX: 'auto' }}>
+                        <button
+                            onClick={() => setActiveTab('primary')}
+                            style={{
+                                padding: '0.65rem 1.25rem', background: activeTab === 'primary' ? 'rgba(124,58,237,0.2)' : 'transparent',
+                                border: '1px solid', borderColor: activeTab === 'primary' ? '#8b5cf6' : 'rgba(255,255,255,0.1)',
+                                borderRadius: '100px', color: activeTab === 'primary' ? 'white' : 'rgba(255,255,255,0.5)',
+                                fontWeight: '800', fontSize: '0.85rem', cursor: 'pointer', transition: 'all 0.2s ease', whiteSpace: 'nowrap'
+                            }}
+                        >
+                            Emisiones de Disquera
+                        </button>
+                        <button
+                            onClick={() => setActiveTab('secondary')}
+                            style={{
+                                padding: '0.65rem 1.25rem', background: activeTab === 'secondary' ? 'rgba(6,182,212,0.2)' : 'transparent',
+                                border: '1px solid', borderColor: activeTab === 'secondary' ? '#06b6d4' : 'rgba(255,255,255,0.1)',
+                                borderRadius: '100px', color: activeTab === 'secondary' ? 'white' : 'rgba(255,255,255,0.5)',
+                                fontWeight: '800', fontSize: '0.85rem', cursor: 'pointer', transition: 'all 0.2s ease', whiteSpace: 'nowrap',
+                                display: 'flex', alignItems: 'center', gap: '0.5rem'
+                            }}
+                        >
+                            Mercado Secundario <span style={{ background: '#06b6d4', color: 'black', padding: '1px 5px', borderRadius: '4px', fontSize: '0.65rem', fontWeight: '900' }}>P2P</span>
+                        </button>
+                    </div>
+                )}
+                {userMode !== 'disquera' && (
                     <div className="be4t-filters">
                         <div>
                             <h2 className="be4t-section-title">Canciones Destacadas</h2>
@@ -421,9 +475,9 @@ const Marketplace = ({ session, onNavigate }) => {
                         ) : filteredSongs.length === 0 ? (
                             <div style={{ textAlign: 'center', padding: '5rem 2rem', color: 'rgba(255,255,255,0.35)' }}>
                                 <p style={{ fontSize: '1rem' }}>
-                                    {searchQuery
-                                        ? `No se encontraron canciones para "${searchQuery}"`
-                                        : 'No hay activos disponibles.'}
+                                    {activeTab === 'secondary'
+                                        ? 'No hay activos listados en el mercado secundario en este momento.'
+                                        : (searchQuery ? `No se encontraron canciones para "${searchQuery}"` : 'No hay activos disponibles.')}
                                 </p>
                             </div>
                         ) : (

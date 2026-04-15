@@ -136,6 +136,52 @@ export function useDemoBalance() {
         setAcquiredMap({});
     }, []);
 
+    /** Sell back immediately to Label at a 10% discount */
+    const instantExit = useCallback((songId) => {
+        setAcquiredMap(prev => {
+            const entry = prev[songId];
+            if (!entry) return prev;
+            
+            // Refund 90% to balance
+            const refund = parseFloat((entry.cost * 0.9).toFixed(2));
+            setBalance(b => parseFloat((b + refund).toFixed(2)));
+            
+            const next = { ...prev };
+            delete next[songId];
+            return next;
+        });
+    }, []);
+
+    /** List token on P2P market */
+    const listOnMarket = useCallback((songId, listPrice) => {
+        setAcquiredMap(prev => {
+            if (!prev[songId]) return prev;
+            return {
+                ...prev,
+                [songId]: {
+                    ...prev[songId],
+                    isListed: true,
+                    listPrice: parseFloat(listPrice)
+                }
+            };
+        });
+    }, []);
+
+    /** Cancel P2P listing */
+    const unlistFromMarket = useCallback((songId) => {
+        setAcquiredMap(prev => {
+            if (!prev[songId]) return prev;
+            return {
+                ...prev,
+                [songId]: {
+                    ...prev[songId],
+                    isListed: false,
+                    listPrice: 0
+                }
+            };
+        });
+    }, []);
+
     /** List all acquired songs with real-time ROI calculation */
     const portfolio = Object.entries(acquiredMap).map(([id, data]) => {
         const daysSince    = (Date.now() - (data.acquiredAt || Date.now())) / (1000 * 60 * 60 * 24);
@@ -158,6 +204,9 @@ export function useDemoBalance() {
         acquire,
         acquired,
         reset,
+        instantExit,
+        listOnMarket,
+        unlistFromMarket,
         portfolio,
         // Utility
         hasBalance: (cost) => balance >= cost,

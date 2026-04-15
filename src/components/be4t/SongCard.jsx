@@ -290,6 +290,16 @@ const SongCard = ({ song, userMode, index = 0, onDetailClick }) => {
                         letterSpacing: '1px', textTransform: 'uppercase', zIndex: 5,
                     }}>{song.tag || song.asset_type}</div>
 
+                    {song.isP2P && (
+                        <div style={{
+                            position: 'absolute', top: '35px', left: '10px',
+                            background: 'rgba(6,182,212,0.9)', border: '1px solid rgba(6,182,212,0.4)',
+                            borderRadius: '100px', padding: '3px 9px',
+                            fontSize: '0.58rem', fontWeight: '800', color: '#111',
+                            letterSpacing: '1px', zIndex: 5, boxShadow: '0 2px 10px rgba(6,182,212,0.4)'
+                        }}>Vendido por {song.seller}</div>
+                    )}
+
                     {/* Risk Tier + HOT */}
                     <div style={{ position: 'absolute', top: '10px', right: '10px', display: 'flex',
                         flexDirection: 'column', alignItems: 'flex-end', gap: '4px', zIndex: 5 }}>
@@ -472,7 +482,7 @@ const SongCard = ({ song, userMode, index = 0, onDetailClick }) => {
                             borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
                             {[
                                 { label: 'Streams / Mes', value: fmt(song.monthly_streams ?? Math.round((song.spotify_streams ?? 0) / 12)) },
-                                { label: 'Precio / Token', value: fmtUSD(song.price) },
+                                { label: song.isP2P ? 'Precio Secundario' : 'Precio / Token', value: fmtUSD(song.isP2P ? song.p2pPrice : song.price) },
                             ].map(({ label, value }, i) => (
                                 <div key={label} style={{
                                     padding: '0.62rem 0.8rem',
@@ -515,9 +525,20 @@ const SongCard = ({ song, userMode, index = 0, onDetailClick }) => {
                             </div>
                         </div>
 
-                        {/* Row 3: Tokens disponibles bar */}
+                        {/* Row 3: Tokens disponibles bar (solo emisiones primarias o info P2P) */}
                         <div style={{ padding: '0.65rem 0.8rem' }}>
-                            <TokenBar available={song.tokens_available} total={song.total_supply} />
+                            {song.isP2P ? (
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '5px' }}>
+                                    <span style={{ fontSize: '0.58rem', color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.9px', fontWeight: '600' }}>
+                                        Lote en Venta
+                                    </span>
+                                    <span style={{ fontSize: '0.72rem', fontWeight: '800', color: '#22d3ee', letterSpacing: '-0.02em' }}>
+                                        {song.fractions} tokens
+                                    </span>
+                                </div>
+                            ) : (
+                                <TokenBar available={song.tokens_available} total={song.total_supply} />
+                            )}
                         </div>
                     </div>
 

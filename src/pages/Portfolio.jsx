@@ -139,7 +139,8 @@ const EmptyPortfolio = ({ onNavigate }) => (
 );
 
 // ── Investment Card ───────────────────────────────────────────────────────────
-const InvestmentCard = ({ holding, isLast, onTransfer }) => {
+const InvestmentCard = ({ holding, isLast, onTransfer, onAction }) => {
+    const [isManaging, setIsManaging] = useState(false);
     const {
         id, name, artist, fractions, cost, tokenPrice, totalSupply,
         apy = 12, earnedToDate = 0, ownershipPct = 0, daysSince = 0,
@@ -242,24 +243,65 @@ const InvestmentCard = ({ holding, isLast, onTransfer }) => {
                 </div>
             </div>
 
-            {/* Transfer button */}
-            <div style={{ marginTop: '0.85rem', display: 'flex', justifyContent: 'flex-end' }}>
-                <button
-                    onClick={() => onTransfer?.(holding)}
-                    style={{
-                        padding: '5px 12px',
-                        background: 'rgba(139,92,246,0.08)',
-                        border: '1px solid rgba(139,92,246,0.25)',
-                        borderRadius: '8px',
-                        color: '#a78bfa', fontSize: '0.65rem', fontWeight: '700',
-                        cursor: 'pointer', letterSpacing: '0.3px',
-                        transition: 'all 0.2s ease',
-                    }}
-                    onMouseOver={e => { e.currentTarget.style.background = 'rgba(139,92,246,0.18)'; e.currentTarget.style.borderColor = 'rgba(139,92,246,0.45)'; }}
-                    onMouseOut={e => { e.currentTarget.style.background = 'rgba(139,92,246,0.08)'; e.currentTarget.style.borderColor = 'rgba(139,92,246,0.25)'; }}
-                >
-                    Transferir participación →
-                </button>
+            {/* Action buttons */}
+            <div style={{ marginTop: '0.85rem', display: 'flex', justifyContent: 'flex-end', gap: '0.5rem', flexWrap: 'wrap' }}>
+                {isManaging ? (
+                    <>
+                        <button
+                            onClick={() => { setIsManaging(false); onAction('sell', holding); }}
+                            style={{
+                                padding: '5px 12px', background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)',
+                                borderRadius: '8px', color: '#f87171', fontSize: '0.65rem', fontWeight: '700', cursor: 'pointer'
+                            }}
+                        >
+                            Vender a Disquera/Distribuidora (-10%)
+                        </button>
+                        <button
+                            onClick={() => { setIsManaging(false); onAction('list', holding); }}
+                            style={{
+                                padding: '5px 12px', background: 'rgba(6,182,212,0.1)', border: '1px solid rgba(6,182,212,0.3)',
+                                borderRadius: '8px', color: '#22d3ee', fontSize: '0.65rem', fontWeight: '700', cursor: 'pointer'
+                            }}
+                        >
+                            Poner en Mercado Secundario
+                        </button>
+                        <button
+                            onClick={() => setIsManaging(false)}
+                            style={{
+                                padding: '5px 12px', background: 'transparent', border: '1px solid transparent',
+                                borderRadius: '8px', color: 'rgba(255,255,255,0.4)', fontSize: '0.65rem', fontWeight: '700', cursor: 'pointer'
+                            }}
+                        >
+                            Reflexionar
+                        </button>
+                    </>
+                ) : (
+                    <>
+                        {holding.isListed && (
+                            <span style={{ fontSize: '0.65rem', color: '#22d3ee', alignSelf: 'center', fontWeight: '800', marginRight: 'auto', border: '1px solid #22d3ee33', padding: '2px 8px', borderRadius: '100px', background: '#22d3ee11' }}>
+                                🛒 En Mercado (Listed)
+                            </span>
+                        )}
+                        <button
+                            onClick={() => setIsManaging(true)}
+                            style={{
+                                padding: '5px 12px', background: 'transparent', border: '1px solid rgba(255,255,255,0.2)',
+                                borderRadius: '8px', color: 'white', fontSize: '0.65rem', fontWeight: '700', cursor: 'pointer'
+                            }}
+                        >
+                            Gestionar Activo ⚙️
+                        </button>
+                        <button
+                            onClick={() => onTransfer?.(holding)}
+                            style={{
+                                padding: '5px 12px', background: 'rgba(139,92,246,0.08)', border: '1px solid rgba(139,92,246,0.25)',
+                                borderRadius: '8px', color: '#a78bfa', fontSize: '0.65rem', fontWeight: '700', cursor: 'pointer'
+                            }}
+                        >
+                            Transferir →
+                        </button>
+                    </>
+                )}
             </div>
         </div>
     );
@@ -269,7 +311,24 @@ const InvestmentCard = ({ holding, isLast, onTransfer }) => {
 const Portfolio = ({ session, onNavigate }) => {
     const [transferTarget, setTransferTarget] = useState(null);
     const [prodPortfolio, setProdPortfolio]   = useState([]);
-    const { balance, portfolio: localPortfolio, reset } = useDemoBalance();
+    const { balance, portfolio: localPortfolio, reset, instantExit, listOnMarket } = useDemoBalance();
+
+    const handleAction = (type, holding) => {
+        if (type === 'sell') {
+            if (window.confirm(`¿Estás seguro/a que deseas vender tus participaciones de "${holding.name || holding.id}" de vuelta al sistema con un 10% de penalización por liquidez anticipada?`)) {
+                instantExit(holding.id);
+                // The requested success response
+                alert("Vendido con éxito a la disquera o distribuidora. Fondos acreditados en tu balance al instante.");
+            }
+        } else if (type === 'list') {
+            const suggested = (holding.cost * 1.15).toFixed(2);
+            const price = window.prompt(`Ponle un precio de venta a tus tokens de "${holding.name || holding.id}". Sugerido: $${suggested} USD`, suggested);
+            if (price !== null && !isNaN(price) && Number(price) > 0) {
+                listOnMarket(holding.id, parseFloat(price));
+                alert(`Tu activo se ha listado exitosamente en el Mercado Secundario por $${parseFloat(price).toFixed(2)} USD.`);
+            }
+        }
+    };
 
     // In production: fetch from Supabase
     useEffect(() => {
@@ -377,6 +436,7 @@ const Portfolio = ({ session, onNavigate }) => {
                             holding={h}
                             isLast={i === portfolio.length - 1}
                             onTransfer={setTransferTarget}
+                            onAction={handleAction}
                         />
                     ))}
 
