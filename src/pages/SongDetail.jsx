@@ -58,13 +58,23 @@ function calcPaybackMonths(investment, monthlyReturn) {
 }
 
 // ── Main ReturnCalculator ───────────────────────────────────────────────────
+// onAmountChange: (amountUSD: number) => void — lifts slider value to parent
+// onInvest: () => void — parent's handleParticipate so the button is wired
+// txState: 'idle'|'processing'|'success'|'error' — shows button feedback
 const ReturnCalculator = ({ streamCount, roiEst, isTrending, paymentFreq = 'monthly',
-    tokensTotal = 10_000, tokensAvailable = 7_500, tokenPrice = 10 }) => {
+    tokensTotal = 10_000, tokensAvailable = 7_500, tokenPrice = 10,
+    onAmountChange, onInvest, txState = 'idle', demoBalance = 0, isDemo = false }) => {
     const [amount, setAmount]       = useState(250);
     const [currency, setCurrency]   = useState('USD');
     const cur = CURRENCIES[currency];
     const sym = cur.symbol;
     const fxr = cur.rate;
+
+    // Report current USD amount to parent whenever slider changes
+    useEffect(() => {
+        const usd = amount / (fxr || 1);
+        onAmountChange?.(parseFloat(usd.toFixed(2)));
+    }, [amount, currency, fxr, onAmountChange]);
 
     // Trending boost: if song is trending, pool is growing ~8% extra
     const trendBoost = isTrending ? 1.08 : 1.0;
@@ -299,9 +309,12 @@ const SongDetail = ({ onBack, songId, songData, onRequireAuth, isAuthenticated, 
     // Showcase invest flow state
     const [txState,  setTxState]  = useState('idle'); // idle | processing | success | error
     const [txResult, setTxResult] = useState(null);   // { cost, fractions, songName, artistName }
+    // Exact investment amount from the ReturnCalculator slider (USD)
+    const [calcAmount, setCalcAmount] = useState(250); // default matches RC initial state
 
     // Demo balance — only meaningful in showcase
     const { balance, acquire, acquired: isAcquired, hasBalance } = useDemoBalance();
+
 
     const { playTrack, togglePlay, currentTrack, isPlaying: globalIsPlaying } = useGlobalPlayer();
     const isPlaying = globalIsPlaying && currentTrack?.id === song?.id;
@@ -444,17 +457,18 @@ const SongDetail = ({ onBack, songId, songData, onRequireAuth, isAuthenticated, 
         if (txState === 'processing' || txState === 'success') return;
         setTxState('processing');
 
-        const cost      = song.price || 10;   // price per token in USD
-        const fractions = 5;                  // default: 5 tokens for quick demo
-        const total     = parseFloat((cost * fractions).toFixed(2));
-        const songMeta  = {
-            name:   song.title,
-            artist: song.artist,
-            tokenPrice:   cost,
-            totalSupply:  song.total_supply || 10_000,
-            apy:    song.roi_est || 14,
+        // Use EXACT amount from ReturnCalculator slider — no hardcoding
+        const tokenPrice = song.price || 10;
+        const total      = parseFloat(calcAmount.toFixed(2));
+        const fractions  = Math.max(1, Math.floor(calcAmount / tokenPrice));
+        const songMeta   = {
+            name:          song.title,
+            artist:        song.artist,
+            tokenPrice,
+            totalSupply:   song.total_supply || 10_000,
+            apy:           song.roi_est || 14,
             spotifyStreams: song.streams_estimate || 0,
-            coverUrl: song.image || null,
+            coverUrl:      song.image || null,
         };
 
         setTimeout(() => {
@@ -729,6 +743,10 @@ const SongDetail = ({ onBack, songId, songData, onRequireAuth, isAuthenticated, 
                         tokensTotal={song.total_supply ?? 10_000}
                         tokensAvailable={song.tokens_available ?? song.tokensAvailable ?? 7_500}
                         tokenPrice={song.price ?? song.token_price_usd ?? 10}
+                        onAmountChange={setCalcAmount}
+                        txState={txState}
+                        demoBalance={balance}
+                        isDemo={isShowcase}
                     />
 
                     {/* Social proof */}
@@ -742,9 +760,9 @@ const SongDetail = ({ onBack, songId, songData, onRequireAuth, isAuthenticated, 
                     </div>
 
                     {/* Insufficient balance warning */}
-                    {isShowcase && !hasBalance((song.price || 10) * 5) && txState === 'idle' && (
+                    {isShowcase && !hasBalance(calcAmount) && txState === 'idle' && (
                         <div style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.25)', borderRadius: '10px', padding: '0.6rem 0.85rem', marginTop: '0.75rem', textAlign: 'center' }}>
-                            <span style={{ fontSize: '0.75rem', color: '#f87171', fontWeight: '600' }}>💸 Saldo insuficiente — recarga tu balance demo</span>
+                            <span style={{ fontSize: '0.75rem', color: '#f87171', fontWeight: '600' }}>💸 Saldo insuficiente — ajusta el monto o recarga tu balance demo</span>
                         </div>
                     )}
 
