@@ -10,6 +10,7 @@ import WaitlistPage from './pages/WaitlistPage';
 import SongDetail from './pages/SongDetail';
 import HowItWorks from './components/be4t/HowItWorks';
 import AdminPanel from './pages/AdminPanel';
+import LabelDashboard from './pages/LabelDashboard';
 import { supabase } from './core/xplit/supabaseClient';
 import { useUserRole } from './hooks/useUserRole';
 import { isShowcase } from './core/env';
@@ -474,12 +475,9 @@ function App() {
                     <Portfolio session={session} onNavigate={setCurrentPage} />
                 )}
 
-                {/* Para Disqueras: B2B + Emitir Activo */}
-                {currentPage === 'disqueras' && (
-                    <DisquerasPage
-                        session={session}
-                        onLoginNeeded={() => setShowAuthModal(true)}
-                    />
+                {/* Business Dashboard: B2B metrics */}
+                {currentPage === 'label-dashboard' && (
+                    <LabelDashboard session={session} onNavigate={setCurrentPage} />
                 )}
 
                 {/* Perfil: User settings */}

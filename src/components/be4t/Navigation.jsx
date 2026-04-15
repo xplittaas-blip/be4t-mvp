@@ -70,7 +70,7 @@ const Navigation = ({ currentPage, setCurrentPage, session, onLoginClick, isAdmi
     const navItems = [
         { id: 'explore',       label: '↗ Explorar',       emoji: '🎵', description: 'Top 20 Artistas' },
         { id: 'mis-canciones', label: '♫ Mis Canciones',  emoji: '🎶', description: 'Tu portafolio' },
-        { id: 'disqueras',     label: '⊞ Para Disqueras', emoji: '🏢', description: 'B2B Institucional' },
+        { id: 'label-dashboard', label: '⊞ Business Dashboard', emoji: '🏢', description: 'Business Metrics' },
         { id: 'como-funciona', label: '❓ Cómo Funciona', emoji: '💡', description: 'Aprende más' },
     ];
 
@@ -215,7 +215,7 @@ const Navigation = ({ currentPage, setCurrentPage, session, onLoginClick, isAdmi
                             <button
                                 onClick={() => isProduction
                                     ? (window.history.pushState({}, '', '/admin'), window.dispatchEvent(new PopStateEvent('popstate')))
-                                    : navigate('disqueras')}
+                                    : navigate('label-dashboard')}
                                 title="Panel de Control"
                                 style={{
                                     display: 'flex', alignItems: 'center', gap: '5px',
@@ -349,7 +349,7 @@ const Navigation = ({ currentPage, setCurrentPage, session, onLoginClick, isAdmi
                     {/* Admin: Panel de Control (mobile) */}
                     {isAdmin && session && (
                         <button
-                            onClick={() => { navigate('disqueras'); setMobileOpen(false); }}
+                            onClick={() => { navigate('label-dashboard'); setMobileOpen(false); }}
                             style={{
                                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.6rem',
                                 padding: '0.85rem', minHeight: '52px',
