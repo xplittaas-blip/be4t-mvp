@@ -68,10 +68,11 @@ const Navigation = ({ currentPage, setCurrentPage, session, onLoginClick, isAdmi
     }, [mobileOpen]);
 
     const navItems = [
-        { id: 'explore',       label: '↗ Explorar',       emoji: '🎵', description: 'Top 20 Artistas' },
-        { id: 'mis-canciones', label: '♫ Mis Canciones',  emoji: '🎶', description: 'Tu portafolio' },
-        { id: 'label-dashboard', label: '⊞ Business Dashboard', emoji: '🏢', description: 'Business Metrics' },
-        { id: 'como-funciona', label: '❓ Cómo Funciona', emoji: '💡', description: 'Aprende más' },
+        { id: 'explore',          label: '↗ Explorar',             emoji: '🎵', description: 'Top 20 Artistas' },
+        { id: 'mis-canciones',    label: '♫ Mis Canciones',        emoji: '🎶', description: 'Tu portafolio' },
+        { id: 'secondary-market', label: '⚡ Mercado Secundario',  emoji: '🔀', description: 'Trading P2P', badge: 'P2P' },
+        { id: 'label-dashboard',  label: '⊞ Business Dashboard',   emoji: '🏢', description: 'Business Metrics' },
+        { id: 'como-funciona',    label: '❓ Cómo Funciona',       emoji: '💡', description: 'Aprende más' },
     ];
 
     const navigate = (id) => { setCurrentPage(id); setMobileOpen(false); };
@@ -178,7 +179,9 @@ const Navigation = ({ currentPage, setCurrentPage, session, onLoginClick, isAdmi
                                     }}
                                     onMouseOver={e => { if (!isActive) { e.currentTarget.style.color = 'rgba(255,255,255,0.85)'; e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; }}}
                                     onMouseOut={e => { if (!isActive) { e.currentTarget.style.color = 'rgba(255,255,255,0.55)'; e.currentTarget.style.background = 'transparent'; }}}
-                                >{item.label}</button>
+                                >{item.label}{item.badge && (
+                                    <span style={{ marginLeft: '5px', fontSize: '0.52rem', fontWeight: '900', background: '#06b6d4', color: '#000', borderRadius: '4px', padding: '1px 5px', verticalAlign: 'middle', letterSpacing: '0.5px' }}>{item.badge}</span>
+                                )}</button>
                             );
                         })}
                     </div>

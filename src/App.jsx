@@ -11,6 +11,7 @@ import SongDetail from './pages/SongDetail';
 import HowItWorks from './components/be4t/HowItWorks';
 import AdminPanel from './pages/AdminPanel';
 import LabelDashboard from './pages/LabelDashboard';
+import SecondaryMarket from './pages/SecondaryMarket';
 import { supabase } from './core/xplit/supabaseClient';
 import { useUserRole } from './hooks/useUserRole';
 import { isShowcase } from './core/env';
@@ -478,6 +479,11 @@ function App() {
                 {/* Business Dashboard: B2B metrics */}
                 {currentPage === 'label-dashboard' && (
                     <LabelDashboard session={session} onNavigate={setCurrentPage} />
+                )}
+
+                {/* Secondary Market: P2P token trading */}
+                {currentPage === 'secondary-market' && (
+                    <SecondaryMarket onNavigate={setCurrentPage} />
                 )}
 
                 {/* Perfil: User settings */}
