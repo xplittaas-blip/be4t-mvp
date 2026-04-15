@@ -17,16 +17,33 @@
 import { useState, useCallback, useEffect } from 'react';
 import { isShowcase } from '../core/env';
 
-const STORAGE_KEY = 'be4t_demo_balance';
-const ACQUIRED_KEY = 'be4t_demo_acquired';
+const STORAGE_KEY   = 'be4t_demo_balance';
+const ACQUIRED_KEY  = 'be4t_demo_acquired';
+const VERSION_KEY   = 'be4t_demo_version';
+const CURRENT_VER   = 'v3-50k'; // bump to force-reset legacy data
 const INITIAL_BALANCE = 50_000; // $50,000 USD — strategic simulation budget
+
+// ── Migration: wipe stale data from older versions ────────────────────────────
+function migrate() {
+    try {
+        const ver = localStorage.getItem(VERSION_KEY);
+        if (ver !== CURRENT_VER) {
+            // Old version: clear everything → fresh $50k
+            localStorage.removeItem(STORAGE_KEY);
+            localStorage.removeItem(ACQUIRED_KEY);
+            localStorage.setItem(VERSION_KEY, CURRENT_VER);
+        }
+    } catch {}
+}
 
 function loadBalance() {
     try {
+        migrate();
         const v = localStorage.getItem(STORAGE_KEY);
         if (v === null) return INITIAL_BALANCE;
         const n = parseFloat(v);
-        return isNaN(n) ? INITIAL_BALANCE : Math.max(0, n);
+        // Safety: if somehow a value ≤ 0 or not a number, reset
+        return (isNaN(n) || n < 0) ? INITIAL_BALANCE : n;
     } catch {
         return INITIAL_BALANCE;
     }
@@ -40,6 +57,7 @@ function loadAcquired() {
         return {};
     }
 }
+
 
 // ── Hook ──────────────────────────────────────────────────────────────────────
 export function useDemoBalance() {

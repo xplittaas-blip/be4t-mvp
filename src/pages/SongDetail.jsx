@@ -14,7 +14,9 @@ import {
 } from '../services/metricsService';
 import './SongDetail.css';
 import { lazy, Suspense } from 'react';
-import { isProduction } from '../core/env';
+import { isProduction, isShowcase } from '../core/env';
+import { useDemoBalance } from '../hooks/useDemoBalance';
+import ConfettiBlast from '../components/be4t/ConfettiBlast';
 const AcquisitionModal = lazy(() => import('../components/be4t/AcquisitionModal'));
 
 // ── Minimal mono-color platform icons (Anti-Notion: single fill color) ───────
@@ -288,12 +290,18 @@ const SongDetail = ({ onBack, songId, songData, onRequireAuth, isAuthenticated, 
     const { t: tSong } = useTranslation('song');
     const { t: tCalc } = useTranslation('calculator');
 
-    const [song, setSong]               = useState(null);
-    const [metrics, setMetrics]         = useState(null);   // live metrics
-    const [ytData, setYtData]           = useState(null);
-    const [isLoading, setIsLoading]     = useState(true);
-    const [showSuccessModal, setShowSuccessModal]       = useState(false);
-    const [showAcquisitionModal, setShowAcquisitionModal] = useState(false);
+    const [song, setSong]                                   = useState(null);
+    const [metrics, setMetrics]                             = useState(null);
+    const [ytData, setYtData]                               = useState(null);
+    const [isLoading, setIsLoading]                         = useState(true);
+    const [showSuccessModal, setShowSuccessModal]           = useState(false);
+    const [showAcquisitionModal, setShowAcquisitionModal]   = useState(false);
+    // Showcase invest flow state
+    const [txState,  setTxState]  = useState('idle'); // idle | processing | success | error
+    const [txResult, setTxResult] = useState(null);   // { cost, fractions, songName, artistName }
+
+    // Demo balance — only meaningful in showcase
+    const { balance, acquire, acquired: isAcquired, hasBalance } = useDemoBalance();
 
     const { playTrack, togglePlay, currentTrack, isPlaying: globalIsPlaying } = useGlobalPlayer();
     const isPlaying = globalIsPlaying && currentTrack?.id === song?.id;
@@ -426,15 +434,47 @@ const SongDetail = ({ onBack, songId, songData, onRequireAuth, isAuthenticated, 
     };
 
     const handleParticipate = () => {
-        if (!isAuthenticated) { onRequireAuth(); return; }
+        if (!isAuthenticated && !isShowcase) { onRequireAuth(); return; }
         if (isProduction) {
             // Production: real blockchain flow via AcquisitionModal
             setShowAcquisitionModal(true);
-        } else {
-            // Showcase: simulated success modal
-            setShowSuccessModal(true);
+            return;
         }
+        // Showcase: execute demo purchase immediately
+        if (txState === 'processing' || txState === 'success') return;
+        setTxState('processing');
+
+        const cost      = song.price || 10;   // price per token in USD
+        const fractions = 5;                  // default: 5 tokens for quick demo
+        const total     = parseFloat((cost * fractions).toFixed(2));
+        const songMeta  = {
+            name:   song.title,
+            artist: song.artist,
+            tokenPrice:   cost,
+            totalSupply:  song.total_supply || 10_000,
+            apy:    song.roi_est || 14,
+            spotifyStreams: song.streams_estimate || 0,
+            coverUrl: song.image || null,
+        };
+
+        setTimeout(() => {
+            const result = acquire(song.id, total, fractions, songMeta);
+            if (result.ok) {
+                setTxResult({ cost: total, fractions, songName: song.title, artistName: song.artist });
+                setTxState('success');
+                // Auto-redirect after 3.5s
+                setTimeout(() => {
+                    document.dispatchEvent(new CustomEvent('navigate', { detail: 'mis-canciones' }));
+                }, 3500);
+            } else {
+                setTxState('error');
+                setTimeout(() => setTxState('idle'), 2500);
+            }
+        }, 1100);
     };
+
+    // Reset txState if user navigates back to same page
+    useEffect(() => { setTxState('idle'); setTxResult(null); }, [song?.id]);
 
     if (isLoading || !song) {
         return (
@@ -701,56 +741,122 @@ const SongDetail = ({ onBack, songId, songData, onRequireAuth, isAuthenticated, 
                         </p>
                     </div>
 
+                    {/* Insufficient balance warning */}
+                    {isShowcase && !hasBalance((song.price || 10) * 5) && txState === 'idle' && (
+                        <div style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.25)', borderRadius: '10px', padding: '0.6rem 0.85rem', marginTop: '0.75rem', textAlign: 'center' }}>
+                            <span style={{ fontSize: '0.75rem', color: '#f87171', fontWeight: '600' }}>💸 Saldo insuficiente — recarga tu balance demo</span>
+                        </div>
+                    )}
+
                     <button
+                        disabled={txState === 'processing' || txState === 'success'}
                         onClick={handleParticipate}
                         style={{
                             width: '100%',
                             padding: '1.1rem',
-                            background: 'linear-gradient(135deg, #7c3aed 0%, #a855f7 50%, #06b6d4 100%)',
+                            background: txState === 'processing'
+                                ? 'rgba(255,255,255,0.08)'
+                                : txState === 'success'
+                                    ? 'linear-gradient(135deg, #10b981, #059669)'
+                                    : txState === 'error'
+                                        ? 'rgba(239,68,68,0.2)'
+                                        : 'linear-gradient(135deg, #7c3aed 0%, #a855f7 50%, #06b6d4 100%)',
                             backgroundSize: '200% auto',
-                            border: 'none', borderRadius: '14px',
-                            color: 'white', fontWeight: '800', fontSize: '1.05rem',
-                            cursor: 'pointer', letterSpacing: '-0.01em',
-                            boxShadow: '0 4px 24px rgba(124,58,237,0.45)',
+                            border: txState === 'error' ? '1px solid rgba(239,68,68,0.4)' : 'none',
+                            borderRadius: '14px',
+                            color: txState === 'processing' ? 'rgba(255,255,255,0.5)' : 'white',
+                            fontWeight: '800', fontSize: '1.05rem',
+                            cursor: (txState === 'processing' || txState === 'success') ? 'not-allowed' : 'pointer',
+                            letterSpacing: '-0.01em',
+                            boxShadow: txState === 'idle' ? '0 4px 24px rgba(124,58,237,0.45)' : 'none',
                             transition: 'all 0.3s ease',
                             marginTop: '1rem',
                         }}
-                        onMouseOver={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.backgroundPosition = 'right center'; e.currentTarget.style.boxShadow = '0 8px 32px rgba(124,58,237,0.65)'; }}
-                        onMouseOut={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.backgroundPosition = 'left center'; e.currentTarget.style.boxShadow = '0 4px 24px rgba(124,58,237,0.45)'; }}
+                        onMouseOver={e => { if (txState === 'idle') { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 8px 32px rgba(124,58,237,0.65)'; }}}
+                        onMouseOut={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = txState === 'idle' ? '0 4px 24px rgba(124,58,237,0.45)' : 'none'; }}
                     >
-                        💰 Invertir en esta Canción
+                        {txState === 'processing' && '⏳ Procesando...'}
+                        {txState === 'success'    && '✅ Activo Adquirido'}
+                        {txState === 'error'      && '❌ Saldo insuficiente'}
+                        {txState === 'idle'       && '💰 Invertir en esta Canción'}
                     </button>
                     <p style={{ textAlign: 'center', fontSize: '0.62rem', color: 'rgba(255,255,255,0.18)', marginTop: '0.5rem' }}>
-                        Al invertir aceptas los términos y condiciones de BE4T.
+                        {isShowcase ? `Saldo disponible: $${balance.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}` : 'Al invertir aceptas los términos y condiciones de BE4T.'}
                     </p>
                 </section>
             </div>
 
-            {/* ── Success Modal ── */}
-            {showSuccessModal && createPortal(
-                <div className="auth-modal-overlay animate-fade-in" style={{ zIndex: 10000 }}>
-                    <div className="auth-modal-content glass-panel text-center">
-                        <div className="auth-icon-wrapper" style={{ background: 'rgba(0,240,144,0.1)', margin: '0 auto 1.5rem' }}>
-                            <CheckCircle size={32} className="success-text" />
+            {/* ── Neon Confetti on showcase success ── */}
+            <ConfettiBlast active={txState === 'success' && isShowcase} duration={3800} />
+
+            {/* ── Showcase Success Overlay ── */}
+            {txState === 'success' && isShowcase && txResult && createPortal(
+                <div style={{
+                    position: 'fixed', inset: 0, zIndex: 9998,
+                    background: 'rgba(6, 2, 18, 0.85)',
+                    backdropFilter: 'blur(10px)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    padding: '1.5rem',
+                    animation: 'sDetailOverlayIn 0.4s ease',
+                }}>
+                    <div style={{
+                        background: 'linear-gradient(160deg, rgba(20,10,40,0.98) 0%, rgba(12,8,28,0.98) 100%)',
+                        border: '1px solid rgba(168,85,247,0.4)',
+                        borderRadius: '24px', padding: '2.5rem 2rem',
+                        maxWidth: '420px', width: '100%',
+                        textAlign: 'center',
+                        boxShadow: '0 0 80px rgba(168,85,247,0.18), 0 24px 64px rgba(0,0,0,0.7)',
+                        animation: 'sDetailCardIn 0.5s cubic-bezier(0.34,1.56,0.64,1)',
+                        position: 'relative', overflow: 'hidden',
+                    }}>
+                        <div style={{ position: 'absolute', top: '-50px', left: '50%', transform: 'translateX(-50%)', width: '200px', height: '200px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(168,85,247,0.2) 0%, transparent 70%)', pointerEvents: 'none' }} />
+                        <div style={{ fontSize: '3.5rem', marginBottom: '0.75rem', lineHeight: 1 }}>🏆</div>
+                        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', background: 'rgba(16,185,129,0.1)', border: '1px solid rgba(16,185,129,0.3)', borderRadius: '100px', padding: '0.25rem 0.85rem', marginBottom: '1rem' }}>
+                            <span style={{ width: '5px', height: '5px', borderRadius: '50%', background: '#10b981', display: 'inline-block', boxShadow: '0 0 6px #10b981', animation: 'sDetailPulse 1.5s ease infinite' }} />
+                            <span style={{ fontSize: '0.62rem', color: '#10b981', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '1.2px' }}>Inversión Confirmada</span>
                         </div>
-                        <h2 style={{ fontSize: '1.8rem', fontWeight: '700', marginBottom: '1rem' }}>
-                            {tSong('success_title')}
+                        <h2 style={{ fontSize: 'clamp(1.3rem,4vw,1.75rem)', fontWeight: '900', margin: '0 0 0.5rem', letterSpacing: '-0.03em', lineHeight: 1.1, color: 'white' }}>
+                            ¡Felicidades socio!
                         </h2>
-                        <p className="text-secondary" style={{ fontSize: '1.05rem', lineHeight: '1.6', marginBottom: '1.5rem' }}>
-                            {tSong('success_desc1')}<br />{tSong('success_desc2')}
+                        <p style={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.65)', margin: '0 0 1.25rem', lineHeight: 1.6 }}>
+                            Ahora eres co-dueño de los derechos de{' '}
+                            <strong style={{ color: '#a855f7', fontWeight: '800' }}>&#34;{txResult.songName}&#34;</strong>
+                            {' '}de <strong style={{ color: 'white' }}>{txResult.artistName}</strong>.<br />
+                            Tus regalías ya están generdándose.
                         </p>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                            <button className="btn-primary" onClick={() => document.dispatchEvent(new CustomEvent('navigate', { detail: 'portfolio' }))}>
-                                {tSong('success_btn_portfolio')}
-                            </button>
-                            <button className="btn-secondary" onClick={onBack}>
-                                {tSong('success_btn_explore')}
-                            </button>
+                        <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '14px', padding: '1rem', marginBottom: '1.5rem', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
+                            <div>
+                                <div style={{ fontSize: '0.58rem', color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: '1px' }}>Invertido</div>
+                                <div style={{ fontWeight: '900', color: '#4ade80', fontSize: '1.1rem', fontFamily: "'Courier New',monospace" }}>${txResult.cost.toFixed(2)}</div>
+                            </div>
+                            <div>
+                                <div style={{ fontSize: '0.58rem', color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: '1px' }}>Tokens</div>
+                                <div style={{ fontWeight: '900', color: '#06b6d4', fontSize: '1.1rem', fontFamily: "'Courier New',monospace" }}>{txResult.fractions}</div>
+                            </div>
                         </div>
+                        <div style={{ marginBottom: '1rem' }}>
+                            <p style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.35)', marginBottom: '0.5rem' }}>Redirigiendo a Mis Canciones...</p>
+                            <div style={{ height: '3px', background: 'rgba(255,255,255,0.08)', borderRadius: '2px', overflow: 'hidden' }}>
+                                <div style={{ height: '100%', background: 'linear-gradient(90deg,#7c3aed,#06b6d4)', borderRadius: '2px', animation: 'sDetailCountdown 3.5s linear forwards' }} />
+                            </div>
+                        </div>
+                        <button
+                            onClick={() => document.dispatchEvent(new CustomEvent('navigate', { detail: 'mis-canciones' }))}
+                            style={{ width:'100%', padding:'0.9rem', background:'linear-gradient(135deg,#7c3aed,#a855f7,#06b6d4)', backgroundSize:'200% auto', border:'none', borderRadius:'14px', color:'white', fontWeight:'800', fontSize:'0.95rem', cursor:'pointer', letterSpacing:'-0.01em', boxShadow:'0 4px 24px rgba(124,58,237,0.5)' }}
+                        >
+                            🎵 Ver en Mis Canciones ahora →
+                        </button>
                     </div>
                 </div>,
                 document.body
             )}
+
+            <style>{`
+                @keyframes sDetailOverlayIn { from { opacity:0; } to { opacity:1; } }
+                @keyframes sDetailCardIn    { from { opacity:0; transform:scale(0.88) translateY(20px); } to { opacity:1; transform:scale(1) translateY(0); } }
+                @keyframes sDetailPulse     { 0%,100% { opacity:1; } 50% { opacity:0.4; } }
+                @keyframes sDetailCountdown { from { width:0%; } to { width:100%; } }
+            `}</style>
 
             {/* ── AcquisitionModal (real blockchain flow) ── */}
             {showAcquisitionModal && song && createPortal(
