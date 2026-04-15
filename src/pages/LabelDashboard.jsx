@@ -174,7 +174,8 @@ const DemoBanner = () => (
         background: 'linear-gradient(135deg, rgba(124,58,237,0.12), rgba(6,182,212,0.08))',
         border: '1px solid rgba(124,58,237,0.3)',
         borderRadius: '14px', padding: '1rem 1.25rem',
-        display: 'flex', alignItems: 'center', gap: '0.85rem',
+        display: 'flex', alignItems: 'flex-start', gap: '0.85rem',
+        flexWrap: 'wrap',
         marginBottom: '2rem',
     }}>
         <span style={{ fontSize: '1.4rem' }}>🎮</span>
@@ -331,8 +332,8 @@ const LabelDashboard = ({ session, onNavigate }) => {
                     )}
                 </div>
 
-                {/* ── Two-column: tracks + bar chart ── */}
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '1.5rem' }}>
+                {/* ── Two-column responsive: tracks + bar chart ── */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem', marginBottom: '1.5rem' }}>
 
                     {/* Track list */}
                     <div className="ldb-section">
