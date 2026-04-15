@@ -215,7 +215,7 @@ const InvestmentCard = ({ holding, isLast, onTransfer }) => {
                 <div>
                     <div style={{ fontSize: '0.58rem', color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '3px', display: 'flex', alignItems: 'center' }}>
                         Invertido
-                        <Be4tTooltip content="Suma de todos los aportes de fans que se convierten en liquidez para la disquera." />
+                        <Be4tTooltip content="Es el capital total que tú has destinado para adquirir participaciones en esta canción específica." />
                     </div>
                     <div style={{ fontWeight: '800', fontSize: '0.95rem' }}>{fmtUSD(cost)}</div>
                 </div>
@@ -228,7 +228,7 @@ const InvestmentCard = ({ holding, isLast, onTransfer }) => {
                 <div>
                     <div style={{ fontSize: '0.58rem', color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '3px', display: 'flex', alignItems: 'center' }}>
                         Regalías/mes
-                        <Be4tTooltip content="Calculado proporcionalmente según tu cantidad de tokens y la TEA del activo." />
+                        <Be4tTooltip content="Es la estimación de lo que tú recibirás mensualmente según tus tokens y el rendimiento de la obra." />
                     </div>
                     <div style={{ fontWeight: '800', fontSize: '0.95rem', color: '#10b981' }}>
                         {fmtUSD(monthlyEarning)}
