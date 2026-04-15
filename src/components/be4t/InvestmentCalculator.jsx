@@ -1,7 +1,9 @@
-import React, { useState, useMemo, lazy, Suspense } from 'react';
+import React, { useState, useMemo, useEffect, lazy, Suspense } from 'react';
 import { TrendingUp, DollarSign, Music, ChevronRight, Zap, CreditCard, CheckCircle } from 'lucide-react';
+import { createPortal } from 'react-dom';
 import { isShowcase, isProduction } from '../../core/env';
 import { useDemoBalance } from '../../hooks/useDemoBalance';
+import ConfettiBlast from './ConfettiBlast';
 
 // Lazy-load PayModal only in production to keep showcase bundle lean
 const ThirdwebPayModal = isProduction
@@ -30,6 +32,17 @@ const InvestmentCalculator = ({ asset, session }) => {
     // ── Ghost Balance (Showcase only) ────────────────────────────────────────
     const { balance, acquire, acquired: isAcquired, hasBalance } = useDemoBalance();
     const songAcquired = isAcquired(asset?.id || asset?.track_id || 'unknown');
+    const songName     = asset?.name || asset?.title || 'esta canción';
+    const artistName   = asset?.metadata?.artist || asset?.artist || 'este artista';
+
+    // ── Auto-redirect to portfolio 3s after success (showcase only) ────────────
+    useEffect(() => {
+        if (txState !== 'success' || !isShowcase) return;
+        const id = setTimeout(() => {
+            document.dispatchEvent(new CustomEvent('navigate', { detail: 'mis-canciones' }));
+        }, 3200);
+        return () => clearTimeout(id);
+    }, [txState]);
 
     // ── Financial calculations ───────────────────────────────────────────────
     const totalSupply    = asset?.total_supply || 1000;
@@ -337,11 +350,112 @@ const InvestmentCalculator = ({ asset, session }) => {
                 </Suspense>
             )}
 
+            {/* \u2500\u2500 Neon Confetti on success \u2500\u2500 */}
+            <ConfettiBlast active={txState === 'success' && isShowcase} duration={3500} />
+
+            {/* \u2500\u2500 Full-screen success overlay (showcase) \u2500\u2500 */}
+            {txState === 'success' && isShowcase && songAcquired && createPortal(
+                <div style={{
+                    position: 'fixed', inset: 0, zIndex: 9998,
+                    background: 'rgba(6, 2, 18, 0.82)',
+                    backdropFilter: 'blur(8px)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    padding: '1.5rem',
+                    animation: 'overlayFadeIn 0.5s ease',
+                }}>
+                    <div style={{
+                        background: 'linear-gradient(160deg, rgba(20,10,40,0.98) 0%, rgba(12,8,28,0.98) 100%)',
+                        border: '1px solid rgba(168,85,247,0.35)',
+                        borderRadius: '24px',
+                        padding: '2.5rem 2rem',
+                        maxWidth: '420px', width: '100%',
+                        textAlign: 'center',
+                        boxShadow: '0 0 60px rgba(168,85,247,0.2), 0 24px 64px rgba(0,0,0,0.7)',
+                        animation: 'cardPopIn 0.55s cubic-bezier(0.34, 1.56, 0.64, 1)',
+                        position: 'relative', overflow: 'hidden',
+                    }}>
+                        {/* Glow halo */}
+                        <div style={{ position: 'absolute', top: '-40px', left: '50%', transform: 'translateX(-50%)', width: '180px', height: '180px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(168,85,247,0.25) 0%, transparent 70%)', pointerEvents: 'none' }} />
+
+                        {/* Trophy icon */}
+                        <div style={{ fontSize: '3.5rem', marginBottom: '0.75rem', lineHeight: 1 }}>🏆</div>
+
+                        <div style={{
+                            display: 'inline-flex', alignItems: 'center', gap: '0.4rem',
+                            background: 'rgba(16,185,129,0.1)', border: '1px solid rgba(16,185,129,0.3)',
+                            borderRadius: '100px', padding: '0.25rem 0.85rem',
+                            marginBottom: '1rem',
+                        }}>
+                            <span style={{ width: '5px', height: '5px', borderRadius: '50%', background: '#10b981', display: 'inline-block', boxShadow: '0 0 6px #10b981' }} />
+                            <span style={{ fontSize: '0.62rem', color: '#10b981', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '1.2px' }}>
+                                Inversión Confirmada
+                            </span>
+                        </div>
+
+                        <h2 style={{ fontSize: 'clamp(1.3rem, 4vw, 1.75rem)', fontWeight: '900', margin: '0 0 0.5rem', letterSpacing: '-0.03em', lineHeight: 1.1, color: 'white' }}>
+                            ¡Felicidades socio!
+                        </h2>
+                        <p style={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.65)', margin: '0 0 1.25rem', lineHeight: 1.6 }}>
+                            Ahora eres co-dueño de los derechos de{' '}
+                            <strong style={{ color: '#a855f7', fontWeight: '800' }}>"{songName}"</strong>
+                            {' '}de <strong style={{ color: 'white' }}>{artistName}</strong>.
+                            Tus regalías ya están generándose.
+                        </p>
+
+                        {/* Investment summary */}
+                        <div style={{
+                            background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)',
+                            borderRadius: '14px', padding: '1rem', marginBottom: '1.5rem',
+                            display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem',
+                        }}>
+                            <div>
+                                <div style={{ fontSize: '0.58rem', color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: '1px' }}>Invertido</div>
+                                <div style={{ fontWeight: '900', color: '#4ade80', fontSize: '1.1rem', fontFamily: "'Courier New', monospace" }}>{formatCurrency(songAcquired.cost)}</div>
+                            </div>
+                            <div>
+                                <div style={{ fontSize: '0.58rem', color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: '1px' }}>Tokens</div>
+                                <div style={{ fontWeight: '900', color: '#06b6d4', fontSize: '1.1rem', fontFamily: "'Courier New', monospace" }}>{songAcquired.fractions}</div>
+                            </div>
+                        </div>
+
+                        {/* Countdown bar */}
+                        <div style={{ marginBottom: '1rem' }}>
+                            <p style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.35)', marginBottom: '0.5rem' }}>
+                                Redirigiendo a Mis Canciones...
+                            </p>
+                            <div style={{ height: '3px', background: 'rgba(255,255,255,0.08)', borderRadius: '2px', overflow: 'hidden' }}>
+                                <div style={{ height: '100%', background: 'linear-gradient(90deg, #7c3aed, #06b6d4)', borderRadius: '2px', animation: 'countdownBar 3.2s linear forwards' }} />
+                            </div>
+                        </div>
+
+                        <button
+                            onClick={() => document.dispatchEvent(new CustomEvent('navigate', { detail: 'mis-canciones' }))}
+                            style={{
+                                width: '100%', padding: '0.9rem',
+                                background: 'linear-gradient(135deg, #7c3aed, #a855f7, #06b6d4)',
+                                backgroundSize: '200% auto',
+                                border: 'none', borderRadius: '14px',
+                                color: 'white', fontWeight: '800', fontSize: '0.95rem',
+                                cursor: 'pointer', letterSpacing: '-0.01em',
+                                boxShadow: '0 4px 24px rgba(124,58,237,0.5)',
+                            }}
+                        >
+                            🎵 Ver en Mis Canciones ahora →
+                        </button>
+                    </div>
+                </div>,
+                document.body
+            )}
+
             <style>{`
-                @keyframes fadeIn { from { opacity:0; transform:translateY(4px); } to { opacity:1; transform:translateY(0); } }
-                @keyframes spin   { from { transform:rotate(0deg); } to { transform:rotate(360deg); } }
+                @keyframes fadeIn     { from { opacity:0; transform:translateY(4px); } to { opacity:1; transform:translateY(0); } }
+                @keyframes spin       { from { transform:rotate(0deg); } to { transform:rotate(360deg); } }
+                @keyframes overlayFadeIn { from { opacity: 0; } to { opacity: 1; } }
+                @keyframes cardPopIn  { from { opacity:0; transform:scale(0.88) translateY(20px); } to { opacity:1; transform:scale(1) translateY(0); } }
+                @keyframes countdownBar { from { width: 0%; } to { width: 100%; } }
             `}</style>
         </div>
+
     );
 };
 
