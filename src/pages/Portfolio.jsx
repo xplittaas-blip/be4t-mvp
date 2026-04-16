@@ -320,7 +320,7 @@ const InvestmentCard = ({ holding, isLast, onTransfer, onAction }) => {
                             }}
                             title={holding.isListed ? "Debes retirar tu oferta del mercado secundario antes de vender a la disquera" : ""}
                         >
-                            Venta a Disquera (-10%)
+                            Devolver Tokens (-10%)
                         </button>
                         {holding.isListed ? (
                             <button
@@ -340,7 +340,7 @@ const InvestmentCard = ({ holding, isLast, onTransfer, onAction }) => {
                                     borderRadius: '8px', color: '#22d3ee', fontSize: '0.65rem', fontWeight: '700', cursor: 'pointer'
                                 }}
                             >
-                                Poner en Mercado Secundario
+                                Revender Tokens
                             </button>
                         )}
 
