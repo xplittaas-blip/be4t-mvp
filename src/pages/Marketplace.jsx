@@ -415,34 +415,8 @@ const Marketplace = ({ session, onNavigate }) => {
                     </div>
                 )}
 
-                {/* ── Section title + filters ── */}
-                {userMode !== 'disquera' && (
-                    <div style={{ padding: '0 1.5rem', marginBottom: '1rem', display: 'flex', gap: '1rem', overflowX: 'auto' }}>
-                        <button
-                            onClick={() => setActiveTab('primary')}
-                            style={{
-                                padding: '0.65rem 1.25rem', background: activeTab === 'primary' ? 'rgba(124,58,237,0.2)' : 'transparent',
-                                border: '1px solid', borderColor: activeTab === 'primary' ? '#8b5cf6' : 'rgba(255,255,255,0.1)',
-                                borderRadius: '100px', color: activeTab === 'primary' ? 'white' : 'rgba(255,255,255,0.5)',
-                                fontWeight: '800', fontSize: '0.85rem', cursor: 'pointer', transition: 'all 0.2s ease', whiteSpace: 'nowrap'
-                            }}
-                        >
-                            Emisiones de Disquera
-                        </button>
-                        <button
-                            onClick={() => setActiveTab('secondary')}
-                            style={{
-                                padding: '0.65rem 1.25rem', background: activeTab === 'secondary' ? 'rgba(6,182,212,0.2)' : 'transparent',
-                                border: '1px solid', borderColor: activeTab === 'secondary' ? '#06b6d4' : 'rgba(255,255,255,0.1)',
-                                borderRadius: '100px', color: activeTab === 'secondary' ? 'white' : 'rgba(255,255,255,0.5)',
-                                fontWeight: '800', fontSize: '0.85rem', cursor: 'pointer', transition: 'all 0.2s ease', whiteSpace: 'nowrap',
-                                display: 'flex', alignItems: 'center', gap: '0.5rem'
-                            }}
-                        >
-                            Mercado Secundario <span style={{ background: '#06b6d4', color: 'black', padding: '1px 5px', borderRadius: '4px', fontSize: '0.65rem', fontWeight: '900' }}>P2P</span>
-                        </button>
-                    </div>
-                )}
+
+
                 {userMode !== 'disquera' && (
                     <div className="be4t-filters">
                         <div>
