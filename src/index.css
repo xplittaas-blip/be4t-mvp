@@ -225,12 +225,7 @@ button {
     scroll-snap-type: x mandatory;
     scroll-padding-left: 1.25rem;  /* aligns first card with peek */
     gap: 1rem;
-    /*
-     * KEY: pan-y lets the browser own vertical scroll.
-     * Horizontal swipes are handled by the native overflow-x.
-     * This eliminates the 'locked page' feeling on mobile.
-     */
-    touch-action: pan-y;
+    touch-action: pan-x pan-y; /* both axes: horizontal swipe drives carousel, vertical propagates to page scroll */
     padding: 0.5rem 0 1rem 1.25rem; /* left peek indent */
     /* Right padding is on last child via gap+card-width — see below */
     cursor: grab;

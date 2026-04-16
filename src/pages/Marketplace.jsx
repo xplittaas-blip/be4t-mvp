@@ -64,12 +64,7 @@ const globalStyles = `
             scroll-padding-left: 1.25rem;
             gap: 0.75rem;
             padding: 0.25rem 0 1.25rem 1.25rem;
-            /*
-             * pan-y — browser handles vertical scroll natively.
-             * Horizontal swipe still drives the overflow-x carousel.
-             * No vertical blocking / lag on iPhone.
-             */
-            touch-action: pan-y;
+            touch-action: pan-x pan-y;
         }
         .be4t-song-grid::-webkit-scrollbar { display: none; }
         .be4t-song-grid > * {
