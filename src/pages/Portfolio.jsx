@@ -18,6 +18,66 @@ const fmtMicro = (v) =>
     new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 6, maximumFractionDigits: 6 }).format(v || 0);
 const fmtPct = (v) => `${(v || 0).toFixed(2)}%`;
 
+// ── Mobile CSS ────────────────────────────────────────────────────────────────
+const PORTFOLIO_MOBILE_CSS = `
+/* === Portfolio Mobile Fixes === */
+@media (max-width: 640px) {
+
+  /* Page wrapper padding */
+  .pf-page { padding: 1rem !important; }
+
+  /* Header: stack title + balance pill */
+  .pf-header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 1rem !important;
+  }
+  .pf-balance {
+    width: 100% !important;
+    text-align: left !important;
+    min-width: 0 !important;
+  }
+
+  /* KPI grid: 2 cols on mobile */
+  .pf-kpi-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.6rem !important;
+  }
+
+  /* Investment card padding */
+  .pf-card { padding: 1rem !important; }
+
+  /* Top row inside card: stack vertically */
+  .pf-card-top {
+    flex-direction: column !important;
+    gap: 0.75rem !important;
+  }
+
+  /* Live ticker takes full width on mobile */
+  .pf-ticker { align-self: stretch !important; }
+
+  /* Stats grid: 2x2 instead of 1x4 */
+  .pf-stats-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.6rem !important;
+  }
+
+  /* Action buttons: full width row */
+  .pf-actions {
+    flex-wrap: wrap !important;
+    gap: 0.4rem !important;
+  }
+  .pf-actions button {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+    font-size: 0.62rem !important;
+    padding: 7px 8px !important;
+    text-align: center !important;
+    white-space: nowrap !important;
+  }
+}
+`;
+
 // ── KPI Card ──────────────────────────────────────────────────────────────────
 const KpiCard = ({ label, value, sub, color = 'white', glow }) => (
     <div style={{
@@ -161,11 +221,12 @@ const InvestmentCard = ({ holding, isLast, onTransfer, onAction }) => {
             marginBottom: isLast ? 0 : '0.75rem',
             transition: 'all 0.2s ease',
         }}
+        className="pf-card"
         onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.035)'; e.currentTarget.style.borderColor = 'rgba(124,58,237,0.25)'; }}
         onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.02)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.06)'; }}
         >
             {/* ── Top row: Song info + Live Ticker ── */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '1rem', flexWrap: 'wrap', marginBottom: '1rem' }}>
+            <div className="pf-card-top" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '1rem', flexWrap: 'wrap', marginBottom: '1rem' }}>
                 {/* Left: cover + info */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', minWidth: 0 }}>
                     <div style={{
@@ -204,11 +265,11 @@ const InvestmentCard = ({ holding, isLast, onTransfer, onAction }) => {
                 </div>
 
                 {/* Right: LIVE TICKER */}
-                <LiveEarningsTicker cost={cost} apy={apy} acquiredAt={acquiredAt} />
+                <div className="pf-ticker"><LiveEarningsTicker cost={cost} apy={apy} acquiredAt={acquiredAt} /></div>
             </div>
 
             {/* ── Bottom row: stats grid ── */}
-            <div style={{
+            <div className="pf-stats-grid" style={{
                 display: 'grid',
                 gridTemplateColumns: 'repeat(4, 1fr)',
                 gap: '0.75rem',
@@ -246,7 +307,7 @@ const InvestmentCard = ({ holding, isLast, onTransfer, onAction }) => {
             </div>
 
             {/* Action buttons */}
-            <div style={{ marginTop: '0.85rem', display: 'flex', justifyContent: 'flex-end', gap: '0.5rem', flexWrap: 'wrap' }}>
+            <div className="pf-actions" style={{ marginTop: '0.85rem', display: 'flex', justifyContent: 'flex-end', gap: '0.5rem', flexWrap: 'wrap' }}>
                 {isManaging ? (
                     <>
                         <button
@@ -366,14 +427,11 @@ const Portfolio = ({ session, onNavigate }) => {
     const portfolioValue = totalInvested + totalEarned;
 
     return (
-        <div style={{
-            minHeight: '100vh', color: 'white',
-            fontFamily: "'Inter', sans-serif",
-            padding: '3rem 1.5rem',
-            maxWidth: '960px', margin: '0 auto',
-        }}>
+        <div style={{ minHeight: '100vh', background: '#08080f', fontFamily: "'Inter', sans-serif", color: 'white' }}>
+            <style>{PORTFOLIO_MOBILE_CSS}</style>
+            <div className="pf-page" style={{ maxWidth: '900px', margin: '0 auto', padding: '2.5rem 2rem' }}>
             {/* ── Header ── */}
-            <div style={{ marginBottom: '2.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
+            <div className="pf-header" style={{ marginBottom: '2.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
                 <div>
                     <div style={{
                         display: 'inline-flex', alignItems: 'center', gap: '0.4rem',
@@ -397,7 +455,7 @@ const Portfolio = ({ session, onNavigate }) => {
                 </div>
 
                 {/* Balance pill */}
-                <div style={{
+                <div className="pf-balance" style={{
                     background: 'rgba(255,255,255,0.04)', borderRadius: '16px',
                     padding: '1rem 1.4rem', border: '1px solid rgba(255,255,255,0.08)',
                     textAlign: 'right', minWidth: '160px',
@@ -421,7 +479,7 @@ const Portfolio = ({ session, onNavigate }) => {
             </div>
 
             {/* ── KPI Row ── */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.85rem', marginBottom: '2rem' }}>
+            <div className="pf-kpi-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.85rem', marginBottom: '2rem' }}>
                 <KpiCard label="Valor Portfolio" value={fmtUSD(portfolioValue)} sub={`${actPortfolio.length} posiciones`} />
                 <KpiCard label="Capital Invertido" value={fmtUSD(totalInvested)} sub="Total desplegado" color="rgba(255,255,255,0.8)" />
                 <KpiCard label="Regalías Acumuladas" value={fmtUSD(totalEarned)} sub="ROI histórico" color="#10b981" glow="#10b981" />
@@ -511,6 +569,7 @@ const Portfolio = ({ session, onNavigate }) => {
                     onClose={() => setListTarget(null)}
                 />
             )}
+        </div>{/* /pf-page */}
         </div>
     );
 };
