@@ -383,6 +383,7 @@ const ShareCardModal = ({ holding, price, gainPct, profit, tradeLink, onClose })
     const content = (
         <div
             onClick={handleClose}
+            className="be4t-modal-overlay"
             style={{
                 position: 'fixed', inset: 0, zIndex: 10000,
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -396,6 +397,7 @@ const ShareCardModal = ({ holding, price, gainPct, profit, tradeLink, onClose })
         >
             <div
                 onClick={e => e.stopPropagation()}
+                className="be4t-modal-inner"
                 style={{
                     width: '100%', maxWidth: '560px',
                     background: 'linear-gradient(160deg, #0e0e18, #08080f)',
@@ -547,16 +549,33 @@ const ShareCardModal = ({ holding, price, gainPct, profit, tradeLink, onClose })
                     onMouseLeave={e => e.currentTarget.style.background = 'rgba(37,211,102,0.08)'}>
                         <MessageCircle size={12} /> WhatsApp
                     </button>
-                    <button onClick={() => navigator.share?.({ url: tradeLink, title: `Compra mis derechos de ${holding.name}`, text: shareText })} style={{
+                    <button onClick={() => {
+                        // Native Web Share API — shares the actual PNG file on iOS/Android
+                        if (imgSrc && typeof navigator.canShare === 'function') {
+                            fetch(imgSrc)
+                                .then(r => r.blob())
+                                .then(blob => {
+                                    const file = new File([blob], `be4t-${holding.id || 'card'}.png`, { type: 'image/png' });
+                                    const shareData = { files: [file], title: `Invierte en ${holding.name}`, text: shareText, url: tradeLink };
+                                    if (navigator.canShare(shareData)) {
+                                        navigator.share(shareData).catch(() => {});
+                                    } else {
+                                        navigator.share({ title: `Invierte en ${holding.name}`, text: shareText, url: tradeLink }).catch(() => {});
+                                    }
+                                });
+                        } else if (imgSrc) {
+                            handleDownload(); // Desktop fallback: download the PNG
+                        }
+                    }} style={{
                         flex: 1, padding: '0.65rem',
-                        background: 'rgba(139,92,246,0.08)', border: '1px solid rgba(139,92,246,0.2)',
-                        borderRadius: '10px', color: '#a78bfa',
+                        background: 'rgba(225,48,108,0.08)', border: '1px solid rgba(225,48,108,0.25)',
+                        borderRadius: '10px', color: '#e1306c',
                         fontWeight: '700', fontSize: '0.7rem', cursor: 'pointer',
                         display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.35rem',
                         transition: 'all 0.2s ease',
                     }}
-                    onMouseEnter={e => e.currentTarget.style.background = 'rgba(139,92,246,0.15)'}
-                    onMouseLeave={e => e.currentTarget.style.background = 'rgba(139,92,246,0.08)'}>
+                    onMouseEnter={e => e.currentTarget.style.background = 'rgba(225,48,108,0.18)'}
+                    onMouseLeave={e => e.currentTarget.style.background = 'rgba(225,48,108,0.08)'}>
                         <Layers size={12} /> Instagram
                     </button>
                 </div>

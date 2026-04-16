@@ -223,19 +223,39 @@ button {
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
     scroll-snap-type: x mandatory;
+    scroll-padding-left: 1.25rem;  /* aligns first card with peek */
     gap: 1rem;
-    padding: 0.5rem 1.5rem 1rem;
-    touch-action: pan-x;
+    /*
+     * KEY: pan-y lets the browser own vertical scroll.
+     * Horizontal swipes are handled by the native overflow-x.
+     * This eliminates the 'locked page' feeling on mobile.
+     */
+    touch-action: pan-y;
+    padding: 0.5rem 0 1rem 1.25rem; /* left peek indent */
+    /* Right padding is on last child via gap+card-width — see below */
+    cursor: grab;
   }
+  .be4t-song-grid:active { cursor: grabbing; }
   .be4t-song-grid::-webkit-scrollbar { display: none; }
 
   /* Each song card becomes a snap item */
   .be4t-song-grid > * {
     flex-shrink: 0;
-    width: calc(85vw - 2rem);
+    /*
+     * 82vw wide so ~18% of next card is always peeking,
+     * giving a clear visual affordance that there is more content.
+     */
+    width: 82vw;
     max-width: 320px;
-    scroll-snap-align: center;
+    scroll-snap-align: start;
     scroll-snap-stop: always;
+  }
+
+  /* Spacer pseudo-element adds right padding after last card */
+  .be4t-song-grid::after {
+    content: '';
+    flex-shrink: 0;
+    width: 1rem;
   }
 
   /* Grid outer — remove horizontal padding to allow full bleed */
@@ -249,5 +269,45 @@ button {
   .be4t-song-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 1rem;
+  }
+}
+
+/* ── Mobile Modal Sheet ─────────────────────────────────────────────────── */
+/*
+ * On small screens, modals become bottom sheets with internal scroll.
+ * Max-height = 90dvh so it never overlaps the status bar.
+ * overscroll-behavior: contain stops the page from scrolling while
+ * the user scrolls inside the modal.
+ */
+@media (max-width: 600px) {
+  .be4t-modal-inner {
+    max-height: 90dvh !important;     /* dynamic viewport height — safe area aware */
+    border-radius: 24px 24px 0 0 !important;
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-y: auto !important;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Overlay background fills full screen on mobile */
+  .be4t-modal-overlay {
+    align-items: flex-end !important;
+    padding: 0 !important;
+  }
+
+  /* Drag handle pill */
+  .be4t-modal-inner::before {
+    content: '';
+    display: block;
+    width: 36px;
+    height: 4px;
+    border-radius: 2px;
+    background: rgba(255,255,255,0.15);
+    margin: 0.6rem auto 0;
   }
 }

@@ -61,18 +61,27 @@ const globalStyles = `
             -webkit-overflow-scrolling: touch;
             scrollbar-width: none;
             scroll-snap-type: x mandatory;
-            scroll-padding: 0 1rem;
+            scroll-padding-left: 1.25rem;
             gap: 0.75rem;
-            padding: 0.25rem 1rem 1.25rem;
-            touch-action: pan-x;
+            padding: 0.25rem 0 1.25rem 1.25rem;
+            /*
+             * pan-y — browser handles vertical scroll natively.
+             * Horizontal swipe still drives the overflow-x carousel.
+             * No vertical blocking / lag on iPhone.
+             */
+            touch-action: pan-y;
         }
         .be4t-song-grid::-webkit-scrollbar { display: none; }
         .be4t-song-grid > * {
             flex-shrink: 0;
-            width: calc(85vw - 1.5rem);
+            width: 82vw;
             max-width: 300px;
-            scroll-snap-align: center;
+            scroll-snap-align: start;   /* left-anchored snap = peek visible */
             scroll-snap-stop: always;
+        }
+        /* Trailing spacer — keeps right edge from being clipped */
+        .be4t-song-grid::after {
+            content: ''; flex-shrink: 0; width: 0.75rem;
         }
         .be4t-grid-outer {
             padding: 0;
