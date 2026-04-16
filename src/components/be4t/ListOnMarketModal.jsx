@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { X, TrendingUp, Zap, Link2, Twitter, MessageCircle, Share2, CheckCircle } from 'lucide-react';
+import { X, TrendingUp, Zap, Link2, Twitter, MessageCircle, Share2, CheckCircle, ImageIcon } from 'lucide-react';
+import ShareCardModal from './ShareCardModal';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 const fmtUSD = (v) =>
@@ -42,6 +43,7 @@ const ListOnMarketModal = ({ holding, onConfirm, onClose }) => {
     const [phase, setPhase]     = useState('form'); // 'form' | 'flying' | 'success'
     const [visible, setVisible] = useState(false);
     const [copied, setCopied]   = useState(false);
+    const [showShareCard, setShowShareCard] = useState(false);
     const inputRef = useRef(null);
 
     const demand     = getDemandSignal(holding.spotifyStreams);
@@ -419,11 +421,30 @@ const ListOnMarketModal = ({ holding, onConfirm, onClose }) => {
                             </p>
                         </div>
 
+                        {/* Primary CTA — Share Card */}
+                        <button
+                            onClick={() => setShowShareCard(true)}
+                            style={{
+                                width: '100%', padding: '0.9rem',
+                                background: 'linear-gradient(135deg, #7c3aed 0%, #a855f7 50%, #06b6d4 100%)',
+                                backgroundSize: '200% auto',
+                                border: 'none', borderRadius: '12px', color: 'white',
+                                fontWeight: '800', fontSize: '0.85rem', cursor: 'pointer',
+                                boxShadow: '0 4px 24px rgba(124,58,237,0.4)',
+                                marginBottom: '0.6rem',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem',
+                                transition: 'all 0.25s ease',
+                            }}
+                            onMouseEnter={e => { e.currentTarget.style.backgroundPosition = 'right center'; e.currentTarget.style.boxShadow = '0 8px 32px rgba(124,58,237,0.6)'; }}
+                            onMouseLeave={e => { e.currentTarget.style.backgroundPosition = 'left center'; e.currentTarget.style.boxShadow = '0 4px 24px rgba(124,58,237,0.4)'; }}
+                        >
+                            🖼 Generar Tarjeta Viral →
+                        </button>
                         <button onClick={handleClose} style={{
-                            width: '100%', padding: '0.8rem',
-                            background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)',
-                            borderRadius: '12px', color: 'rgba(255,255,255,0.5)',
-                            fontWeight: '700', fontSize: '0.82rem', cursor: 'pointer',
+                            width: '100%', padding: '0.7rem',
+                            background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)',
+                            borderRadius: '12px', color: 'rgba(255,255,255,0.35)',
+                            fontWeight: '600', fontSize: '0.78rem', cursor: 'pointer',
                         }}>
                             Ver en Premium Assets →
                         </button>
@@ -445,7 +466,21 @@ const ListOnMarketModal = ({ holding, onConfirm, onClose }) => {
         </div>
     );
 
-    return createPortal(content, document.body);
+    return (
+        <>
+            {createPortal(content, document.body)}
+            {showShareCard && (
+                <ShareCardModal
+                    holding={holding}
+                    price={price}
+                    gainPct={gainPct}
+                    profit={profit}
+                    tradeLink={tradeLink}
+                    onClose={() => setShowShareCard(false)}
+                />
+            )}
+        </>
+    );
 };
 
 export default ListOnMarketModal;
