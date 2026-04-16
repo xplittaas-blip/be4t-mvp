@@ -5,6 +5,7 @@ import { isShowcase } from '../core/env';
 import { resolvePortfolio } from '../services/investmentService';
 import { Be4tTooltip } from '../components/be4t/Be4tTooltip';
 import InstantExitModal from '../components/be4t/InstantExitModal';
+import ListOnMarketModal from '../components/be4t/ListOnMarketModal';
 const TransferModal = lazy(() => import('../components/be4t/TransferModal'));
 
 // ── Constants ─────────────────────────────────────────────────────────────────
@@ -319,20 +320,17 @@ const InvestmentCard = ({ holding, isLast, onTransfer, onAction }) => {
 const Portfolio = ({ session, onNavigate }) => {
     const [transferTarget, setTransferTarget] = useState(null);
     const [prodPortfolio, setProdPortfolio]   = useState([]);
-    const [exitTarget, setExitTarget]         = useState(null);   // holding to confirm exit
-    const [exitingIds, setExitingIds]         = useState(new Set()); // animating out
+    const [exitTarget, setExitTarget]         = useState(null);
+    const [exitingIds, setExitingIds]         = useState(new Set());
+    const [listTarget, setListTarget]         = useState(null);  // holding to list on market
     const { balance, portfolio: localPortfolio, reset, instantExit, listOnMarket, unlistFromMarket } = useDemoBalance();
 
     const handleAction = (action, holding) => {
         if (action === 'sell') {
-            if (holding.isListed) return; // button is already disabled
-            setExitTarget(holding);       // open modal
+            if (holding.isListed) return;
+            setExitTarget(holding);
         } else if (action === 'list') {
-            const suggested = (holding.cost * 1.15).toFixed(2);
-            const price = window.prompt(`Ponle un precio de venta a tus tokens de "${holding.name || holding.id}". Sugerido: $${suggested} USD`, suggested);
-            if (price !== null && !isNaN(price) && Number(price) > 0) {
-                listOnMarket(holding.id, parseFloat(price));
-            }
+            setListTarget(holding);          // open modal
         } else if (action === 'unlist') {
             unlistFromMarket(holding.id);
         }
@@ -501,6 +499,16 @@ const Portfolio = ({ session, onNavigate }) => {
                     holding={exitTarget}
                     onConfirm={handleConfirmExit}
                     onClose={() => setExitTarget(null)}
+                />
+            )}
+
+            {listTarget && (
+                <ListOnMarketModal
+                    holding={listTarget}
+                    onConfirm={(price) => {
+                        listOnMarket(listTarget.id, price);
+                    }}
+                    onClose={() => setListTarget(null)}
                 />
             )}
         </div>
