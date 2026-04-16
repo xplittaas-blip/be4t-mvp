@@ -4,6 +4,7 @@ import { useDemoBalance } from '../hooks/useDemoBalance';
 import { isShowcase } from '../core/env';
 import { resolvePortfolio } from '../services/investmentService';
 import { Be4tTooltip } from '../components/be4t/Be4tTooltip';
+import InstantExitModal from '../components/be4t/InstantExitModal';
 const TransferModal = lazy(() => import('../components/be4t/TransferModal'));
 
 // ── Constants ─────────────────────────────────────────────────────────────────
@@ -326,29 +327,34 @@ const InvestmentCard = ({ holding, isLast, onTransfer, onAction }) => {
 const Portfolio = ({ session, onNavigate }) => {
     const [transferTarget, setTransferTarget] = useState(null);
     const [prodPortfolio, setProdPortfolio]   = useState([]);
+    const [exitTarget, setExitTarget]         = useState(null);   // holding to confirm exit
+    const [exitingIds, setExitingIds]         = useState(new Set()); // animating out
     const { balance, portfolio: localPortfolio, reset, instantExit, listOnMarket, unlistFromMarket } = useDemoBalance();
 
     const handleAction = (action, holding) => {
         if (action === 'sell') {
-            if (holding.isListed) {
-                alert('No puedes vender a la disquera un activo que ya está listado en el mercado secundario. Retíralo primero.');
-                return;
-            }
-            if (window.confirm(`¿Estás seguro/a que deseas vender tus participaciones de "${holding.name || holding.id}" de vuelta al sistema con un 10% de penalización por liquidez anticipada?`)) {
-                instantExit(holding.id);
-                alert("Vendido con éxito a la disquera o distribuidora. Fondos acreditados en tu balance al instante.");
-            }
+            if (holding.isListed) return; // button is already disabled
+            setExitTarget(holding);       // open modal
         } else if (action === 'list') {
             const suggested = (holding.cost * 1.15).toFixed(2);
             const price = window.prompt(`Ponle un precio de venta a tus tokens de "${holding.name || holding.id}". Sugerido: $${suggested} USD`, suggested);
             if (price !== null && !isNaN(price) && Number(price) > 0) {
                 listOnMarket(holding.id, parseFloat(price));
-                alert(`Tu activo se ha listado exitosamente en el Mercado Secundario por $${parseFloat(price).toFixed(2)} USD.`);
             }
         } else if (action === 'unlist') {
             unlistFromMarket(holding.id);
-            alert(`"${holding.name}" fue retirado del mercado secundario exitosamente.`);
         }
+    };
+
+    const handleConfirmExit = () => {
+        if (!exitTarget) return;
+        instantExit(exitTarget.id);
+        // Trigger slide-out animation THEN close modal
+        setExitingIds(prev => new Set([...prev, exitTarget.id]));
+        setTimeout(() => {
+            setExitingIds(prev => { const n = new Set(prev); n.delete(exitTarget.id); return n; });
+        }, 500);
+        setExitTarget(null);
     };
 
     // In production: fetch from Supabase
@@ -453,13 +459,23 @@ const Portfolio = ({ session, onNavigate }) => {
                     </div>
 
                     {actPortfolio.map((h, i) => (
-                        <InvestmentCard
+                        <div
                             key={h.id}
-                            holding={h}
-                            isLast={i === actPortfolio.length - 1}
-                            onTransfer={setTransferTarget}
-                            onAction={handleAction}
-                        />
+                            style={{
+                                opacity:   exitingIds.has(h.id) ? 0   : 1,
+                                transform: exitingIds.has(h.id) ? 'translateX(60px) scale(0.97)' : 'translateX(0) scale(1)',
+                                maxHeight: exitingIds.has(h.id) ? '0' : '500px',
+                                overflow:  'hidden',
+                                transition: 'opacity 0.4s ease, transform 0.4s ease, max-height 0.45s ease',
+                            }}
+                        >
+                            <InvestmentCard
+                                holding={h}
+                                isLast={i === actPortfolio.length - 1}
+                                onTransfer={setTransferTarget}
+                                onAction={handleAction}
+                            />
+                        </div>
                     ))}
 
                     {/* Footer note */}
@@ -486,6 +502,14 @@ const Portfolio = ({ session, onNavigate }) => {
                     />
                 </Suspense>,
                 document.body
+            )}
+
+            {exitTarget && (
+                <InstantExitModal
+                    holding={exitTarget}
+                    onConfirm={handleConfirmExit}
+                    onClose={() => setExitTarget(null)}
+                />
             )}
         </div>
     );
