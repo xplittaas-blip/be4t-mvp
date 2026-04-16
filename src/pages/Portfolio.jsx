@@ -281,15 +281,7 @@ const InvestmentCard = ({ holding, isLast, onTransfer, onAction }) => {
                                 Poner en Mercado Secundario
                             </button>
                         )}
-                        <button
-                            onClick={() => setIsManaging(false)}
-                            style={{
-                                padding: '5px 12px', background: 'transparent', border: '1px solid transparent',
-                                borderRadius: '8px', color: 'rgba(255,255,255,0.4)', fontSize: '0.65rem', fontWeight: '700', cursor: 'pointer'
-                            }}
-                        >
-                            Reflexionar
-                        </button>
+
                     </>
                 ) : (
                     <>
