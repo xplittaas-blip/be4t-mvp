@@ -248,23 +248,38 @@ const InvestmentCard = ({ holding, isLast, onTransfer, onAction }) => {
                 {isManaging ? (
                     <>
                         <button
+                            disabled={holding.isListed}
                             onClick={() => { setIsManaging(false); onAction('sell', holding); }}
                             style={{
-                                padding: '5px 12px', background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)',
-                                borderRadius: '8px', color: '#f87171', fontSize: '0.65rem', fontWeight: '700', cursor: 'pointer'
+                                padding: '5px 12px', background: holding.isListed ? 'transparent' : 'rgba(239,68,68,0.1)', border: holding.isListed ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(239,68,68,0.3)',
+                                borderRadius: '8px', color: holding.isListed ? 'rgba(255,255,255,0.3)' : '#f87171', fontSize: '0.65rem', fontWeight: '700',
+                                cursor: holding.isListed ? 'not-allowed' : 'pointer'
                             }}
+                            title={holding.isListed ? "Debes retirar tu oferta del mercado secundario antes de vender a la disquera" : ""}
                         >
-                            Vender a Disquera/Distribuidora (-10%)
+                            Venta a Disquera (-10%)
                         </button>
-                        <button
-                            onClick={() => { setIsManaging(false); onAction('list', holding); }}
-                            style={{
-                                padding: '5px 12px', background: 'rgba(6,182,212,0.1)', border: '1px solid rgba(6,182,212,0.3)',
-                                borderRadius: '8px', color: '#22d3ee', fontSize: '0.65rem', fontWeight: '700', cursor: 'pointer'
-                            }}
-                        >
-                            Poner en Mercado Secundario
-                        </button>
+                        {holding.isListed ? (
+                            <button
+                                onClick={() => { setIsManaging(false); onAction('unlist', holding); }}
+                                style={{
+                                    padding: '5px 12px', background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.3)',
+                                    borderRadius: '8px', color: '#fcd34d', fontSize: '0.65rem', fontWeight: '700', cursor: 'pointer'
+                                }}
+                            >
+                                Retirar del Mercado
+                            </button>
+                        ) : (
+                            <button
+                                onClick={() => { setIsManaging(false); onAction('list', holding); }}
+                                style={{
+                                    padding: '5px 12px', background: 'rgba(6,182,212,0.1)', border: '1px solid rgba(6,182,212,0.3)',
+                                    borderRadius: '8px', color: '#22d3ee', fontSize: '0.65rem', fontWeight: '700', cursor: 'pointer'
+                                }}
+                            >
+                                Poner en Mercado Secundario
+                            </button>
+                        )}
                         <button
                             onClick={() => setIsManaging(false)}
                             style={{
@@ -311,22 +326,28 @@ const InvestmentCard = ({ holding, isLast, onTransfer, onAction }) => {
 const Portfolio = ({ session, onNavigate }) => {
     const [transferTarget, setTransferTarget] = useState(null);
     const [prodPortfolio, setProdPortfolio]   = useState([]);
-    const { balance, portfolio: localPortfolio, reset, instantExit, listOnMarket } = useDemoBalance();
+    const { balance, portfolio: localPortfolio, reset, instantExit, listOnMarket, unlistFromMarket } = useDemoBalance();
 
-    const handleAction = (type, holding) => {
-        if (type === 'sell') {
+    const handleAction = (action, holding) => {
+        if (action === 'sell') {
+            if (holding.isListed) {
+                alert('No puedes vender a la disquera un activo que ya está listado en el mercado secundario. Retíralo primero.');
+                return;
+            }
             if (window.confirm(`¿Estás seguro/a que deseas vender tus participaciones de "${holding.name || holding.id}" de vuelta al sistema con un 10% de penalización por liquidez anticipada?`)) {
                 instantExit(holding.id);
-                // The requested success response
                 alert("Vendido con éxito a la disquera o distribuidora. Fondos acreditados en tu balance al instante.");
             }
-        } else if (type === 'list') {
+        } else if (action === 'list') {
             const suggested = (holding.cost * 1.15).toFixed(2);
             const price = window.prompt(`Ponle un precio de venta a tus tokens de "${holding.name || holding.id}". Sugerido: $${suggested} USD`, suggested);
             if (price !== null && !isNaN(price) && Number(price) > 0) {
                 listOnMarket(holding.id, parseFloat(price));
                 alert(`Tu activo se ha listado exitosamente en el Mercado Secundario por $${parseFloat(price).toFixed(2)} USD.`);
             }
+        } else if (action === 'unlist') {
+            unlistFromMarket(holding.id);
+            alert(`"${holding.name}" fue retirado del mercado secundario exitosamente.`);
         }
     };
 
@@ -338,12 +359,13 @@ const Portfolio = ({ session, onNavigate }) => {
     }, []);
 
     const portfolio = isShowcase ? localPortfolio : prodPortfolio;
+    const actPortfolio = portfolio.filter(p => !p.exited);
 
     // ── KPIs ──
-    const totalInvested  = portfolio.reduce((s, h) => s + (h.cost || 0), 0);
-    const totalEarned    = portfolio.reduce((s, h) => s + (h.earnedToDate || 0), 0);
-    const avgApy         = portfolio.length
-        ? portfolio.reduce((s, h) => s + (h.apy || 12), 0) / portfolio.length
+    const totalInvested  = actPortfolio.reduce((s, h) => s + (h.cost || 0), 0);
+    const totalEarned    = actPortfolio.reduce((s, h) => s + (h.earnedToDate || 0), 0);
+    const avgApy         = actPortfolio.length
+        ? actPortfolio.reduce((s, h) => s + (h.apy || 12), 0) / actPortfolio.length
         : 0;
     const portfolioValue = totalInvested + totalEarned;
 
@@ -364,7 +386,7 @@ const Portfolio = ({ session, onNavigate }) => {
                     }}>
                         <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#10b981', display: 'inline-block', boxShadow: '0 0 6px #10b981', animation: 'be4t-nav-pulse 1.8s ease infinite' }} />
                         <span style={{ fontSize: '0.65rem', color: '#10b981', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '1.5px', fontFamily: "'Courier New', monospace" }}>
-                            Streaming en vivo · {portfolio.length} activo{portfolio.length !== 1 ? 's' : ''}
+                            Streaming en vivo · {actPortfolio.length} activo{actPortfolio.length !== 1 ? 's' : ''}
                         </span>
                     </div>
                     <h1 style={{ fontSize: 'clamp(1.8rem, 4vw, 2.5rem)', fontWeight: '900', letterSpacing: '-0.04em', margin: '0 0 0.35rem', lineHeight: 1.05 }}>
@@ -404,14 +426,14 @@ const Portfolio = ({ session, onNavigate }) => {
 
             {/* ── KPI Row ── */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.85rem', marginBottom: '2rem' }}>
-                <KpiCard label="Valor Portfolio" value={fmtUSD(portfolioValue)} sub={`${portfolio.length} posiciones`} />
+                <KpiCard label="Valor Portfolio" value={fmtUSD(portfolioValue)} sub={`${actPortfolio.length} posiciones`} />
                 <KpiCard label="Capital Invertido" value={fmtUSD(totalInvested)} sub="Total desplegado" color="rgba(255,255,255,0.8)" />
                 <KpiCard label="Regalías Acumuladas" value={fmtUSD(totalEarned)} sub="ROI histórico" color="#10b981" glow="#10b981" />
                 <KpiCard label="APY Promedio" value={`${avgApy.toFixed(1)}%`} sub="Retorno anualizado" color="#10b981" glow="#10b981" />
             </div>
 
             {/* ── Cards or Empty State ── */}
-            {portfolio.length === 0 ? (
+            {actPortfolio.length === 0 ? (
                 <EmptyPortfolio onNavigate={onNavigate} />
             ) : (
                 <div>
@@ -430,11 +452,11 @@ const Portfolio = ({ session, onNavigate }) => {
                         </span>
                     </div>
 
-                    {portfolio.map((h, i) => (
+                    {actPortfolio.map((h, i) => (
                         <InvestmentCard
                             key={h.id}
                             holding={h}
-                            isLast={i === portfolio.length - 1}
+                            isLast={i === actPortfolio.length - 1}
                             onTransfer={setTransferTarget}
                             onAction={handleAction}
                         />

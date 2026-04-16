@@ -204,7 +204,7 @@ const AccessDenied = ({ onBack }) => (
 
 // ── Main Dashboard ─────────────────────────────────────────────────────────────
 const LabelDashboard = ({ session, onNavigate }) => {
-    const { portfolio } = useDemoBalance();
+    const { portfolio, labelLedger } = useDemoBalance();
     const [tick, setTick] = useState(0);
 
     // Live ticker: re-render every 4s to update earned-to-date
@@ -223,21 +223,22 @@ const LabelDashboard = ({ session, onNavigate }) => {
         }
     }
 
-    // ── KPI calculations from live portfolio ──────────────────────────────────
-    const totalCapital   = portfolio.reduce((s, h) => s + (h.cost || 0), 0);
-    const uniqueInvestors = portfolio.length; // In demo: each song = 1 investor (user is the only investor)
-    const totalTokens    = portfolio.reduce((s, h) => s + (h.fractions || 0), 0);
+    // ── KPI calculations from live portfolio / ledger ─────────────────────────
+    const currentHoldersArray = portfolio.filter(p => !p.exited);
+    const totalCapital   = isShowcase ? labelLedger.gross_capital : portfolio.reduce((s, h) => s + (h.cost || 0), 0);
+    const uniqueInvestors = isShowcase ? Math.max(1, currentHoldersArray.length) : portfolio.length;
+    const totalTokens    = isShowcase ? portfolio.reduce((s, h) => s + (h.fractions || 0), 0) + labelLedger.reserve_inventory : portfolio.reduce((s, h) => s + (h.fractions || 0), 0);
     const estimatedSave  = totalCapital * 0.15; // 15% marketing savings metric
-    const totalEarned    = portfolio.reduce((s, h) => s + (h.earnedToDate || 0), 0);
-    const avgApy         = portfolio.length
-        ? portfolio.reduce((s, h) => s + (h.apy || 12), 0) / portfolio.length
+    const totalEarned    = currentHoldersArray.reduce((s, h) => s + (h.earnedToDate || 0), 0);
+    const avgApy         = currentHoldersArray.length
+        ? currentHoldersArray.reduce((s, h) => s + (h.apy || 12), 0) / currentHoldersArray.length
         : 14;
 
     // ── Chart data ────────────────────────────────────────────────────────────
     const dailyFlow = useMemo(() => buildDailyFlow(portfolio), [portfolio]);
 
     // ── Tracks for bar chart (top 5 by capital) ───────────────────────────────
-    const topTracks = [...portfolio].sort((a, b) => (b.cost || 0) - (a.cost || 0)).slice(0, 5);
+    const topTracks = [...currentHoldersArray].sort((a, b) => (b.cost || 0) - (a.cost || 0)).slice(0, 5);
 
     // ── Bar chart: capital por canción ────────────────────────────────────────
     const barData = topTracks.map(h => ({
