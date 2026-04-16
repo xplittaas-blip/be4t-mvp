@@ -160,20 +160,20 @@ const Navigation = ({ currentPage, setCurrentPage, session, onLoginClick, isAdmi
                     {/* Desktop nav links */}
                     <div className="be4t-nav-links" style={{
                         flex: 1, display: 'flex', alignItems: 'center',
-                        gap: '0.25rem', paddingLeft: '1rem',
-                        overflowX: 'auto', scrollbarWidth: 'none',
+                        gap: '0.1rem', paddingLeft: '0.5rem',
+                        whiteSpace: 'nowrap',
                     }}>
                         {navItems.map(item => {
                             const isActive = currentPage === item.id;
                             return (
                                 <button key={item.id} onClick={() => navigate(item.id)} title={item.description}
                                     style={{
-                                        padding: '0.4rem 0.85rem',
+                                        padding: '0.4rem 0.6rem',
                                         borderRadius: '8px', border: 'none',
                                         background: isActive ? 'rgba(139,92,246,0.2)' : 'transparent',
                                         color: isActive ? '#c4b5fd' : 'rgba(255,255,255,0.55)',
                                         fontWeight: isActive ? '700' : '400',
-                                        fontSize: '0.82rem', cursor: 'pointer', whiteSpace: 'nowrap',
+                                        fontSize: '0.75rem', cursor: 'pointer', whiteSpace: 'nowrap',
                                         borderBottom: isActive ? '2px solid #a855f7' : '2px solid transparent',
                                         transition: 'all 0.2s ease',
                                     }}

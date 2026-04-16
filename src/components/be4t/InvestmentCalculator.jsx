@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect, lazy, Suspense } from 'react';
-import { TrendingUp, DollarSign, Music, ChevronRight, Zap, CreditCard, CheckCircle } from 'lucide-react';
+import { TrendingUp, DollarSign, Music, ChevronRight, Zap, CreditCard, CheckCircle, ShieldCheck } from 'lucide-react';
 import { createPortal } from 'react-dom';
 import { isShowcase, isProduction } from '../../core/env';
 import { useDemoBalance } from '../../hooks/useDemoBalance';
@@ -331,11 +331,19 @@ const InvestmentCalculator = ({ asset, session }) => {
                 )}
             </button>
 
-            <p style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.3)', textAlign: 'center', marginTop: '0.75rem', lineHeight: '1.4' }}>
-                {isShowcase
-                    ? '🎮 Modo Demo — Practica con crédito ficticio. Sin dinero real involucrado.'
-                    : '* Los retornos son estimaciones. Inversión sujeta a riesgo. No constituyen garantía.'}
-            </p>
+            <div style={{ textAlign: 'center', marginTop: '0.75rem' }}>
+                <div style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', background: 'rgba(16,185,129,0.05)', border: '1px solid rgba(16,185,129,0.2)', padding: '2px 8px', borderRadius: '100px', marginBottom: '6px' }}>
+                    <ShieldCheck size={10} color="#10b981" />
+                    <span style={{ fontSize: '0.55rem', color: '#10b981', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                        Activo digital emitido bajo normativas internacionales de activos digitales.
+                    </span>
+                </div>
+                <p style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.3)', margin: 0, lineHeight: '1.4' }}>
+                    {isShowcase
+                        ? '🎮 Modo Demo — Practica con crédito ficticio. Sin dinero real involucrado.'
+                        : '* Los retornos son estimaciones. Inversión sujeta a riesgo. No constituyen garantía.'}
+                </p>
+            </div>
 
             {/* ── Thirdweb Pay Modal (Production only) ────────────────────────── */}
             {isProduction && ThirdwebPayModal && (
