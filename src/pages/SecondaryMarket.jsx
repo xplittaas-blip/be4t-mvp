@@ -499,10 +499,10 @@ const SecondaryMarket = ({ onNavigate }) => {
                         WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
                         marginBottom: '0.5rem',
                     }}>
-                        Mercado Secundario
+                        Premium Assets
                     </h1>
                     <p style={{ color: 'rgba(255,255,255,0.45)', fontSize: '0.9rem', maxWidth: '560px', lineHeight: 1.6 }}>
-                        Compra tokens de fans que buscan liquidez — a precios de mercado real, con APY incluido. Tu dinero nunca está atrapado.
+                        Compra y vende participaciones de hits consolidados entre la comunidad.
                     </p>
 
                     {/* Stats bar */}

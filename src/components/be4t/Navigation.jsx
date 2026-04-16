@@ -70,8 +70,8 @@ const Navigation = ({ currentPage, setCurrentPage, session, onLoginClick, isAdmi
     const navItems = [
         { id: 'explore',          label: '↗ Explorar',             emoji: '🎵', description: 'Top 20 Artistas' },
         { id: 'mis-canciones',    label: '♫ Mis Canciones',        emoji: '🎶', description: 'Tu portafolio' },
-        { id: 'secondary-market', label: '⚡ Mercado Secundario',  emoji: '🔀', description: 'Trading P2P', badge: 'P2P' },
         { id: 'label-dashboard',  label: '⊞ Business Dashboard',   emoji: '🏢', description: 'Business Metrics' },
+        { id: 'secondary-market', label: '⚡ Premium Assets',      emoji: '🔀', description: 'Trading P2P', badge: 'P2P' },
         { id: 'como-funciona',    label: '❓ Cómo Funciona',       emoji: '💡', description: 'Aprende más' },
     ];
 
