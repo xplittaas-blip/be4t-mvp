@@ -271,6 +271,77 @@ const StickyWaitlistCTA = ({ onOpenModal }) => {
     );
 };
 
+// ── LiveActivity Ticker ────────────────────────────────────────────────────────
+const LiveActivityTicker = () => {
+    const [msg, setMsg] = useState('');
+    const [visible, setVisible] = useState(false);
+    
+    useEffect(() => {
+        const messages = [
+            'Nueva oferta en Mercado Secundario',
+            'Inversión reciente: 10 tokens de Feid',
+            'Inversión reciente: 50 tokens de Bad Bunny',
+            'Activo "LUNA" acaba de pagar yield',
+            'Inversión reciente: 25 tokens de Shakira',
+            'Nueva canción listada en Premium Assets',
+            'Recompra exitosa por Label (+10%)'
+        ];
+        
+        let TO;
+        const tick = () => {
+            const random = messages[Math.floor(Math.random() * messages.length)];
+            setMsg(random);
+            setVisible(true);
+            TO = setTimeout(() => {
+                setVisible(false);
+            }, 5000);
+        };
+        
+        const init = setTimeout(tick, 2000);
+        const interval = setInterval(tick, 16000);
+        return () => { clearTimeout(init); clearTimeout(TO); clearInterval(interval); };
+    }, []);
+
+    return (
+        <div className="live-ticker" style={{
+            position: 'fixed',
+            bottom: '2rem',
+            left: '2rem',
+            zIndex: 800,
+            transform: visible ? 'translateY(0) scale(1)' : 'translateY(20px) scale(0.95)',
+            opacity: visible ? 1 : 0,
+            transition: 'all 0.5s cubic-bezier(0.34,1.56,0.64,1)',
+            pointerEvents: 'none',
+        }}>
+            <div style={{
+                background: 'rgba(15,15,20,0.85)',
+                backdropFilter: 'blur(12px)',
+                WebkitBackdropFilter: 'blur(12px)',
+                border: '1px solid rgba(255,255,255,0.08)',
+                borderRadius: '8px',
+                padding: '0.6rem 1rem',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.6rem',
+                boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
+            }}>
+                <span style={{ fontSize: '0.9rem' }}>🔔</span>
+                <span style={{ fontSize: '0.75rem', fontWeight: '600', color: 'rgba(255,255,255,0.9)', letterSpacing: '0.5px' }}>
+                    {msg}
+                </span>
+            </div>
+            <style>{`
+                @media (max-width: 768px) {
+                    .live-ticker {
+                        left: 1rem !important;
+                        bottom: 6rem !important;
+                    }
+                }
+            `}</style>
+        </div>
+    );
+};
+
 // ── Sort functions ────────────────────────────────────────────────────────────
 const SORT_FNS = {
     roi:       (a, b) => (b.roi_est || 0)            - (a.roi_est || 0),
@@ -512,6 +583,9 @@ const Marketplace = ({ session, onNavigate }) => {
 
             {/* ── Sticky mobile waitlist pill ── Hide in showcase playground ── */}
             {!isShowcase && <StickyWaitlistCTA onOpenModal={() => setWaitlistOpen(true)} />}
+
+            {/* ── Live Activity Ticker ── Social Proof Sim ── */}
+            <LiveActivityTicker />
 
             {/* ── Early Access Modal ── Hide in showcase playground ── */}
             {!isShowcase && <EarlyAccessModal isOpen={waitlistOpen} onClose={() => setWaitlistOpen(false)} />}

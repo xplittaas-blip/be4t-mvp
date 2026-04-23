@@ -104,13 +104,15 @@ export const SongCardSkeleton = () => (
 
 // ── Tokens Availability Bar ────────────────────────────────────────────────────
 const TokenBar = ({ available, total }) => {
-    const pct        = total > 0 ? (available / total) * 100 : 0;
-    const isLow      = pct < 20;
-    const isMid      = pct >= 20 && pct < 50;
-    const barColor   = isLow  ? '#f97316'  // orange — scarcity
-                     : isMid  ? '#eab308'  // yellow — limited
-                     :          '#10b981'; // green — available
-    const textColor  = isLow  ? '#fb923c' : isMid ? '#fbbf24' : 'rgba(255,255,255,0.45)';
+    const pct        = Math.max(0, Math.min(100, total > 0 ? (available / total) * 100 : 0));
+    const isScarce   = pct < 15;
+    const isLow      = pct >= 15 && pct < 30;
+    const isMid      = pct >= 30 && pct < 50;
+    const barColor   = isScarce ? '#ff4500'  // neon orange — scarcity
+                     : isLow    ? '#f97316'  // orange
+                     : isMid    ? '#eab308'  // yellow
+                     :          '#10b981';   // green
+    const textColor  = isScarce ? '#ff4500' : isLow ? '#fb923c' : isMid ? '#fbbf24' : 'rgba(255,255,255,0.45)';
 
     return (
         <div>
@@ -118,10 +120,12 @@ const TokenBar = ({ available, total }) => {
                 <span style={{ fontSize: '0.58rem', color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.9px', fontWeight: '600' }}>
                     Tokens Disponibles
                 </span>
-                <span style={{ fontSize: '0.72rem', fontWeight: '800', color: textColor, letterSpacing: '-0.02em' }}>
+                <span style={{ fontSize: '0.72rem', fontWeight: '800', color: textColor, letterSpacing: '-0.02em', display: 'flex', alignItems: 'center' }}>
                     {fmt(available)}
-                    <span style={{ color: 'rgba(255,255,255,0.2)', fontWeight: '400', fontSize: '0.62rem' }}> / {fmt(total)}</span>
-                    {isLow && <span style={{ marginLeft: '4px', fontSize: '0.55rem', color: '#f97316', fontWeight: '800', letterSpacing: '0.5px' }}>CASI AGOTADO</span>}
+                    <span style={{ color: 'rgba(255,255,255,0.2)', fontWeight: '400', fontSize: '0.62rem', margin: '0 4px' }}>/ {fmt(total)}</span>
+                    {isScarce && (
+                        <span style={{ background: 'rgba(255,69,0,0.1)', padding: '1px 4px', borderRadius: '4px', fontSize: '0.55rem', color: '#ff4500', fontWeight: '900', letterSpacing: '0.5px', textShadow: '0 0 8px rgba(255,69,0,0.5)', animation: 'be4t-scarcity-flash 1s infinite' }}>ÚLTIMAS UNIDADES</span>
+                    )}
                 </span>
             </div>
             {/* Progress bar */}
@@ -132,7 +136,7 @@ const TokenBar = ({ available, total }) => {
                     background: barColor,
                     borderRadius: '100px',
                     transition: 'width 0.6s ease',
-                    boxShadow: `0 0 6px ${barColor}88`,
+                    boxShadow: isScarce ? `0 0 12px ${barColor}` : `0 0 6px ${barColor}88`,
                 }} />
             </div>
         </div>
@@ -226,6 +230,9 @@ const SongCard = ({ song, userMode, index = 0, onDetailClick }) => {
     const availablePct = song.total_supply > 0 ? (song.tokens_available / song.total_supply) * 100 : 50;
     const isLowSupply  = availablePct < 20;
 
+    // Premium Asset Logic
+    const isPremiumAsset = song.apy >= 15 || song.risk_tier === 'BLUE_CHIP';
+
     return (
         <>
             <style>{`
@@ -239,17 +246,26 @@ const SongCard = ({ song, userMode, index = 0, onDetailClick }) => {
                 @keyframes be4t-scarcity-flash {
                     0%,100% { opacity: 1; } 50% { opacity: 0.6; }
                 }
+                @keyframes top-performer-glow {
+                    0%   { border-color: rgba(139,92,246,0.3); box-shadow: 0 0 15px rgba(139,92,246,0.1); }
+                    50%  { border-color: rgba(6,182,212,0.5);  box-shadow: 0 0 25px rgba(6,182,212,0.25); }
+                    100% { border-color: rgba(139,92,246,0.3); box-shadow: 0 0 15px rgba(139,92,246,0.1); }
+                }
+                .is-premium {
+                    animation: top-performer-glow 4s ease-in-out infinite alternate;
+                }
             `}</style>
 
             <div
                 id={`song-card-${song.id}`}
+                className={isPremiumAsset ? 'is-premium' : ''}
                 onMouseEnter={() => setHovered(true)}
                 onMouseLeave={() => setHovered(false)}
                 style={{
                     background: 'rgba(12,12,22,0.92)',
                     border: `1px solid ${hovered
                         ? (isLowSupply ? 'rgba(249,115,22,0.55)' : 'rgba(139,92,246,0.45)')
-                        : 'rgba(255,255,255,0.07)'}`,
+                        : (isPremiumAsset ? 'transparent' : 'rgba(255,255,255,0.07)')}`,
                     borderRadius: '20px',
                     overflow: 'hidden',
                     display: 'flex',
@@ -310,11 +326,19 @@ const SongCard = ({ song, userMode, index = 0, onDetailClick }) => {
                                 BLUE CHIP
                             </span>
                         ) : (
-                            <span style={{ background: 'rgba(234,179,8,0.15)', border: '1px solid rgba(234,179,8,0.5)',
-                                borderRadius: '100px', padding: '3px 9px', fontSize: '0.58rem', fontWeight: '800',
-                                color: '#fbbf24', letterSpacing: '0.8px', fontFamily: "'Courier New', monospace" }}>
-                                EMERGING
-                            </span>
+                            isPremiumAsset ? (
+                                <span style={{ background: 'linear-gradient(90deg, rgba(139,92,246,0.8), rgba(6,182,212,0.8))', border: '1px solid rgba(255,255,255,0.3)',
+                                    borderRadius: '100px', padding: '3px 9px', fontSize: '0.58rem', fontWeight: '800',
+                                    color: 'white', letterSpacing: '0.8px', boxShadow: '0 0 10px rgba(139,92,246,0.5)' }}>
+                                    TOP PERFORMER
+                                </span>
+                            ) : (
+                                <span style={{ background: 'rgba(234,179,8,0.15)', border: '1px solid rgba(234,179,8,0.5)',
+                                    borderRadius: '100px', padding: '3px 9px', fontSize: '0.58rem', fontWeight: '800',
+                                    color: '#fbbf24', letterSpacing: '0.8px', fontFamily: "'Courier New', monospace" }}>
+                                    EMERGING
+                                </span>
+                            )
                         )}
                         {song.is_trending && (
                             <span style={{ background: 'rgba(239,68,68,0.9)', borderRadius: '100px', padding: '3px 9px',
