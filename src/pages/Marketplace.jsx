@@ -343,7 +343,20 @@ const LiveActivityTicker = () => {
 };
 
 // ── Sort functions ────────────────────────────────────────────────────────────
+const getScarcityScore = (song) => {
+    const availablePct = song.total_supply > 0 ? (song.tokens_available / song.total_supply) * 100 : 50;
+    if (availablePct < 15) return 100; // ÚLTIMAS UNIDADES
+    if (song.apy >= 15 || song.risk_tier === 'BLUE_CHIP') return 50; // TOP PERFORMER
+    return 0; // Regular
+};
+
 const SORT_FNS = {
+    hot:       (a, b) => {
+        const scoreA = getScarcityScore(a);
+        const scoreB = getScarcityScore(b);
+        if (scoreA !== scoreB) return scoreB - scoreA;
+        return (b.roi_est || 0) - (a.roi_est || 0); // Empate -> Mayor ROI
+    },
     roi:       (a, b) => (b.roi_est || 0)            - (a.roi_est || 0),
     streams:   (a, b) => (b.spotify_streams || 0)    - (a.spotify_streams || 0),
     price_asc: (a, b) => (a.price || 0)              - (b.price || 0),
@@ -365,7 +378,7 @@ const Marketplace = ({ session, onNavigate }) => {
     const [activeTab, setActiveTab]       = useState('primary'); // 'primary' | 'secondary'
     const [userMode, setUserMode]         = useState('fan');
     const [searchQuery, setSearchQuery]   = useState('');
-    const [sortBy, setSortBy]             = useState('roi');
+    const [sortBy, setSortBy]             = useState('hot');
     const [genreFilter, setGenreFilter]   = useState('all'); // 'all' | 'reggaeton' | 'rock'
     const [rawAssets, setRawAssets]       = useState([]);
     const [isLoading, setIsLoading]       = useState(true);
@@ -507,6 +520,7 @@ const Marketplace = ({ session, onNavigate }) => {
                                 <option value="rock">🎸 Rock</option>
                             </select>
                             <select value={sortBy} onChange={e => setSortBy(e.target.value)} style={SELECT_STYLE}>
+                                <option value="hot">🔥 Destacados (Hot)</option>
                                 <option value="roi">Mayor ROI</option>
                                 <option value="growth">Mayor crecimiento</option>
                                 <option value="price_asc">Precio menor</option>
