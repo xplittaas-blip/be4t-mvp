@@ -14,6 +14,7 @@ import LabelDashboard from './pages/LabelDashboard';
 import SecondaryMarket from './pages/SecondaryMarket';
 import { supabase } from './core/xplit/supabaseClient';
 import { useUserRole } from './hooks/useUserRole';
+import { useWalletSync } from './hooks/useWalletSync';
 import { isShowcase } from './core/env';
 
 // ── Lazy pages ────────────────────────────────────────────────────────────────
@@ -393,6 +394,13 @@ function App() {
     // ── Role detection ────────────────────────────────────────────────────────
     const { isAdmin, role: userRole } = useUserRole(session);
 
+    // ── Wallet Sync (Thirdweb ↔ Supabase bridge) ──────────────────────────────
+    // walletAddress is the canonical 0x identity used for the balance ledger
+    const { walletAddress, isSynced: isWalletSynced } = useWalletSync(session);
+
+    // Auth is valid when Supabase session OR Thirdweb wallet is present
+    const isAuthenticated = !!(session || walletAddress);
+
     // ── Auth ─────────────────────────────────────────────────────────────────
     useEffect(() => {
         supabase.auth.getSession().then(({ data: { session } }) => setSession(session));
@@ -457,7 +465,7 @@ function App() {
             <main>
                 {/* Explorar: Marketplace with Spotify Top 20 */}
                 {currentPage === 'explore' && (
-                    <Marketplace session={session} onNavigate={navigate} />
+                    <Marketplace session={session} walletAddress={walletAddress} onNavigate={navigate} />
                 )}
 
                 {/* Song Detail: Full-page view */}
@@ -465,8 +473,9 @@ function App() {
                     <SongDetail
                         songId={activeSongId}
                         songData={activeSong}
-                        isAuthenticated={!!session}
+                        isAuthenticated={isAuthenticated}
                         session={session}
+                        walletAddress={walletAddress}
                         onBack={() => navigate('explore')}
                         onRequireAuth={() => setShowAuthModal(true)}
                     />
@@ -474,17 +483,17 @@ function App() {
 
                 {/* Mis Canciones: Portfolio / Dashboard */}
                 {currentPage === 'mis-canciones' && (
-                    <Portfolio session={session} onNavigate={setCurrentPage} />
+                    <Portfolio session={session} walletAddress={walletAddress} onNavigate={setCurrentPage} />
                 )}
 
                 {/* Business Dashboard: B2B metrics */}
                 {currentPage === 'label-dashboard' && (
-                    <LabelDashboard session={session} onNavigate={setCurrentPage} />
+                    <LabelDashboard session={session} walletAddress={walletAddress} onNavigate={setCurrentPage} />
                 )}
 
                 {/* Secondary Market: P2P token trading */}
                 {currentPage === 'secondary-market' && (
-                    <SecondaryMarket session={session} onNavigate={setCurrentPage} onRequireAuth={() => setShowAuthModal(true)} />
+                    <SecondaryMarket session={session} walletAddress={walletAddress} onNavigate={setCurrentPage} onRequireAuth={() => setShowAuthModal(true)} />
                 )}
 
                 {/* Perfil: User settings */}

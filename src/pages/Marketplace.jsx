@@ -374,7 +374,7 @@ const SELECT_STYLE = {
 // ── Marketplace ───────────────────────────────────────────────────────────────
 import { useDemoBalance } from '../hooks/useDemoBalance';
 
-const Marketplace = ({ session, onNavigate }) => {
+const Marketplace = ({ session, walletAddress, onNavigate }) => {
     const [activeTab, setActiveTab]       = useState('primary'); // 'primary' | 'secondary'
     const [userMode, setUserMode]         = useState('fan');
     const [searchQuery, setSearchQuery]   = useState('');
@@ -388,7 +388,7 @@ const Marketplace = ({ session, onNavigate }) => {
     const [waitlistOpen, setWaitlistOpen] = useState(false);
 
     // ── Load 20 songs directly from Spotify (no Supabase for demo) ────────
-    const { portfolio: localPortfolio } = useDemoBalance(session?.user?.id);
+    const { portfolio: localPortfolio } = useDemoBalance(walletAddress);
 
     useEffect(() => {
         const load = async () => {

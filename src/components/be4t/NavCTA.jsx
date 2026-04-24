@@ -23,7 +23,6 @@
 
 import React, { useState, lazy, Suspense } from 'react';
 import {
-    ThirdwebProvider,
     ConnectButton,
     useActiveAccount,
     useActiveWallet,
@@ -31,18 +30,14 @@ import {
     useDisconnect,
     useWalletBalance,
 } from 'thirdweb/react';
-import { inAppWallet } from 'thirdweb/wallets';
-import { baseSepolia } from 'thirdweb/chains';
-import { client } from '../../core/thirdwebClient';
 import { isShowcase, isProduction } from '../../core/env';
+import { client, wallets, activeChain } from '../../core/thirdwebClient';
 import { useDemoBalance } from '../../hooks/useDemoBalance';
 
 // Lazy-load PayModal for production
 const ThirdwebPayModal = isProduction
     ? lazy(() => import('./ThirdwebPayModal'))
     : null;
-
-const wallets = [inAppWallet({ auth: { options: ['google', 'email'] } })];
 
 const formatUSD = (n) =>
     new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n);
@@ -64,14 +59,14 @@ function NavCTAInner({ session, onNavigate, onLoginClick }) {
     const wallet  = useActiveWallet();
     const { disconnect } = useDisconnect();
     const { data: profiles } = useProfiles({ client });
-    const { balance: demoBalance } = useDemoBalance(session?.user?.id);
+    const { balance: demoBalance } = useDemoBalance(account?.address);
     const [showPay, setShowPay] = useState(false);
     const [walletMenuOpen, setWalletMenuOpen] = useState(false);
 
     // Real ETH balance on Base Sepolia (production only)
     const { data: ethBalance } = useWalletBalance({
         client,
-        chain: baseSepolia,
+        chain: activeChain,
         address: account?.address,
     });
 
@@ -95,7 +90,7 @@ function NavCTAInner({ session, onNavigate, onLoginClick }) {
             <ConnectButton
                 client={client}
                 wallets={wallets}
-                chain={baseSepolia}
+                chain={activeChain}
                 connectButton={{
                     label: 'Acceso Anticipado',
                     style: {
@@ -269,15 +264,13 @@ function NavCTAInner({ session, onNavigate, onLoginClick }) {
     );
 }
 
-// ── Root with ThirdwebProvider ────────────────────────────────────────────────
+// ── Root: no longer needs its own ThirdwebProvider (global in main.jsx) ─────
 export default function NavCTA({ session, onNavigate, onLoginClick }) {
     return (
-        <ThirdwebProvider>
-            <NavCTAInner
-                session={session}
-                onNavigate={onNavigate}
-                onLoginClick={onLoginClick}
-            />
-        </ThirdwebProvider>
+        <NavCTAInner
+            session={session}
+            onNavigate={onNavigate}
+            onLoginClick={onLoginClick}
+        />
     );
 }

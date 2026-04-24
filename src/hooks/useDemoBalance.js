@@ -1,219 +1,208 @@
 /**
- * useDemoBalance — BE4T Ghost Balance System (v5-Ledger)
+ * useDemoBalance — BE4T Ledger System (v6 — Wallet-Anchored)
  * ─────────────────────────────────────────────────────────────────────────────
- * Atomic ledger based simulation. Balance is calculated dynamically from an 
- * append-only transaction history rather than a static Number.
- * 
- * Supports user-isolation via `userId`.
+ * Balance is now anchored to a wallet address (0x...) instead of a Supabase UUID.
+ * This enables true Web3 identity — same wallet, same balance, any device.
+ *
+ * Identity hierarchy:
+ *   walletAddress (0x...)  ← PRIMARY (from Thirdweb inAppWallet)
+ *   userId (UUID)          ← FALLBACK only if walletAddress is null (legacy)
+ *
+ * API:
+ *   const { balance, acquire, acquired, portfolio, history, reset } = useDemoBalance(walletAddress);
+ *
+ * Balance Formula (Atomic Ledger):
+ *   INITIAL_BALANCE - SUM(COMPRA) + SUM(REFUND | VENTA_P2P | REGALIA)
  */
 
 import { useState, useCallback, useEffect, useMemo } from 'react';
 import { isShowcase } from '../core/env';
 
 const INITIAL_BALANCE = 50_000;
+const GLOBAL_LABEL_LEDGER = 'be4t_demo_label_ledger';
 
-export function useDemoBalance(userId = null) {
-    const GLOBAL_LABEL_LEDGER  = `be4t_demo_label_ledger`;
-    const getAcquiredKey = () => userId ? `be4t_demo_acquired_${userId}` : null;
-    const getHistoryKey  = () => userId ? `be4t_demo_history_${userId}`  : null;
+// ── Storage key derivation ────────────────────────────────────────────────────
+// Normalize key: strip '0x' prefix, lowercase for consistency
+function normalizeAddr(addr) {
+    if (!addr) return null;
+    return addr.toLowerCase().replace(/^0x/, '');
+}
 
-    // ── Loaders ──
-    const [acquiredMap, setAcquiredMap] = useState(() => {
-        if (!userId) return {};
-        try {
-            const v = localStorage.getItem(getAcquiredKey());
-            return v ? JSON.parse(v) : {};
-        } catch { return {}; }
-    });
+function getKeys(walletAddress) {
+    const key = normalizeAddr(walletAddress);
+    if (!key) return { acquiredKey: null, historyKey: null };
+    return {
+        acquiredKey: `be4t_demo_acquired_${key}`,
+        historyKey:  `be4t_demo_history_${key}`,
+    };
+}
 
-    const [history, setHistory] = useState(() => {
-        if (!userId) return [];
-        try {
-            const v = localStorage.getItem(getHistoryKey());
-            return v ? JSON.parse(v) : [];
-        } catch { return []; }
-    });
+// ── LocalStorage helpers ──────────────────────────────────────────────────────
+function loadJSON(key, fallback) {
+    if (!key) return fallback;
+    try {
+        const v = localStorage.getItem(key);
+        return v ? JSON.parse(v) : fallback;
+    } catch { return fallback; }
+}
 
-    const [labelLedger, setLabelLedger] = useState(() => {
-        try {
-            const v = localStorage.getItem(GLOBAL_LABEL_LEDGER);
-            return v ? JSON.parse(v) : { gross_capital: 0, reserve_inventory: 0 };
-        } catch {
-            return { gross_capital: 0, reserve_inventory: 0 };
-        }
-    });
+function saveJSON(key, value) {
+    if (!key || !isShowcase) return;
+    try { localStorage.setItem(key, JSON.stringify(value)); } catch {}
+}
 
-    // ── Re-sync on userId change ──
+// ── Main Hook ─────────────────────────────────────────────────────────────────
+export function useDemoBalance(walletAddress = null) {
+    const { acquiredKey, historyKey } = getKeys(walletAddress);
+
+    // ── State ──
+    const [acquiredMap, setAcquiredMap] = useState(() => loadJSON(acquiredKey, {}));
+    const [history,     setHistory]     = useState(() => loadJSON(historyKey, []));
+    const [labelLedger, setLabelLedger] = useState(() => loadJSON(GLOBAL_LABEL_LEDGER, { gross_capital: 0, reserve_inventory: 0 }));
+
+    // ── Re-sync when wallet changes ───────────────────────────────────────────
     useEffect(() => {
-        if (!userId) {
+        if (!walletAddress) {
             setAcquiredMap({});
             setHistory([]);
             return;
         }
-        try {
-            const acq = localStorage.getItem(getAcquiredKey());
-            const hist = localStorage.getItem(getHistoryKey());
-            setAcquiredMap(acq ? JSON.parse(acq) : {});
-            setHistory(hist ? JSON.parse(hist) : []);
-        } catch {}
-    }, [userId]);
+        const { acquiredKey: ak, historyKey: hk } = getKeys(walletAddress);
+        setAcquiredMap(loadJSON(ak, {}));
+        setHistory(loadJSON(hk, []));
+    }, [walletAddress]);
 
-    // ── Persist ──
-    useEffect(() => {
-        if (!isShowcase || !userId) return;
-        localStorage.setItem(getAcquiredKey(), JSON.stringify(acquiredMap));
-    }, [acquiredMap, userId]);
+    // ── Persist on change ─────────────────────────────────────────────────────
+    useEffect(() => { saveJSON(acquiredKey, acquiredMap); }, [acquiredKey, acquiredMap]);
+    useEffect(() => { saveJSON(historyKey, history); },     [historyKey, history]);
+    useEffect(() => { saveJSON(GLOBAL_LABEL_LEDGER, labelLedger); }, [labelLedger]);
 
-    useEffect(() => {
-        if (!isShowcase || !userId) return;
-        localStorage.setItem(getHistoryKey(), JSON.stringify(history));
-    }, [history, userId]);
-
-    useEffect(() => {
-        if (!isShowcase) return;
-        localStorage.setItem(GLOBAL_LABEL_LEDGER, JSON.stringify(labelLedger));
-    }, [labelLedger]);
-
-    // ── Ledger Calculation ──
+    // ── Atomic balance calculation (the Ledger) ───────────────────────────────
     const balance = useMemo(() => {
-        if (!userId) return 0; // Require login
-        
+        if (!walletAddress) return 0; // No wallet = no balance shown
         let bal = INITIAL_BALANCE;
         for (const tx of history) {
-            if (tx.type === 'COMPRA') bal -= tx.amount;
-            if (tx.type === 'VENTA_P2P' || tx.type === 'REFUND') bal += tx.amount;
-            if (tx.type === 'REGALIA') bal += tx.amount;
+            if (tx.type === 'COMPRA')                             bal -= tx.amount;
+            if (['REFUND', 'VENTA_P2P', 'REGALIA'].includes(tx.type)) bal += tx.amount;
         }
         return parseFloat(bal.toFixed(2));
-    }, [userId, history]);
+    }, [walletAddress, history]);
 
-    /**
-     * acquire (Buy from Primary or Secondary Market)
-     */
+    // ── acquire ───────────────────────────────────────────────────────────────
     const acquire = useCallback((songId, cost, fractions = 1, songMeta = {}) => {
-        if (!isShowcase) return { ok: false, reason: 'not-showcase' };
-        if (!userId) return { ok: false, reason: 'not-authenticated' };
-        if (cost <= 0) return { ok: false, reason: 'invalid-cost' };
-
-        if (balance < cost) {
-            return { ok: false, reason: 'insufficient', balance, needed: cost };
-        }
+        if (!isShowcase)      return { ok: false, reason: 'not-showcase' };
+        if (!walletAddress)   return { ok: false, reason: 'no-wallet' };
+        if (cost <= 0)        return { ok: false, reason: 'invalid-cost' };
+        if (balance < cost)   return { ok: false, reason: 'insufficient', balance, needed: cost };
 
         const costFloat = parseFloat(cost.toFixed(2));
 
-        // 1. History Log
+        // 1. Log transaction
         setHistory(prev => [
             ...prev,
-            { type: 'COMPRA', amount: costFloat, assetId: songId, assetName: songMeta.name || 'Canción', date: Date.now() }
+            {
+                type:      'COMPRA',
+                amount:    costFloat,
+                assetId:   songId,
+                assetName: songMeta.name || 'Canción',
+                date:      Date.now(),
+            },
         ]);
 
-        // 2. Acquired Map
+        // 2. Update portfolio map
         setAcquiredMap(prev => {
-            const existing = prev[songId] || {};
+            const ex = prev[songId] || {};
             return {
                 ...prev,
                 [songId]: {
-                    ...existing,
-                    fractions:    (existing.fractions || 0) + fractions,
-                    cost:         parseFloat(((existing.cost || 0) + cost).toFixed(2)),
-                    acquiredAt:   existing.acquiredAt || Date.now(),
-                    lastAddedAt:  Date.now(),
-                    isListed:     false,
-                    name:         songMeta.name || existing.name || 'Canción',
-                    artist:       songMeta.artist || existing.artist || 'Artista',
-                    tokenPrice:   songMeta.tokenPrice || existing.tokenPrice || 0,
-                    totalSupply:  songMeta.totalSupply || existing.totalSupply || 1000,
-                    apy:          songMeta.apy || existing.apy || 12,
-                    spotifyStreams: songMeta.spotifyStreams || existing.spotifyStreams || 0,
-                    coverUrl:     songMeta.coverUrl || existing.coverUrl || null,
+                    ...ex,
+                    fractions:     (ex.fractions || 0) + fractions,
+                    cost:          parseFloat(((ex.cost || 0) + cost).toFixed(2)),
+                    acquiredAt:    ex.acquiredAt || Date.now(),
+                    lastAddedAt:   Date.now(),
+                    isListed:      false,
+                    name:          songMeta.name        || ex.name        || 'Canción',
+                    artist:        songMeta.artist      || ex.artist      || 'Artista',
+                    tokenPrice:    songMeta.tokenPrice  || ex.tokenPrice  || 0,
+                    totalSupply:   songMeta.totalSupply || ex.totalSupply || 1000,
+                    apy:           songMeta.apy         || ex.apy         || 12,
+                    spotifyStreams: songMeta.spotifyStreams || ex.spotifyStreams || 0,
+                    coverUrl:      songMeta.coverUrl    || ex.coverUrl    || null,
                 },
             };
         });
 
-        // 3. Update Label Ledger
+        // 3. Label ledger (primary market only)
         if (!String(songId).endsWith('-p2p')) {
             setLabelLedger(prev => ({
                 ...prev,
-                gross_capital: parseFloat((prev.gross_capital + costFloat).toFixed(2))
+                gross_capital: parseFloat((prev.gross_capital + costFloat).toFixed(2)),
             }));
         }
 
         return { ok: true, newBalance: parseFloat((balance - costFloat).toFixed(2)) };
-    }, [balance, userId]);
+    }, [balance, walletAddress]);
 
+    // ── acquired ──────────────────────────────────────────────────────────────
     const acquired = useCallback((songId) => {
         const entry = acquiredMap[songId];
         return entry ? { acquired: true, ...entry } : false;
     }, [acquiredMap]);
 
+    // ── reset ─────────────────────────────────────────────────────────────────
     const reset = useCallback(() => {
-        if (!userId) return;
+        if (!walletAddress) return;
         setHistory([]);
         setAcquiredMap({});
-        // We leave Label Ledger intact or reset it? Let's leave it for global demo.
-    }, [userId]);
+    }, [walletAddress]);
 
-    /** Sell back immediately to Label at a 10% discount */
+    // ── instantExit ───────────────────────────────────────────────────────────
     const instantExit = useCallback((songId) => {
         setAcquiredMap(prev => {
             const entry = prev[songId];
             if (!entry || entry.isListed || entry.exited) return prev;
-            
+
             const refund = parseFloat((entry.cost * 0.9).toFixed(2));
-            
-            // 1. History Log
+
             setHistory(h => [
                 ...h,
-                { type: 'REFUND', amount: refund, assetId: songId, assetName: entry.name, date: Date.now() }
+                { type: 'REFUND', amount: refund, assetId: songId, assetName: entry.name, date: Date.now() },
             ]);
-            
-            // 2. Label Ledger
+
             setLabelLedger(ledge => ({
                 ...ledge,
-                gross_capital: Math.max(0, parseFloat((ledge.gross_capital - refund).toFixed(2))),
-                reserve_inventory: ledge.reserve_inventory + entry.fractions
+                gross_capital:     Math.max(0, parseFloat((ledge.gross_capital - refund).toFixed(2))),
+                reserve_inventory: ledge.reserve_inventory + entry.fractions,
             }));
 
-            return {
-                ...prev,
-                [songId]: { ...entry, exited: true }
-            };
+            return { ...prev, [songId]: { ...entry, exited: true } };
         });
-    }, [userId]);
+    }, [walletAddress]);
 
-    /** List token on P2P market */
+    // ── listOnMarket ──────────────────────────────────────────────────────────
     const listOnMarket = useCallback((songId, listPrice) => {
         setAcquiredMap(prev => {
             if (!prev[songId] || prev[songId].exited) return prev;
-            return {
-                ...prev,
-                [songId]: { ...prev[songId], isListed: true, listPrice: parseFloat(listPrice) }
-            };
+            return { ...prev, [songId]: { ...prev[songId], isListed: true, listPrice: parseFloat(listPrice) } };
         });
     }, []);
 
-    /** Cancel P2P listing */
+    // ── unlistFromMarket ──────────────────────────────────────────────────────
     const unlistFromMarket = useCallback((songId) => {
         setAcquiredMap(prev => {
             if (!prev[songId]) return prev;
-            return {
-                ...prev,
-                [songId]: { ...prev[songId], isListed: false, listPrice: 0 }
-            };
+            return { ...prev, [songId]: { ...prev[songId], isListed: false, listPrice: 0 } };
         });
     }, []);
 
-    /** List all acquired songs with real-time ROI */
-    const portfolio = Object.entries(acquiredMap).map(([id, data]) => {
-        const now = Date.now();
+    // ── portfolio (computed) ──────────────────────────────────────────────────
+    const portfolio = useMemo(() => Object.entries(acquiredMap).map(([id, data]) => {
+        const now          = Date.now();
         const secondsSince = (now - (data.acquiredAt || now)) / 1000;
         const apyDecimal   = (data.apy || 12) / 100;
         const cost         = data.cost || 0;
-        
-        const earnedToDate = (cost * apyDecimal / 31536000) * secondsSince;
-        const ownershipPct = (data.totalSupply > 0)
-            ? (data.fractions / data.totalSupply) * 100
-            : 0;
+        const earnedToDate = (cost * apyDecimal / 31_536_000) * secondsSince;
+        const ownershipPct = data.totalSupply > 0 ? (data.fractions / data.totalSupply) * 100 : 0;
 
         return {
             id,
@@ -221,7 +210,7 @@ export function useDemoBalance(userId = null) {
             earnedToDate: parseFloat(earnedToDate.toFixed(4)),
             ownershipPct: parseFloat(ownershipPct.toFixed(4)),
         };
-    });
+    }), [acquiredMap]);
 
     return {
         balance,
@@ -237,6 +226,9 @@ export function useDemoBalance(userId = null) {
         unlistFromMarket,
         hasBalance: (cost) => balance >= cost,
         isDemo: isShowcase,
+        // Identity info
+        walletAddress,
+        isWalletConnected: !!walletAddress,
     };
 }
 

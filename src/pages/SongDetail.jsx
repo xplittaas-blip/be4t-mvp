@@ -16,6 +16,7 @@ import './SongDetail.css';
 import { lazy, Suspense } from 'react';
 import { isProduction, isShowcase } from '../core/env';
 import { useDemoBalance } from '../hooks/useDemoBalance';
+import { useActiveAccount } from 'thirdweb/react';
 import ConfettiBlast from '../components/be4t/ConfettiBlast';
 const AcquisitionModal = lazy(() => import('../components/be4t/AcquisitionModal'));
 
@@ -296,7 +297,7 @@ const ReturnCalculator = ({ streamCount, roiEst, isTrending, paymentFreq = 'mont
 };
 
 // ── Main SongDetail ───────────────────────────────────────────────────────────────
-const SongDetail = ({ onBack, songId, songData, onRequireAuth, isAuthenticated, session, onInvest }) => {
+const SongDetail = ({ onBack, songId, songData, onRequireAuth, isAuthenticated, session, walletAddress, onInvest }) => {
     const { t: tSong } = useTranslation('song');
     const { t: tCalc } = useTranslation('calculator');
 
@@ -312,8 +313,11 @@ const SongDetail = ({ onBack, songId, songData, onRequireAuth, isAuthenticated, 
     // Exact investment amount from the ReturnCalculator slider (USD)
     const [calcAmount, setCalcAmount] = useState(250); // default matches RC initial state
 
-    // Demo balance — only meaningful in showcase
-    const { balance, acquire, acquired: isAcquired, hasBalance } = useDemoBalance(session?.user?.id);
+    // Demo balance — anchored to wallet address (0x)
+    const { balance, acquire, acquired: isAcquired, hasBalance } = useDemoBalance(walletAddress);
+    // Is the wallet available? Used for Auth Guard 2.0
+    const account = useActiveAccount();
+    const isWalletPending = isAuthenticated && !walletAddress && !account;
 
 
     const { playTrack, togglePlay, currentTrack, isPlaying: globalIsPlaying } = useGlobalPlayer();
@@ -447,7 +451,14 @@ const SongDetail = ({ onBack, songId, songData, onRequireAuth, isAuthenticated, 
     };
 
     const handleParticipate = () => {
+        // Auth Guard 2.0
         if (!isAuthenticated) { onRequireAuth(); return; }
+        // Wallet is being provisioned (Thirdweb inAppWallet still initializing)
+        if (isAuthenticated && !walletAddress && !account) {
+            // The ConnectButton in NavCTA will handle auto-connect on next interaction
+            onRequireAuth();
+            return;
+        }
         if (isProduction) {
             // Production: real blockchain flow via AcquisitionModal
             setShowAcquisitionModal(true);
