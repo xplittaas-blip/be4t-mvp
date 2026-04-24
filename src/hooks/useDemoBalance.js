@@ -1,28 +1,29 @@
 /**
- * useDemoBalance — BE4T Ledger System (v6 — Wallet-Anchored)
+ * useDemoBalance — BE4T Ledger System (v7 — Hybrid Persistence)
  * ─────────────────────────────────────────────────────────────────────────────
- * Balance is now anchored to a wallet address (0x...) instead of a Supabase UUID.
- * This enables true Web3 identity — same wallet, same balance, any device.
+ * Balance is anchored to a wallet address (0x...).
  *
- * Identity hierarchy:
- *   walletAddress (0x...)  ← PRIMARY (from Thirdweb inAppWallet)
- *   userId (UUID)          ← FALLBACK only if walletAddress is null (legacy)
+ * Persistence Strategy (Layered):
+ *   1. Supabase `user_assets` table — PRIMARY when isSupabaseReady + walletAddress
+ *   2. localStorage                 — FALLBACK / CACHE (always written)
+ *   3. In-memory state              — always reactive
  *
- * API:
- *   const { balance, acquire, acquired, portfolio, history, reset } = useDemoBalance(walletAddress);
+ * This means demo users who sign in with Google get REAL persistence:
+ * their portfolio survives cache clears, incognito sessions, and device changes.
  *
  * Balance Formula (Atomic Ledger):
  *   INITIAL_BALANCE - SUM(COMPRA) + SUM(REFUND | VENTA_P2P | REGALIA)
  */
 
-import { useState, useCallback, useEffect, useMemo } from 'react';
+import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import { isShowcase } from '../core/env';
+import { supabase, isSupabaseReady } from '../core/xplit/supabaseClient';
 
-const INITIAL_BALANCE = 50_000;
+const INITIAL_BALANCE   = 50_000;
 const GLOBAL_LABEL_LEDGER = 'be4t_demo_label_ledger';
+const SUPABASE_DEBOUNCE_MS = 1500; // Batch writes to Supabase
 
-// ── Storage key derivation ────────────────────────────────────────────────────
-// Normalize key: strip '0x' prefix, lowercase for consistency
+// ── Address normalization ─────────────────────────────────────────────────────
 function normalizeAddr(addr) {
     if (!addr) return null;
     return addr.toLowerCase().replace(/^0x/, '');
@@ -47,69 +48,138 @@ function loadJSON(key, fallback) {
 }
 
 function saveJSON(key, value) {
-    if (!key || !isShowcase) return;
+    if (!key) return;
     try { localStorage.setItem(key, JSON.stringify(value)); } catch {}
+}
+
+// ── Supabase persistence ──────────────────────────────────────────────────────
+async function fetchFromSupabase(walletAddress) {
+    if (!isSupabaseReady || !walletAddress) return null;
+    try {
+        const { data, error } = await supabase
+            .from('user_assets')
+            .select('portfolio, history')
+            .eq('wallet_addr', walletAddress.toLowerCase())
+            .single();
+        if (error && error.code !== 'PGRST116') throw error; // PGRST116 = no rows
+        return data || null;
+    } catch (err) {
+        console.warn('[BE4T] Supabase fetch skipped:', err.message);
+        return null;
+    }
+}
+
+async function saveToSupabase(walletAddress, portfolio, history) {
+    if (!isSupabaseReady || !walletAddress) return;
+    try {
+        await supabase.from('user_assets').upsert(
+            { wallet_addr: walletAddress.toLowerCase(), portfolio, history, updated_at: new Date().toISOString() },
+            { onConflict: 'wallet_addr' }
+        );
+    } catch (err) {
+        console.warn('[BE4T] Supabase write skipped:', err.message);
+    }
 }
 
 // ── Main Hook ─────────────────────────────────────────────────────────────────
 export function useDemoBalance(walletAddress = null) {
     const { acquiredKey, historyKey } = getKeys(walletAddress);
 
-    // ── State ──
+    // State — initialized from localStorage (instant, no flicker)
     const [acquiredMap, setAcquiredMap] = useState(() => loadJSON(acquiredKey, {}));
     const [history,     setHistory]     = useState(() => loadJSON(historyKey, []));
     const [labelLedger, setLabelLedger] = useState(() => loadJSON(GLOBAL_LABEL_LEDGER, { gross_capital: 0, reserve_inventory: 0 }));
+    const [isLoaded,    setIsLoaded]    = useState(false); // true after Supabase load attempt
 
-    // ── Re-sync when wallet changes ───────────────────────────────────────────
+    // Debounce ref for batched Supabase writes
+    const supabaseTimer = useRef(null);
+
+    // ── Load from Supabase on wallet change (hydrate over localStorage) ────────
     useEffect(() => {
         if (!walletAddress) {
             setAcquiredMap({});
             setHistory([]);
+            setIsLoaded(true);
             return;
         }
+
+        // Immediately load from localStorage
         const { acquiredKey: ak, historyKey: hk } = getKeys(walletAddress);
         setAcquiredMap(loadJSON(ak, {}));
         setHistory(loadJSON(hk, []));
+
+        // Then hydrate from Supabase (may have more up-to-date data)
+        fetchFromSupabase(walletAddress).then(data => {
+            if (data) {
+                // Supabase wins if it has more history entries (more authoritative)
+                const localHistory = loadJSON(hk, []);
+                if (data.history && data.history.length >= localHistory.length) {
+                    setHistory(data.history);
+                    saveJSON(hk, data.history);
+                }
+                if (data.portfolio && Object.keys(data.portfolio).length >= Object.keys(loadJSON(ak, {})).length) {
+                    setAcquiredMap(data.portfolio);
+                    saveJSON(ak, data.portfolio);
+                }
+            }
+            setIsLoaded(true);
+        });
     }, [walletAddress]);
 
-    // ── Persist on change ─────────────────────────────────────────────────────
-    useEffect(() => { saveJSON(acquiredKey, acquiredMap); }, [acquiredKey, acquiredMap]);
-    useEffect(() => { saveJSON(historyKey, history); },     [historyKey, history]);
-    useEffect(() => { saveJSON(GLOBAL_LABEL_LEDGER, labelLedger); }, [labelLedger]);
+    // ── Persist changes: localStorage (instant) + Supabase (debounced) ─────────
+    useEffect(() => {
+        saveJSON(acquiredKey, acquiredMap);
+        // Debounced Supabase write
+        if (walletAddress && isLoaded) {
+            clearTimeout(supabaseTimer.current);
+            supabaseTimer.current = setTimeout(() => {
+                saveToSupabase(walletAddress, acquiredMap, history);
+            }, SUPABASE_DEBOUNCE_MS);
+        }
+    }, [acquiredKey, acquiredMap]);
 
-    // ── Atomic balance calculation (the Ledger) ───────────────────────────────
+    useEffect(() => {
+        saveJSON(historyKey, history);
+        if (walletAddress && isLoaded) {
+            clearTimeout(supabaseTimer.current);
+            supabaseTimer.current = setTimeout(() => {
+                saveToSupabase(walletAddress, acquiredMap, history);
+            }, SUPABASE_DEBOUNCE_MS);
+        }
+    }, [historyKey, history]);
+
+    useEffect(() => {
+        saveJSON(GLOBAL_LABEL_LEDGER, labelLedger);
+    }, [labelLedger]);
+
+    // Cleanup debounce on unmount
+    useEffect(() => () => clearTimeout(supabaseTimer.current), []);
+
+    // ── Atomic balance calculation ─────────────────────────────────────────────
     const balance = useMemo(() => {
-        if (!walletAddress) return 0; // No wallet = no balance shown
+        if (!walletAddress) return 0;
         let bal = INITIAL_BALANCE;
         for (const tx of history) {
-            if (tx.type === 'COMPRA')                             bal -= tx.amount;
-            if (['REFUND', 'VENTA_P2P', 'REGALIA'].includes(tx.type)) bal += tx.amount;
+            if (tx.type === 'COMPRA')                                      bal -= tx.amount;
+            if (['REFUND', 'VENTA_P2P', 'REGALIA'].includes(tx.type))     bal += tx.amount;
         }
         return parseFloat(bal.toFixed(2));
     }, [walletAddress, history]);
 
     // ── acquire ───────────────────────────────────────────────────────────────
     const acquire = useCallback((songId, cost, fractions = 1, songMeta = {}) => {
-        if (!isShowcase)      return { ok: false, reason: 'not-showcase' };
-        if (!walletAddress)   return { ok: false, reason: 'no-wallet' };
-        if (cost <= 0)        return { ok: false, reason: 'invalid-cost' };
-        if (balance < cost)   return { ok: false, reason: 'insufficient', balance, needed: cost };
+        if (!isShowcase)    return { ok: false, reason: 'not-showcase' };
+        if (!walletAddress) return { ok: false, reason: 'no-wallet' };
+        if (cost <= 0)      return { ok: false, reason: 'invalid-cost' };
+        if (balance < cost) return { ok: false, reason: 'insufficient', balance, needed: cost };
 
         const costFloat = parseFloat(cost.toFixed(2));
 
-        // 1. Log transaction
         setHistory(prev => [
             ...prev,
-            {
-                type:      'COMPRA',
-                amount:    costFloat,
-                assetId:   songId,
-                assetName: songMeta.name || 'Canción',
-                date:      Date.now(),
-            },
+            { type: 'COMPRA', amount: costFloat, assetId: songId, assetName: songMeta.name || 'Canción', date: Date.now() },
         ]);
 
-        // 2. Update portfolio map
         setAcquiredMap(prev => {
             const ex = prev[songId] || {};
             return {
@@ -132,7 +202,6 @@ export function useDemoBalance(walletAddress = null) {
             };
         });
 
-        // 3. Label ledger (primary market only)
         if (!String(songId).endsWith('-p2p')) {
             setLabelLedger(prev => ({
                 ...prev,
@@ -150,10 +219,15 @@ export function useDemoBalance(walletAddress = null) {
     }, [acquiredMap]);
 
     // ── reset ─────────────────────────────────────────────────────────────────
-    const reset = useCallback(() => {
+    const reset = useCallback(async () => {
         if (!walletAddress) return;
         setHistory([]);
         setAcquiredMap({});
+        if (isSupabaseReady) {
+            await supabase.from('user_assets')
+                .update({ portfolio: {}, history: [] })
+                .eq('wallet_addr', walletAddress.toLowerCase());
+        }
     }, [walletAddress]);
 
     // ── instantExit ───────────────────────────────────────────────────────────
@@ -225,10 +299,13 @@ export function useDemoBalance(walletAddress = null) {
         listOnMarket,
         unlistFromMarket,
         hasBalance: (cost) => balance >= cost,
-        isDemo: isShowcase,
-        // Identity info
+        // Identity
         walletAddress,
         isWalletConnected: !!walletAddress,
+        // Persistence state (useful for UI indicators)
+        isLoaded,
+        isPersisted: isSupabaseReady && !!walletAddress,
+        isDemo: isShowcase,
     };
 }
 
