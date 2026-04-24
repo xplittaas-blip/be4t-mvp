@@ -17,8 +17,9 @@ export const client = createThirdwebClient({
     clientId: THIRDWEB_CLIENT_ID || 'e96be70a9e07ba78c44a7eb82ae58d59',
 });
 
-// ── Chain: Base Sepolia for demo/testnet, Base Mainnet for production ─────────
-export const activeChain = isProduction ? base : baseSepolia;
+// ── Chain: Locked to Base Sepolia for MVP Phase 1 (Testnet) ─────────────────
+// Even in 'production' deployments, we use testnet until the real L2 launch.
+export const activeChain = baseSepolia;
 
 // ── Wallets: inAppWallet only (email + Google) — Account Abstraction ready ───
 // inAppWallet creates an invisible Smart Account for the user.
