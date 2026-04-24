@@ -387,8 +387,8 @@ function MarketStat({ label, value, color = 'white' }) {
 }
 
 // ── Main Page ─────────────────────────────────────────────────────────────────
-const SecondaryMarket = ({ onNavigate }) => {
-    const { balance, portfolio, acquire } = useDemoBalance();
+const SecondaryMarket = ({ session, onNavigate, onRequireAuth }) => {
+    const { balance, portfolio, acquire } = useDemoBalance(session?.user?.id);
     const [buyTarget, setBuyTarget]       = useState(null);
     const [successMsg, setSuccessMsg]     = useState('');
     const [sortBy, setSortBy]             = useState('premium');
@@ -583,7 +583,10 @@ const SecondaryMarket = ({ onNavigate }) => {
                 ) : (
                     <div className="sm-card-grid">
                         {allListings.map(listing => (
-                            <ListingCard key={listing.id} listing={listing} onBuy={setBuyTarget} />
+                            <ListingCard key={listing.id} listing={listing} onBuy={(l) => {
+                                if (!session) { onRequireAuth?.(); return; }
+                                setBuyTarget(l);
+                            }} />
                         ))}
                     </div>
                 )}

@@ -296,7 +296,7 @@ const ReturnCalculator = ({ streamCount, roiEst, isTrending, paymentFreq = 'mont
 };
 
 // ── Main SongDetail ───────────────────────────────────────────────────────────────
-const SongDetail = ({ onBack, songId, songData, onRequireAuth, isAuthenticated, onInvest }) => {
+const SongDetail = ({ onBack, songId, songData, onRequireAuth, isAuthenticated, session, onInvest }) => {
     const { t: tSong } = useTranslation('song');
     const { t: tCalc } = useTranslation('calculator');
 
@@ -313,7 +313,7 @@ const SongDetail = ({ onBack, songId, songData, onRequireAuth, isAuthenticated, 
     const [calcAmount, setCalcAmount] = useState(250); // default matches RC initial state
 
     // Demo balance — only meaningful in showcase
-    const { balance, acquire, acquired: isAcquired, hasBalance } = useDemoBalance();
+    const { balance, acquire, acquired: isAcquired, hasBalance } = useDemoBalance(session?.user?.id);
 
 
     const { playTrack, togglePlay, currentTrack, isPlaying: globalIsPlaying } = useGlobalPlayer();
@@ -447,7 +447,7 @@ const SongDetail = ({ onBack, songId, songData, onRequireAuth, isAuthenticated, 
     };
 
     const handleParticipate = () => {
-        if (!isAuthenticated && !isShowcase) { onRequireAuth(); return; }
+        if (!isAuthenticated) { onRequireAuth(); return; }
         if (isProduction) {
             // Production: real blockchain flow via AcquisitionModal
             setShowAcquisitionModal(true);

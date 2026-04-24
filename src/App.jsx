@@ -466,6 +466,7 @@ function App() {
                         songId={activeSongId}
                         songData={activeSong}
                         isAuthenticated={!!session}
+                        session={session}
                         onBack={() => navigate('explore')}
                         onRequireAuth={() => setShowAuthModal(true)}
                     />
@@ -483,7 +484,7 @@ function App() {
 
                 {/* Secondary Market: P2P token trading */}
                 {currentPage === 'secondary-market' && (
-                    <SecondaryMarket onNavigate={setCurrentPage} />
+                    <SecondaryMarket session={session} onNavigate={setCurrentPage} onRequireAuth={() => setShowAuthModal(true)} />
                 )}
 
                 {/* Perfil: User settings */}

@@ -30,7 +30,7 @@ const InvestmentCalculator = ({ asset, session }) => {
     const [txState,   setTxState]   = useState('idle'); // idle | processing | success | error
 
     // ── Ghost Balance (Showcase only) ────────────────────────────────────────
-    const { balance, acquire, acquired: isAcquired, hasBalance } = useDemoBalance();
+    const { balance, acquire, acquired: isAcquired, hasBalance } = useDemoBalance(session?.user?.id);
     const songAcquired = isAcquired(asset?.id || asset?.track_id || 'unknown');
     const songName     = asset?.name || asset?.title || 'esta canción';
     const artistName   = asset?.metadata?.artist || asset?.artist || 'este artista';

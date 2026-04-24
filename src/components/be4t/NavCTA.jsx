@@ -64,7 +64,7 @@ function NavCTAInner({ session, onNavigate, onLoginClick }) {
     const wallet  = useActiveWallet();
     const { disconnect } = useDisconnect();
     const { data: profiles } = useProfiles({ client });
-    const { balance: demoBalance } = useDemoBalance();
+    const { balance: demoBalance } = useDemoBalance(session?.user?.id);
     const [showPay, setShowPay] = useState(false);
     const [walletMenuOpen, setWalletMenuOpen] = useState(false);
 

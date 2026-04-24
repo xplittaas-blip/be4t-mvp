@@ -384,7 +384,7 @@ const Portfolio = ({ session, onNavigate }) => {
     const [exitTarget, setExitTarget]         = useState(null);
     const [exitingIds, setExitingIds]         = useState(new Set());
     const [listTarget, setListTarget]         = useState(null);  // holding to list on market
-    const { balance, portfolio: localPortfolio, reset, instantExit, listOnMarket, unlistFromMarket } = useDemoBalance();
+    const { balance, portfolio: localPortfolio, reset, instantExit, listOnMarket, unlistFromMarket } = useDemoBalance(session?.user?.id);
 
     const handleAction = (action, holding) => {
         if (action === 'sell') {

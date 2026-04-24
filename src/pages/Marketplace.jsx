@@ -388,7 +388,7 @@ const Marketplace = ({ session, onNavigate }) => {
     const [waitlistOpen, setWaitlistOpen] = useState(false);
 
     // ── Load 20 songs directly from Spotify (no Supabase for demo) ────────
-    const { portfolio: localPortfolio } = useDemoBalance();
+    const { portfolio: localPortfolio } = useDemoBalance(session?.user?.id);
 
     useEffect(() => {
         const load = async () => {
