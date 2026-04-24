@@ -395,10 +395,11 @@ function App() {
     const { isAdmin, role: userRole } = useUserRole(session);
 
     // ── Wallet Sync (Thirdweb ↔ Supabase bridge) ──────────────────────────────
-    // walletAddress is the canonical 0x identity used for the balance ledger
-    const { walletAddress, isSynced: isWalletSynced } = useWalletSync(session);
+    // walletAddress = 0x from Thirdweb
+    // effectiveId   = 0x ?? UUID — always valid once user logs in (any method)
+    const { walletAddress, effectiveId, isSynced: isWalletSynced } = useWalletSync(session);
 
-    // Auth is valid when Supabase session OR Thirdweb wallet is present
+    // Single authoritative isAuthenticated flag
     const isAuthenticated = !!(session || walletAddress);
 
     // ── Auth ─────────────────────────────────────────────────────────────────
@@ -465,7 +466,7 @@ function App() {
             <main>
                 {/* Explorar: Marketplace with Spotify Top 20 */}
                 {currentPage === 'explore' && (
-                    <Marketplace session={session} walletAddress={walletAddress} onNavigate={navigate} />
+                    <Marketplace session={session} walletAddress={effectiveId} onNavigate={navigate} />
                 )}
 
                 {/* Song Detail: Full-page view */}
@@ -475,7 +476,7 @@ function App() {
                         songData={activeSong}
                         isAuthenticated={isAuthenticated}
                         session={session}
-                        walletAddress={walletAddress}
+                        walletAddress={effectiveId}
                         onBack={() => navigate('explore')}
                         onRequireAuth={() => setShowAuthModal(true)}
                     />
@@ -483,17 +484,17 @@ function App() {
 
                 {/* Mis Canciones: Portfolio / Dashboard */}
                 {currentPage === 'mis-canciones' && (
-                    <Portfolio session={session} walletAddress={walletAddress} onNavigate={setCurrentPage} />
+                    <Portfolio session={session} walletAddress={effectiveId} onNavigate={setCurrentPage} />
                 )}
 
                 {/* Business Dashboard: B2B metrics */}
                 {currentPage === 'label-dashboard' && (
-                    <LabelDashboard session={session} walletAddress={walletAddress} onNavigate={setCurrentPage} />
+                    <LabelDashboard session={session} walletAddress={effectiveId} onNavigate={setCurrentPage} />
                 )}
 
                 {/* Secondary Market: P2P token trading */}
                 {currentPage === 'secondary-market' && (
-                    <SecondaryMarket session={session} walletAddress={walletAddress} onNavigate={setCurrentPage} onRequireAuth={() => setShowAuthModal(true)} />
+                    <SecondaryMarket session={session} walletAddress={effectiveId} onNavigate={setCurrentPage} onRequireAuth={() => setShowAuthModal(true)} />
                 )}
 
                 {/* Perfil: User settings */}

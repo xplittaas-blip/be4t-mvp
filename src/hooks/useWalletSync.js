@@ -14,9 +14,9 @@
  */
 
 import { useEffect, useState, useCallback } from 'react';
-import { useActiveAccount } from 'thirdweb/react';
+import { useActiveAccount, useAutoConnect } from 'thirdweb/react';
+import { client, wallets, activeChain } from '../core/thirdwebClient';
 import { supabase } from '../core/xplit/supabaseClient';
-import { isShowcase } from '../core/env';
 
 const MIGRATION_FLAG_PREFIX = 'be4t_migrated_';
 
@@ -48,6 +48,20 @@ function markMigrated(walletAddress) {
 export function useWalletSync(session) {
     const account = useActiveAccount();
     const walletAddress = account?.address ?? null;
+
+    // ── Auto-reconnect: when a Supabase session exists, silently
+    // re-activate the Thirdweb inAppWallet (same email → same 0x address)
+    useAutoConnect({
+        client,
+        wallets,
+        chain: activeChain,
+        // Only auto-connect if there is a valid Supabase session
+        accountAbstraction: undefined,
+    });
+
+    // ── Effective identity: 0x preferred, Supabase UUID as fallback ──────────────
+    // This keeps the balance visible even before the Thirdweb wallet activates
+    const effectiveId = walletAddress ?? session?.user?.id ?? null;
 
     const [isSynced,    setIsSynced]    = useState(false);
     const [isMigrating, setIsMigrating] = useState(false);
@@ -119,11 +133,10 @@ export function useWalletSync(session) {
     }, [walletAddress, session?.user?.id, syncToSupabase]);
 
     return {
-        walletAddress,        // canonical 0x address (or null)
-        isSynced,             // true once Supabase sync is complete (or localStorage fallback)
-        isMigrating,          // true while syncing
+        walletAddress,   // 0x from Thirdweb (null until wallet activates)
+        effectiveId,     // 0x ?? UUID — always non-null when user is logged in
+        isSynced,
+        isMigrating,
         error,
     };
 }
-
-export default useWalletSync;
