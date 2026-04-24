@@ -33,6 +33,7 @@ import {
 import { isShowcase, isProduction } from '../../core/env';
 import { client, wallets, activeChain } from '../../core/thirdwebClient';
 import { useDemoBalance } from '../../hooks/useDemoBalance';
+import { useWalletSync } from '../../hooks/useWalletSync';
 
 // Lazy-load PayModal for production
 const ThirdwebPayModal = isProduction
@@ -59,7 +60,10 @@ function NavCTAInner({ session, onNavigate, onLoginClick }) {
     const wallet  = useActiveWallet();
     const { disconnect } = useDisconnect();
     const { data: profiles } = useProfiles({ client });
-    const { balance: demoBalance } = useDemoBalance(account?.address);
+    
+    // Get effectiveId (0x ?? UUID) exactly like App.jsx does
+    const { effectiveId } = useWalletSync(session);
+    const { balance: demoBalance } = useDemoBalance(effectiveId);
     const [showPay, setShowPay] = useState(false);
     const [walletMenuOpen, setWalletMenuOpen] = useState(false);
 
