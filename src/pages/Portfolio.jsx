@@ -384,7 +384,7 @@ const Portfolio = ({ session, walletAddress, onNavigate }) => {
     const [exitTarget, setExitTarget]         = useState(null);
     const [exitingIds, setExitingIds]         = useState(new Set());
     const [listTarget, setListTarget]         = useState(null);  // holding to list on market
-    const { balance, portfolio: localPortfolio, reset, instantExit, listOnMarket, unlistFromMarket, isPersisted, isLoaded } = useDemoBalance(walletAddress);
+    const { balance, portfolio: localPortfolio, reset, instantExit, listOnMarket, unlistFromMarket, isPersisted } = useDemoBalance(walletAddress);
 
     const handleAction = (action, holding) => {
         if (action === 'sell') {
@@ -453,13 +453,35 @@ const Portfolio = ({ session, walletAddress, onNavigate }) => {
                         Tus regalías suben en tiempo real · {SECONDS_PER_YEAR.toLocaleString()} segundos al año de streaming global
                     </p>
 
-                    {/* ── Persistence status indicator ── */}
-                    <div style={{ marginTop: '0.75rem', display: 'inline-flex', alignItems: 'center', gap: '0.4rem', padding: '0.2rem 0.7rem', borderRadius: '100px', border: `1px solid ${isPersisted ? 'rgba(6,182,212,0.3)' : 'rgba(255,255,255,0.1)'}`, background: isPersisted ? 'rgba(6,182,212,0.06)' : 'rgba(255,255,255,0.03)' }}>
-                        <span style={{ width: '5px', height: '5px', borderRadius: '50%', background: isPersisted ? '#06b6d4' : 'rgba(255,255,255,0.2)', display: 'inline-block', boxShadow: isPersisted ? '0 0 5px #06b6d4' : 'none' }} />
-                        <span style={{ fontSize: '0.6rem', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '1.2px', color: isPersisted ? '#06b6d4' : 'rgba(255,255,255,0.25)', fontFamily: "'Courier New', monospace" }}>
-                            {isPersisted ? '☁ Demo Mode: Data Persisted' : isLoaded ? '💾 Demo Mode: Local Only' : '⏳ Cargando portfolio...'}
-                        </span>
-                    </div>
+                    {/* ── Persistence Badge ── */}
+                    {isShowcase && (
+                        <div style={{
+                            display: 'inline-flex', alignItems: 'center', gap: '0.4rem',
+                            marginTop: '0.6rem',
+                            background: isPersisted
+                                ? 'rgba(99,102,241,0.1)'
+                                : 'rgba(255,255,255,0.05)',
+                            border: `1px solid ${isPersisted ? 'rgba(99,102,241,0.35)' : 'rgba(255,255,255,0.1)'}`,
+                            borderRadius: '100px', padding: '0.2rem 0.75rem',
+                            transition: 'all 0.4s ease',
+                        }}>
+                            <span style={{
+                                width: '5px', height: '5px', borderRadius: '50%',
+                                background: isPersisted ? '#818cf8' : 'rgba(255,255,255,0.25)',
+                                display: 'inline-block',
+                                boxShadow: isPersisted ? '0 0 5px #818cf8' : 'none',
+                                animation: isPersisted ? 'be4t-nav-pulse 2s ease infinite' : 'none',
+                                flexShrink: 0,
+                            }} />
+                            <span style={{
+                                fontSize: '0.58rem', fontWeight: '700', letterSpacing: '1.2px',
+                                textTransform: 'uppercase', fontFamily: "'Courier New', monospace",
+                                color: isPersisted ? '#a5b4fc' : 'rgba(255,255,255,0.25)',
+                            }}>
+                                {isPersisted ? 'Demo Mode · Data Persisted ✓' : 'Demo Mode · Guardando...'}
+                            </span>
+                        </div>
+                    )}
                 </div>
 
                 {/* Balance pill */}
