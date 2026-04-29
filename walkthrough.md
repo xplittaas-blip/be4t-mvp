@@ -1,28 +1,32 @@
-# 🎫 Walkthrough: Beneficios Fan (Token-Gating)
+# 🎫 Walkthrough: VIP Backstage & Perks
 
-La funcionalidad de Beneficios Exclusivos ('Exclusive Perks') ha sido exitosamente construida e integrada en la UI, replicando el modelo de Subvert.fm con el estilo estético premium y "underground" de BE4T.
+La bóveda de beneficios ha evolucionado a una experiencia inmersiva estilo "VIP Backstage" basada en 3 niveles de inversión, aumentando el atractivo visual y el sentido de exclusividad del activo.
 
-## 🛠️ ¿Qué hemos modificado?
+## 🛠️ Modificaciones Realizadas
 
-### 1. Inyección Dinámica de Metadata
-Ejecuté un script en Python que recorrió nuestro catálogo musical de `fallbackSongs.json` inyectando nativamente los `perks` base. Ahora cada canción expone sus beneficios condicionando el número de tokens requeridos.
+### 1. Inyección de Tiers (Niveles) en el Catálogo
+Ejecuté el script de actualización en la data local para que cada canción ofrezca 3 niveles de perks estándar, con descripciones detalladas y categorías:
+- **Nivel 1 (50 Tokens):** *Preventa VIP (Boletería)*.
+- **Nivel 2 (150 Tokens):** *Merch Limitado (Merchandising)*.
+- **Nivel 3 (250 Tokens):** *Studio Session (Experiencia)*.
 
-### 2. Componente de UI: `BenefitCard.jsx`
-Creamos un componente asilado para controlar el *Token-Gating*.
-- **Estado Bloqueado:** Muestra un diseño oscuro con cristal empañado, ícono grisáceo y candado pequeño junto a los *TOKENS REQ*. Debajo, una sutil barra de progreso te muestra el porcentaje adquirido sobre la meta.
-- **Estado Desbloqueado (Neón Berlin):** Si la cantidad de tokens (fracciones) del usuario cumple o supera la barrera, la tarjeta de inmediato enciende sus bordes, su ícono, y el botón pasa a un estado pulsante de Cyan Neón para habilitar la acción.
+### 2. Marketplace Abre Bocas (`SongCard.jsx`)
+Las tarjetas del Marketplace principal ahora actúan como un embudo de marketing para la bóveda:
+- Añadido el badge luminoso **PERKS DISPONIBLES** en la esquina superior izquierda.
+- Insertada la línea promocional en Cyan Neón: `🎁 Desbloquea: Preventa VIP + Merch Exclusivo` debajo de cada artista para despertar el FOMO antes de hacer clic.
 
-### 3. Integración Directa con la Inversión
-El componente de Beneficios ha sido anclado nativamente en `SongDetail.jsx` y enlazado con la lógica de `useDemoBalance(walletAddress)`. 
-Dado que `SongDetail` ya observa el hook `isAcquired`, basta con que el usuario adquiera más fracciones (tokens) desde la misma pantalla de `ReturnCalculator` para ver cómo los candados caen en tiempo real sin necesidad de recargar la página.
-
-### 4. Flujo de Reclamo Integrado
-Al pulsar **Reclamar**:
-- **En la Demo (Showcase):** El botón queda bloqueado con "✅ Reclamado" y dispara una alerta nativa amigable informando que las instrucciones llegarán por correo, dando fin exitoso al *user-journey*.
-- **Modo en Vivo:** Hemos preparado la estructura condicional (`if (!isShowcase)`) donde el trigger podrá integrarse de manera transparente con el webhook CRM del sello en un futuro.
+### 3. El 'VIP Backstage' (`BenefitCard.jsx` & `SongDetail.jsx`)
+- **Rediseño Vertical:** El antiguo `BenefitCard` horizontal es ahora un "pilar" de cristal oscuro (`backdrop-blur-md`). 
+- **Rejilla 3-Col:** En la pantalla de `SongDetail`, los 3 pilares se muestran lado a lado bajo el título `🎫 VIP BACKSTAGE`.
+- **Micro-interacciones:** 
+  - Las tarjetas bloqueadas ahora te dicen exactamente cuántos tokens te faltan (ej. *"Invierte 150 tokens más"*).
+  - Al presionar **Reclamar Beneficio** en un nivel desbloqueado, se dispara un elegante efecto de **confeti neón** para premiar de inmediato al usuario, junto a la alerta de instrucciones.
 
 ---
 
 > [!TIP]
-> **Pruébalo ya mismo en Producción / Vercel.** 
-> Al entrar al detalle de cualquier canción (p.ej. "High"), verás la sección de *EXCLUSIVE PERKS*. Compra 51 tokens en la demo y observarás cómo el primer beneficio se desbloquea instantáneamente ante tus ojos.
+> **Prueba el flujo de persuasión en Vercel:** 
+> 1. Entra al Marketplace y nota cómo los copys de la tarjeta captan más atención.
+> 2. Haz clic en una canción. Verás el `VIP BACKSTAGE` con sus 3 pilares oscuros.
+> 3. En el planificador de flujo de caja, compra **150 fracciones**. 
+> 4. Verás cómo los dos primeros pilares cobran vida inmediatamente en cyan, y al hacer clic en "Reclamar", ¡verás el confeti!

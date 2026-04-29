@@ -1,7 +1,8 @@
-# Fan Perks (Tier System) & Marketplace Card Improvements
+# Fan Status & Web3 Integration
 
-- [x] Write and run python script to inject 3-tier perks (`50`, `150`, `250` tokens) with `description` and `category` into `fallbackSongs.json`
-- [x] Update `SongCard.jsx` to include `PERKS DISPONIBLES` badge, `HOT`/`BLUE CHIP` tags, and `🎁 Desbloquea...` text
-- [ ] Refactor `BenefitCard.jsx` to a vertical pillar design (glassmorphism) for 3-tier grid layout
-- [ ] Update `SongDetail.jsx` to use a 3-column grid and rename section to `BACKSTAGE ACCESS`
-- [ ] Build and verify UI
+- [x] Update `fallbackSongs.json` via python script to use new Tier thresholds: 100, 500, 2500 tokens
+- [x] Create `FanStatusPanel.jsx` component matching the requested design, using `calcAmount` + `userBalance` to show preview states
+- [x] Refactor `SongDetail.jsx` right column to use `sticky top-8` layout (leveraged existing `.calculator-section` sticky rules)
+- [x] Move Fan Status into the right column, below the Calculator and above the Invest button
+- [x] Implement Thirdweb `prepareContractCall` and `useSendTransaction` logic in `SongDetail.jsx` for the `invest` button (Approve + Invest sequential)
+- [x] Build and verify on demo mode

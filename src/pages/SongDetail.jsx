@@ -13,10 +13,20 @@ import {
     YOUTUBE_VIDEO_IDS,
 } from '../services/metricsService';
 import './SongDetail.css';
+import { formatDistanceToNow } from 'date-fns';
+import { es } from 'date-fns/locale';
 import { lazy, Suspense } from 'react';
+import {
+    useActiveAccount,
+    useSendTransaction,
+} from 'thirdweb/react';
+import { getContract, prepareContractCall } from 'thirdweb';
+import { client, activeChain } from '../core/thirdwebClient';
 import { isProduction, isShowcase } from '../core/env';
 import { useDemoBalance } from '../hooks/useDemoBalance';
-import { useActiveAccount } from 'thirdweb/react';
+
+// be4t components
+import FanStatusPanel from '../components/be4t/FanStatusPanel';
 import ConfettiBlast from '../components/be4t/ConfettiBlast';
 import BenefitCard from '../components/be4t/BenefitCard';
 const AcquisitionModal = lazy(() => import('../components/be4t/AcquisitionModal'));
@@ -60,9 +70,6 @@ function calcPaybackMonths(investment, monthlyReturn) {
 }
 
 // ── Main ReturnCalculator ───────────────────────────────────────────────────
-// onAmountChange: (amountUSD: number) => void — lifts slider value to parent
-// onInvest: () => void — parent's handleParticipate so the button is wired
-// txState: 'idle'|'processing'|'success'|'error' — shows button feedback
 const ReturnCalculator = ({ streamCount, roiEst, isTrending, paymentFreq = 'monthly',
     tokensTotal = 10_000, tokensAvailable = 7_500, tokenPrice = 10,
     onAmountChange, onInvest, txState = 'idle', demoBalance = 0, isDemo = false }) => {
@@ -72,36 +79,29 @@ const ReturnCalculator = ({ streamCount, roiEst, isTrending, paymentFreq = 'mont
     const sym = cur.symbol;
     const fxr = cur.rate;
 
-    // Report current USD amount to parent whenever slider changes
     useEffect(() => {
         const usd = amount / (fxr || 1);
         onAmountChange?.(parseFloat(usd.toFixed(2)));
     }, [amount, currency, fxr, onAmountChange]);
 
-    // Trending boost: if song is trending, pool is growing ~8% extra
     const trendBoost = isTrending ? 1.08 : 1.0;
 
-    // Annual royalty pool (in USD)
     const annualPoolUSD = useMemo(() => {
         const monthlySt = Math.max(streamCount ?? 0, 1_500_000);
         return monthlySt * 12 * ROYALTY_PER_STREAM * ROYALTY_SHARE * trendBoost;
     }, [streamCount, trendBoost]);
 
-    // Total asset valuation (USD)
     const totalValuationUSD = useMemo(() => {
         const roiDec = (roiEst ?? 18) / 100;
         return roiDec > 0 ? annualPoolUSD / roiDec : annualPoolUSD * 5;
     }, [annualPoolUSD, roiEst]);
 
-    // Convert amount to USD always (slider is in selected currency)
     const amountUSD = amount / fxr;
 
-    // Participation %
     const participationPct = totalValuationUSD > 0
         ? (amountUSD / totalValuationUSD) * 100
         : 0;
 
-    // Annual return in USD → convert to display currency
     const annualReturnUSD    = (amountUSD / totalValuationUSD) * annualPoolUSD;
     const annualReturn       = annualReturnUSD * fxr;
     const monthlyReturn      = annualReturn / 12;
@@ -109,30 +109,25 @@ const ReturnCalculator = ({ streamCount, roiEst, isTrending, paymentFreq = 'mont
     const displayReturn      = paymentFreq === 'monthly' ? monthlyReturn : quarterlyReturn;
     const displayFreqLabel   = paymentFreq === 'monthly' ? 'Mensual' : 'Trimestral';
 
-    // ROI %
     const teaRate = amount > 0 ? (annualReturn / amount) * 100 : 0;
 
-    // Payback months
     const paybackMonths = calcPaybackMonths(amount, displayReturn);
     const paybackLabel  = !paybackMonths ? 'N/D'
         : paybackMonths < 13 ? `${paybackMonths} meses`
         : `${(paybackMonths / 12).toFixed(1)} años`;
 
-    // 12 / 24 / 36 month projections (compounded at roiEst)
     const project = (months) => {
         const roiDec    = teaRate / 100;
         const projected = amount * Math.pow(1 + roiDec / 12, months);
-        return (projected - amount) * fxr; // returns only the gain
+        return (projected - amount) * fxr; 
     };
     const proj12 = project(12);
     const proj24 = project(24);
     const proj36 = project(36);
 
-    // Bond comparison multiplier
     const bondAnnual    = amount * GOV_BOND_RATE * fxr;
     const bondMultiplier = bondAnnual > 0 ? (annualReturn / bondAnnual).toFixed(1) : '—';
 
-    // Tokens that will be purchased with current amount (in USD)
     const tokensBought = Math.floor(amountUSD / (tokenPrice || 10));
     const tokensPct    = tokensTotal > 0 ? (tokensAvailable / tokensTotal) * 100 : 100;
     const tokensLow    = tokensPct < 20;
@@ -154,7 +149,6 @@ const ReturnCalculator = ({ streamCount, roiEst, isTrending, paymentFreq = 'mont
                 .proj-bar { transition: height 0.4s cubic-bezier(0.25,0.8,0.25,1); }
             `}</style>
 
-            {/* ── Currency Toggle ── */}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <span style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: '700' }}>
                     Moneda de proyección
@@ -176,7 +170,6 @@ const ReturnCalculator = ({ streamCount, roiEst, isTrending, paymentFreq = 'mont
                 </div>
             </div>
 
-            {/* ── Slider ── */}
             <div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '0.4rem' }}>
                     <div>
@@ -206,7 +199,6 @@ const ReturnCalculator = ({ streamCount, roiEst, isTrending, paymentFreq = 'mont
                 </div>
             </div>
 
-            {/* ── Preset buttons ── */}
             <div style={{ display: 'flex', gap: '6px' }}>
                 {PRESETS.map(p => (
                     <button key={p} onClick={() => setAmount(p)} style={{
@@ -221,9 +213,7 @@ const ReturnCalculator = ({ streamCount, roiEst, isTrending, paymentFreq = 'mont
                 ))}
             </div>
 
-            {/* ── Key metrics 2x2 ── */}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
-                {/* TEA */}
                 <div style={{ background: 'linear-gradient(135deg, rgba(139,92,246,0.15) 0%, rgba(59,130,246,0.08) 100%)', border: '1px solid rgba(139,92,246,0.25)', borderRadius: '14px', padding: '0.9rem 1rem' }}>
                     <div style={{ fontSize: '0.58rem', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: '700', marginBottom: '4px' }}>TEA (APY)</div>
                     <div style={{ fontSize: '1.6rem', fontWeight: '900', color: '#a78bfa', letterSpacing: '-0.04em' }} className="calc-anim">
@@ -232,7 +222,6 @@ const ReturnCalculator = ({ streamCount, roiEst, isTrending, paymentFreq = 'mont
                     {isTrending && <div style={{ fontSize: '0.55rem', color: '#4ade80', marginTop: '2px', fontWeight: '700' }}>⚡ +8% por tendencia</div>}
                 </div>
 
-                {/* Cobro peridico */}
                 <div style={{ background: 'linear-gradient(135deg, rgba(34,197,94,0.12) 0%, rgba(16,185,129,0.06) 100%)', border: '1px solid rgba(34,197,94,0.2)', borderRadius: '14px', padding: '0.9rem 1rem' }}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
                         <div style={{ fontSize: '0.58rem', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: '700' }}>Pago {displayFreqLabel}</div>
@@ -246,7 +235,6 @@ const ReturnCalculator = ({ streamCount, roiEst, isTrending, paymentFreq = 'mont
                     </div>
                 </div>
 
-                {/* Tokens Disponibles */}
                 <div style={{ background: 'rgba(255,255,255,0.03)', border: `1px solid ${tokensLow ? 'rgba(249,115,22,0.3)' : 'rgba(255,255,255,0.08)'}`, borderRadius: '14px', padding: '0.9rem 1rem' }}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
                         <div style={{ fontSize: '0.58rem', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: '700' }}>Tokens Disp.</div>
@@ -256,13 +244,11 @@ const ReturnCalculator = ({ streamCount, roiEst, isTrending, paymentFreq = 'mont
                         {tokensAvailable.toLocaleString('es-ES')}
                     </div>
                     <div style={{ fontSize: '0.52rem', color: 'rgba(255,255,255,0.25)', marginTop: '2px', marginBottom: '6px' }}>de {tokensTotal.toLocaleString('es-ES')} totales</div>
-                    {/* Scarcity bar */}
                     <div style={{ height: '3px', background: 'rgba(255,255,255,0.07)', borderRadius: '100px', overflow: 'hidden' }}>
                         <div style={{ height: '100%', width: `${Math.min(100, 100 - tokensPct)}%`, background: tokenBarColor, borderRadius: '100px', boxShadow: `0 0 5px ${tokenBarColor}88`, transition: 'width 0.5s ease' }} />
                     </div>
                 </div>
 
-                {/* Tokens que compras */}
                 <div style={{ background: 'linear-gradient(135deg, rgba(99,102,241,0.12) 0%, rgba(139,92,246,0.07) 100%)', border: '1px solid rgba(99,102,241,0.25)', borderRadius: '14px', padding: '0.9rem 1rem' }}>
                     <div style={{ fontSize: '0.58rem', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: '700', marginBottom: '4px' }}>Compras</div>
                     <div style={{ fontSize: '1.4rem', fontWeight: '900', color: '#818cf8', letterSpacing: '-0.03em' }} className="calc-anim">
@@ -274,7 +260,6 @@ const ReturnCalculator = ({ streamCount, roiEst, isTrending, paymentFreq = 'mont
                 </div>
             </div>
 
-            {/* ── Bond comparison ── */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '0.75rem 1rem', background: 'rgba(251,191,36,0.06)', border: '1px solid rgba(251,191,36,0.18)', borderRadius: '12px' }}>
                 <span style={{ fontSize: '1.1rem' }}>🏆</span>
                 <span style={{ fontSize: '0.78rem', color: 'rgba(255,255,255,0.65)', lineHeight: 1.4 }}>
@@ -284,7 +269,6 @@ const ReturnCalculator = ({ streamCount, roiEst, isTrending, paymentFreq = 'mont
                 </span>
             </div>
 
-            {/* ── Disclaimer ── */}
             <div style={{ padding: '0.75rem', background: 'rgba(255,255,255,0.025)', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.055)' }}>
                 <p style={{ fontSize: '0.68rem', color: 'rgba(255,255,255,0.28)', margin: 0, lineHeight: 1.6 }}>
                     TEA estimada: <strong style={{ color: '#c4b5fd' }}>{teaRate.toFixed(1)}%</strong>.
@@ -308,24 +292,18 @@ const SongDetail = ({ onBack, songId, songData, onRequireAuth, isAuthenticated, 
     const [isLoading, setIsLoading]                         = useState(true);
     const [showSuccessModal, setShowSuccessModal]           = useState(false);
     const [showAcquisitionModal, setShowAcquisitionModal]   = useState(false);
-    // Showcase invest flow state
-    const [txState,  setTxState]  = useState('idle'); // idle | processing | success | error
-    const [txResult, setTxResult] = useState(null);   // { cost, fractions, songName, artistName }
-    // Exact investment amount from the ReturnCalculator slider (USD)
-    const [calcAmount, setCalcAmount] = useState(250); // default matches RC initial state
+    const [txState,  setTxState]  = useState('idle');
+    const [txResult, setTxResult] = useState(null);
+    const [calcAmount, setCalcAmount] = useState(250);
 
-    // Demo balance — anchored to wallet address (0x)
     const { balance, acquire, acquired: isAcquired, hasBalance } = useDemoBalance(walletAddress);
-    // Is the wallet available? Used for Auth Guard 2.0
     const account = useActiveAccount();
-    const isWalletPending = isAuthenticated && !walletAddress && !account;
-
+    const { mutateAsync: sendTx } = useSendTransaction();
 
     const { playTrack, togglePlay, currentTrack, isPlaying: globalIsPlaying } = useGlobalPlayer();
     const isPlaying = globalIsPlaying && currentTrack?.id === song?.id;
     const calculatorRef = useRef(null);
 
-    // ── Fetch song + enrich with real metrics ─────────────────────────────────────────
     useEffect(() => {
         let cancelled = false;
         const run = async () => {
@@ -333,9 +311,6 @@ const SongDetail = ({ onBack, songId, songData, onRequireAuth, isAuthenticated, 
                 let baseSong = null;
 
                 if (songData) {
-                    // ── Fast path: use the full object passed from Marketplace ──────
-                    // songData is the _raw object from spotifyService.normalize():
-                    // { id, name, cover_url, deezer_id, spotify_id, metadata: { artist, ... } }
                     baseSong = {
                         id:               songData.id,
                         title:            songData.name || songData.title,
@@ -352,13 +327,11 @@ const SongDetail = ({ onBack, songId, songData, onRequireAuth, isAuthenticated, 
                         popularity:       songData.metadata?.popularity || songData.popularity || 90,
                         streams_estimate: songData.metadata?.spotify_streams || 0,
                         roi_est:          parseFloat((songData.metadata?.yield_estimate || '18').replace('%', '')) || 18,
-                        // Token data
                         total_supply:     songData.total_supply || songData.metadata?.total_supply || 10_000,
                         tokens_available: songData.tokens_available ?? songData.metadata?.tokens_available ??
                             Math.floor((songData.total_supply || 10_000) * 0.72),
                         price:            songData.token_price_usd || songData.price_per_token || songData.metadata?.token_price_usd || 10,
                         is_trending:      songData.is_trending || songData.metadata?.is_trending || false,
-                        // Pre-fill metrics from catalog (overridden by live data below)
                         spotify:   fmtMetric(songData.metadata?.spotify_streams || 0),
                         youtube:   fmtMetric(songData.metadata?.youtube_views   || 0),
                         tiktok:    fmtMetric(songData.metadata?.tiktok_creations || 0),
@@ -366,7 +339,6 @@ const SongDetail = ({ onBack, songId, songData, onRequireAuth, isAuthenticated, 
                         artistListeners: fmtMetric((songData.metadata?.spotify_streams || 0) * 1.5),
                     };
                 } else {
-                    // ── Fallback: fetch from legacy marketplace data by ID ──────────
                     const allSongs = await getMarketplaceData();
                     const targetId = songId || allSongs[0]?.id;
                     const raw      = allSongs.find(s => s.id === targetId) || allSongs[0];
@@ -398,7 +370,6 @@ const SongDetail = ({ onBack, songId, songData, onRequireAuth, isAuthenticated, 
 
                 if (!cancelled) setSong(baseSong);
 
-                // ── Enrich with real metrics from metricsService ────────────────
                 const targetId = baseSong.id;
                 const songProxy = {
                     id:         targetId,
@@ -440,7 +411,6 @@ const SongDetail = ({ onBack, songId, songData, onRequireAuth, isAuthenticated, 
         return () => { cancelled = true; };
     }, [songId, songData]);
 
-    // Growth data
     const growthData     = metrics?.growth ?? getWeeklyGrowth(songId ?? 'default', 18);
     const growthPct      = growthData.pct;
     const growthPositive = growthData.positive;
@@ -452,51 +422,87 @@ const SongDetail = ({ onBack, songId, songData, onRequireAuth, isAuthenticated, 
     };
 
     const handleParticipate = () => {
-        // Auth Guard 2.0
         if (!isAuthenticated) { onRequireAuth(); return; }
-        // Wallet is being provisioned (Thirdweb inAppWallet still initializing)
         if (isAuthenticated && !walletAddress && !account) {
-            // The ConnectButton in NavCTA will handle auto-connect on next interaction
             onRequireAuth();
             return;
         }
-        if (isProduction) {
-            // Production: real blockchain flow via AcquisitionModal
-            setShowAcquisitionModal(true);
-            return;
-        }
-        // Showcase: execute demo purchase immediately
+
         if (txState === 'processing' || txState === 'success') return;
         setTxState('processing');
 
-        // Use EXACT amount from ReturnCalculator slider — no hardcoding
-        const tokenPrice = song.price || 10;
-        const total      = parseFloat(calcAmount.toFixed(2));
-        const fractions  = Math.max(1, Math.floor(calcAmount / tokenPrice));
-        const songMeta   = {
-            name:          song.title,
-            artist:        song.artist,
-            tokenPrice,
-            totalSupply:   song.total_supply || 10_000,
-            apy:           song.roi_est || 14,
-            spotifyStreams: song.streams_estimate || 0,
-            coverUrl:      song.image || null,
+        const executeInvestment = async () => {
+            const tokenPrice = song.price || 10;
+            const total      = parseFloat(calcAmount.toFixed(2));
+            const fractions  = Math.max(1, Math.floor(calcAmount / tokenPrice));
+            const songMeta   = {
+                name:          song.title,
+                artist:        song.artist,
+                tokenPrice,
+                totalSupply:   song.total_supply || 10_000,
+                apy:           song.roi_est || 14,
+                spotifyStreams: song.streams_estimate || 0,
+                coverUrl:      song.image || null,
+            };
+
+            try {
+                if (account) {
+                    const VAULT_ADDRESS = import.meta.env.VITE_VAULT_ADDRESS || "0x51EaE61B3fF980560b4570144f808796E2E10972"; 
+                    const USDC_ADDRESS  = import.meta.env.VITE_USDC_ADDRESS  || "0xA87C1f7dcfc7A3102377484B6c8A9bb02447d2fE";
+
+                    const usdcContract = getContract({ client, chain: activeChain, address: USDC_ADDRESS });
+                    const vaultContract = getContract({ client, chain: activeChain, address: VAULT_ADDRESS });
+
+                    const totalUSDC = BigInt(Math.floor(total * 1000000));
+                    const approveTx = prepareContractCall({
+                        contract: usdcContract,
+                        method: "function approve(address spender, uint256 amount) returns (bool)",
+                        params: [VAULT_ADDRESS, totalUSDC]
+                    });
+                    
+                    const investTx = prepareContractCall({
+                        contract: vaultContract,
+                        method: "function invest(uint256 id, uint256 quantity)",
+                        params: [BigInt(song.id || 1), BigInt(fractions)]
+                    });
+
+                    await sendTx(approveTx);
+                    await sendTx(investTx);
+                } else if (!isShowcase) {
+                    throw new Error("Wallet not connected");
+                }
+
+                const result = acquire(song.id, total, fractions, songMeta);
+                if (result.ok) {
+                    setTxResult({ cost: total, fractions, songName: song.title, artistName: song.artist });
+                    setTxState('success');
+                    setTimeout(() => {
+                        document.dispatchEvent(new CustomEvent('navigate', { detail: 'mis-canciones' }));
+                    }, 3500);
+                } else {
+                    setTxState('error');
+                    setTimeout(() => setTxState('idle'), 2500);
+                }
+            } catch (error) {
+                console.error("[Web3 Error]", error);
+                if (isShowcase) {
+                    const result = acquire(song.id, total, fractions, songMeta);
+                    if (result.ok) {
+                        setTxResult({ cost: total, fractions, songName: song.title, artistName: song.artist });
+                        setTxState('success');
+                        setTimeout(() => document.dispatchEvent(new CustomEvent('navigate', { detail: 'mis-canciones' })), 3500);
+                    } else {
+                        setTxState('error');
+                        setTimeout(() => setTxState('idle'), 2500);
+                    }
+                } else {
+                    setTxState('error');
+                    setTimeout(() => setTxState('idle'), 2500);
+                }
+            }
         };
 
-        setTimeout(() => {
-            const result = acquire(song.id, total, fractions, songMeta);
-            if (result.ok) {
-                setTxResult({ cost: total, fractions, songName: song.title, artistName: song.artist });
-                setTxState('success');
-                // Auto-redirect after 3.5s
-                setTimeout(() => {
-                    document.dispatchEvent(new CustomEvent('navigate', { detail: 'mis-canciones' }));
-                }, 3500);
-            } else {
-                setTxState('error');
-                setTimeout(() => setTxState('idle'), 2500);
-            }
-        }, 1100);
+        executeInvestment();
     };
 
     // Reset txState if user navigates back to same page
@@ -771,6 +777,15 @@ const SongDetail = ({ onBack, songId, songData, onRequireAuth, isAuthenticated, 
                         </p>
                     </div>
 
+                    {/* Fan Status Panel (Bóveda de Beneficios) */}
+                    <div style={{ marginTop: '1.5rem' }}>
+                        <FanStatusPanel 
+                            perks={song.perks}
+                            currentTokens={isAcquired(song.id)?.fractions || 0}
+                            projectedTokens={Math.floor(calcAmount / (song.price ?? song.token_price_usd ?? 10))}
+                        />
+                    </div>
+
                     {/* Insufficient balance warning */}
                     {isShowcase && !hasBalance(calcAmount) && txState === 'idle' && (
                         <div style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.25)', borderRadius: '10px', padding: '0.6rem 0.85rem', marginTop: '0.75rem', textAlign: 'center' }}>
@@ -817,28 +832,6 @@ const SongDetail = ({ onBack, songId, songData, onRequireAuth, isAuthenticated, 
                         </p>
                     </div>
                 </section>
-                
-                {/* ── Fan Benefits (Token-Gating 3-Tier) ── */}
-                {song.perks && song.perks.length > 0 && (
-                    <section style={{ marginTop: '3rem' }}>
-                        <div className="flex items-center space-x-3 mb-6">
-                            <span className="text-2xl">🎫</span>
-                            <h3 className="text-xl font-bold tracking-tight text-white font-mono uppercase text-transparent bg-clip-text bg-gradient-to-r from-white to-neutral-500">
-                                VIP Backstage
-                            </h3>
-                        </div>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            {song.perks.map((perk, idx) => (
-                                <BenefitCard 
-                                    key={idx} 
-                                    tierIndex={idx}
-                                    perk={perk} 
-                                    userBalance={isAcquired(song.id)?.fractions || 0} 
-                                />
-                            ))}
-                        </div>
-                    </section>
-                )}
             </div>
 
             {/* ── Neon Confetti on showcase success ── */}
