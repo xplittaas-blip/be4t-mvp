@@ -27,7 +27,24 @@
     "youtube_channel_id": "channel_442661985",
     "youtube_channel_name": "Rawayana Oficial",
     "youtube_channel_subscribers": 473126,
-    "is_official_video": true
+    "is_official_video": true,
+    "perks": [
+      {
+        "min_tokens": 50,
+        "label": "Early Access to Tickets",
+        "icon": "🎟️"
+      },
+      {
+        "min_tokens": 150,
+        "label": "Limited Edition Merch",
+        "icon": "🧢"
+      },
+      {
+        "min_tokens": 500,
+        "label": "Studio Session Behind-the-scenes",
+        "icon": "🎧"
+      }
+    ]
   },
   {
     "id": "1671644454",
@@ -57,7 +74,24 @@
     "youtube_channel_id": "channel_442661985",
     "youtube_channel_name": "Rawayana & Danny Ocean Oficial",
     "youtube_channel_subscribers": 9651821,
-    "is_official_video": true
+    "is_official_video": true,
+    "perks": [
+      {
+        "min_tokens": 50,
+        "label": "Early Access to Tickets",
+        "icon": "🎟️"
+      },
+      {
+        "min_tokens": 150,
+        "label": "Limited Edition Merch",
+        "icon": "🧢"
+      },
+      {
+        "min_tokens": 500,
+        "label": "Studio Session Behind-the-scenes",
+        "icon": "🎧"
+      }
+    ]
   },
   {
     "id": "1694960281",
@@ -87,7 +121,24 @@
     "youtube_channel_id": "channel_442661985",
     "youtube_channel_name": "Rawayana Oficial",
     "youtube_channel_subscribers": 4030525,
-    "is_official_video": false
+    "is_official_video": false,
+    "perks": [
+      {
+        "min_tokens": 50,
+        "label": "Early Access to Tickets",
+        "icon": "🎟️"
+      },
+      {
+        "min_tokens": 150,
+        "label": "Limited Edition Merch",
+        "icon": "🧢"
+      },
+      {
+        "min_tokens": 500,
+        "label": "Studio Session Behind-the-scenes",
+        "icon": "🎧"
+      }
+    ]
   },
   {
     "id": "1248528301",
@@ -117,7 +168,24 @@
     "youtube_channel_id": "channel_1248515752",
     "youtube_channel_name": "Danny Ocean Oficial",
     "youtube_channel_subscribers": 7378293,
-    "is_official_video": true
+    "is_official_video": true,
+    "perks": [
+      {
+        "min_tokens": 50,
+        "label": "Early Access to Tickets",
+        "icon": "🎟️"
+      },
+      {
+        "min_tokens": 150,
+        "label": "Limited Edition Merch",
+        "icon": "🧢"
+      },
+      {
+        "min_tokens": 500,
+        "label": "Studio Session Behind-the-scenes",
+        "icon": "🎧"
+      }
+    ]
   },
   {
     "id": "1643983113",
@@ -147,7 +215,24 @@
     "youtube_channel_id": "channel_1474881462",
     "youtube_channel_name": "Sax Efrain Acosta Oficial",
     "youtube_channel_subscribers": 8334851,
-    "is_official_video": false
+    "is_official_video": false,
+    "perks": [
+      {
+        "min_tokens": 50,
+        "label": "Early Access to Tickets",
+        "icon": "🎟️"
+      },
+      {
+        "min_tokens": 150,
+        "label": "Limited Edition Merch",
+        "icon": "🧢"
+      },
+      {
+        "min_tokens": 500,
+        "label": "Studio Session Behind-the-scenes",
+        "icon": "🎧"
+      }
+    ]
   },
   {
     "id": "1455553955",
@@ -177,7 +262,24 @@
     "youtube_channel_id": "channel_1248515752",
     "youtube_channel_name": "Danny Ocean Oficial",
     "youtube_channel_subscribers": 1764052,
-    "is_official_video": true
+    "is_official_video": true,
+    "perks": [
+      {
+        "min_tokens": 50,
+        "label": "Early Access to Tickets",
+        "icon": "🎟️"
+      },
+      {
+        "min_tokens": 150,
+        "label": "Limited Edition Merch",
+        "icon": "🧢"
+      },
+      {
+        "min_tokens": 500,
+        "label": "Studio Session Behind-the-scenes",
+        "icon": "🎧"
+      }
+    ]
   },
   {
     "id": "1645032135",
@@ -207,7 +309,24 @@
     "youtube_channel_id": "channel_194502100",
     "youtube_channel_name": "Feid Oficial",
     "youtube_channel_subscribers": 637434,
-    "is_official_video": true
+    "is_official_video": true,
+    "perks": [
+      {
+        "min_tokens": 50,
+        "label": "Early Access to Tickets",
+        "icon": "🎟️"
+      },
+      {
+        "min_tokens": 150,
+        "label": "Limited Edition Merch",
+        "icon": "🧢"
+      },
+      {
+        "min_tokens": 500,
+        "label": "Studio Session Behind-the-scenes",
+        "icon": "🎧"
+      }
+    ]
   },
   {
     "id": "1645032528",
@@ -237,7 +356,24 @@
     "youtube_channel_id": "channel_194502100",
     "youtube_channel_name": "Feid Oficial",
     "youtube_channel_subscribers": 476107,
-    "is_official_video": true
+    "is_official_video": true,
+    "perks": [
+      {
+        "min_tokens": 50,
+        "label": "Early Access to Tickets",
+        "icon": "🎟️"
+      },
+      {
+        "min_tokens": 150,
+        "label": "Limited Edition Merch",
+        "icon": "🧢"
+      },
+      {
+        "min_tokens": 500,
+        "label": "Studio Session Behind-the-scenes",
+        "icon": "🎧"
+      }
+    ]
   },
   {
     "id": "1680967843",
@@ -267,7 +403,24 @@
     "youtube_channel_id": "channel_194502100",
     "youtube_channel_name": "Feid & Young Miko Oficial",
     "youtube_channel_subscribers": 14578069,
-    "is_official_video": true
+    "is_official_video": true,
+    "perks": [
+      {
+        "min_tokens": 50,
+        "label": "Early Access to Tickets",
+        "icon": "🎟️"
+      },
+      {
+        "min_tokens": 150,
+        "label": "Limited Edition Merch",
+        "icon": "🧢"
+      },
+      {
+        "min_tokens": 500,
+        "label": "Studio Session Behind-the-scenes",
+        "icon": "🎧"
+      }
+    ]
   },
   {
     "id": "1677446410",
@@ -297,7 +450,24 @@
     "youtube_channel_id": "channel_1482429034",
     "youtube_channel_name": "Eslabon Armado & Peso Pluma Oficial",
     "youtube_channel_subscribers": 3116310,
-    "is_official_video": true
+    "is_official_video": true,
+    "perks": [
+      {
+        "min_tokens": 50,
+        "label": "Early Access to Tickets",
+        "icon": "🎟️"
+      },
+      {
+        "min_tokens": 150,
+        "label": "Limited Edition Merch",
+        "icon": "🧢"
+      },
+      {
+        "min_tokens": 500,
+        "label": "Studio Session Behind-the-scenes",
+        "icon": "🎧"
+      }
+    ]
   },
   {
     "id": "1677446410",
@@ -327,7 +497,24 @@
     "youtube_channel_id": "channel_1482429034",
     "youtube_channel_name": "Eslabon Armado & Peso Pluma Oficial",
     "youtube_channel_subscribers": 1211939,
-    "is_official_video": true
+    "is_official_video": true,
+    "perks": [
+      {
+        "min_tokens": 50,
+        "label": "Early Access to Tickets",
+        "icon": "🎟️"
+      },
+      {
+        "min_tokens": 150,
+        "label": "Limited Edition Merch",
+        "icon": "🧢"
+      },
+      {
+        "min_tokens": 500,
+        "label": "Studio Session Behind-the-scenes",
+        "icon": "🎧"
+      }
+    ]
   },
   {
     "id": "1727430102",
@@ -357,7 +544,24 @@
     "youtube_channel_id": "channel_1500139475",
     "youtube_channel_name": "Peso Pluma Oficial",
     "youtube_channel_subscribers": 3408456,
-    "is_official_video": true
+    "is_official_video": true,
+    "perks": [
+      {
+        "min_tokens": 50,
+        "label": "Early Access to Tickets",
+        "icon": "🎟️"
+      },
+      {
+        "min_tokens": 150,
+        "label": "Limited Edition Merch",
+        "icon": "🧢"
+      },
+      {
+        "min_tokens": 500,
+        "label": "Studio Session Behind-the-scenes",
+        "icon": "🎧"
+      }
+    ]
   },
   {
     "id": "1659925720",
@@ -387,7 +591,24 @@
     "youtube_channel_id": "channel_1275690475",
     "youtube_channel_name": "Fuerza Regida & Grupo Frontera Oficial",
     "youtube_channel_subscribers": 9036257,
-    "is_official_video": true
+    "is_official_video": true,
+    "perks": [
+      {
+        "min_tokens": 50,
+        "label": "Early Access to Tickets",
+        "icon": "🎟️"
+      },
+      {
+        "min_tokens": 150,
+        "label": "Limited Edition Merch",
+        "icon": "🧢"
+      },
+      {
+        "min_tokens": 500,
+        "label": "Studio Session Behind-the-scenes",
+        "icon": "🎧"
+      }
+    ]
   },
   {
     "id": "1446953756",
@@ -417,7 +638,24 @@
     "youtube_channel_id": "channel_1275690475",
     "youtube_channel_name": "Fuerza Regida Oficial",
     "youtube_channel_subscribers": 9737002,
-    "is_official_video": true
+    "is_official_video": true,
+    "perks": [
+      {
+        "min_tokens": 50,
+        "label": "Early Access to Tickets",
+        "icon": "🎟️"
+      },
+      {
+        "min_tokens": 150,
+        "label": "Limited Edition Merch",
+        "icon": "🧢"
+      },
+      {
+        "min_tokens": 500,
+        "label": "Studio Session Behind-the-scenes",
+        "icon": "🎧"
+      }
+    ]
   },
   {
     "id": "1728939096",
@@ -447,7 +685,24 @@
     "youtube_channel_id": "channel_1275690475",
     "youtube_channel_name": "Fuerza Regida Oficial",
     "youtube_channel_subscribers": 3578545,
-    "is_official_video": true
+    "is_official_video": true,
+    "perks": [
+      {
+        "min_tokens": 50,
+        "label": "Early Access to Tickets",
+        "icon": "🎟️"
+      },
+      {
+        "min_tokens": 150,
+        "label": "Limited Edition Merch",
+        "icon": "🧢"
+      },
+      {
+        "min_tokens": 500,
+        "label": "Studio Session Behind-the-scenes",
+        "icon": "🎧"
+      }
+    ]
   },
   {
     "id": "1664297506",
@@ -477,7 +732,24 @@
     "youtube_channel_id": "channel_1126808565",
     "youtube_channel_name": "Bad Bunny Oficial",
     "youtube_channel_subscribers": 11908289,
-    "is_official_video": true
+    "is_official_video": true,
+    "perks": [
+      {
+        "min_tokens": 50,
+        "label": "Early Access to Tickets",
+        "icon": "🎟️"
+      },
+      {
+        "min_tokens": 150,
+        "label": "Limited Edition Merch",
+        "icon": "🧢"
+      },
+      {
+        "min_tokens": 500,
+        "label": "Studio Session Behind-the-scenes",
+        "icon": "🎧"
+      }
+    ]
   },
   {
     "id": "1622045948",
@@ -507,7 +779,24 @@
     "youtube_channel_id": "channel_1126808565",
     "youtube_channel_name": "Bad Bunny Oficial",
     "youtube_channel_subscribers": 6080863,
-    "is_official_video": false
+    "is_official_video": false,
+    "perks": [
+      {
+        "min_tokens": 50,
+        "label": "Early Access to Tickets",
+        "icon": "🎟️"
+      },
+      {
+        "min_tokens": 150,
+        "label": "Limited Edition Merch",
+        "icon": "🧢"
+      },
+      {
+        "min_tokens": 500,
+        "label": "Studio Session Behind-the-scenes",
+        "icon": "🎧"
+      }
+    ]
   },
   {
     "id": "1470146805",
@@ -537,7 +826,24 @@
     "youtube_channel_id": "channel_444520760",
     "youtube_channel_name": "J Balvin & Bad Bunny Oficial",
     "youtube_channel_subscribers": 6505663,
-    "is_official_video": true
+    "is_official_video": true,
+    "perks": [
+      {
+        "min_tokens": 50,
+        "label": "Early Access to Tickets",
+        "icon": "🎟️"
+      },
+      {
+        "min_tokens": 150,
+        "label": "Limited Edition Merch",
+        "icon": "🧢"
+      },
+      {
+        "min_tokens": 500,
+        "label": "Studio Session Behind-the-scenes",
+        "icon": "🎧"
+      }
+    ]
   },
   {
     "id": "1670245875",
@@ -567,7 +873,24 @@
     "youtube_channel_id": "channel_290814601",
     "youtube_channel_name": "KAROL G Oficial",
     "youtube_channel_subscribers": 14884504,
-    "is_official_video": true
+    "is_official_video": true,
+    "perks": [
+      {
+        "min_tokens": 50,
+        "label": "Early Access to Tickets",
+        "icon": "🎟️"
+      },
+      {
+        "min_tokens": 150,
+        "label": "Limited Edition Merch",
+        "icon": "🧢"
+      },
+      {
+        "min_tokens": 500,
+        "label": "Studio Session Behind-the-scenes",
+        "icon": "🎧"
+      }
+    ]
   },
   {
     "id": "1473307010",
@@ -597,7 +920,24 @@
     "youtube_channel_id": "channel_996166916",
     "youtube_channel_name": "Anuel AA, Daddy Yankee & KAROL G Oficial",
     "youtube_channel_subscribers": 5539107,
-    "is_official_video": true
+    "is_official_video": true,
+    "perks": [
+      {
+        "min_tokens": 50,
+        "label": "Early Access to Tickets",
+        "icon": "🎟️"
+      },
+      {
+        "min_tokens": 150,
+        "label": "Limited Edition Merch",
+        "icon": "🧢"
+      },
+      {
+        "min_tokens": 500,
+        "label": "Studio Session Behind-the-scenes",
+        "icon": "🎧"
+      }
+    ]
   },
   {
     "id": "1619425410",
@@ -627,7 +967,24 @@
     "youtube_channel_id": "channel_290814601",
     "youtube_channel_name": "KAROL G Oficial",
     "youtube_channel_subscribers": 2790679,
-    "is_official_video": true
+    "is_official_video": true,
+    "perks": [
+      {
+        "min_tokens": 50,
+        "label": "Early Access to Tickets",
+        "icon": "🎟️"
+      },
+      {
+        "min_tokens": 150,
+        "label": "Limited Edition Merch",
+        "icon": "🧢"
+      },
+      {
+        "min_tokens": 500,
+        "label": "Studio Session Behind-the-scenes",
+        "icon": "🎧"
+      }
+    ]
   },
   {
     "id": "1585074413",
@@ -657,7 +1014,24 @@
     "youtube_channel_id": "channel_3628117",
     "youtube_channel_name": "KIDZ BOP Kids Oficial",
     "youtube_channel_subscribers": 8574780,
-    "is_official_video": true
+    "is_official_video": true,
+    "perks": [
+      {
+        "min_tokens": 50,
+        "label": "Early Access to Tickets",
+        "icon": "🎟️"
+      },
+      {
+        "min_tokens": 150,
+        "label": "Limited Edition Merch",
+        "icon": "🧢"
+      },
+      {
+        "min_tokens": 500,
+        "label": "Studio Session Behind-the-scenes",
+        "icon": "🎧"
+      }
+    ]
   },
   {
     "id": "1550877481",
@@ -687,7 +1061,24 @@
     "youtube_channel_id": "channel_280215834",
     "youtube_channel_name": "Selena Gomez & Rauw Alejandro Oficial",
     "youtube_channel_subscribers": 12821913,
-    "is_official_video": true
+    "is_official_video": true,
+    "perks": [
+      {
+        "min_tokens": 50,
+        "label": "Early Access to Tickets",
+        "icon": "🎟️"
+      },
+      {
+        "min_tokens": 150,
+        "label": "Limited Edition Merch",
+        "icon": "🧢"
+      },
+      {
+        "min_tokens": 500,
+        "label": "Studio Session Behind-the-scenes",
+        "icon": "🎧"
+      }
+    ]
   },
   {
     "id": "1676118960",
@@ -717,7 +1108,24 @@
     "youtube_channel_id": "channel_1107186883",
     "youtube_channel_name": "Rauw Alejandro & Bad Bunny Oficial",
     "youtube_channel_subscribers": 13071116,
-    "is_official_video": true
+    "is_official_video": true,
+    "perks": [
+      {
+        "min_tokens": 50,
+        "label": "Early Access to Tickets",
+        "icon": "🎟️"
+      },
+      {
+        "min_tokens": 150,
+        "label": "Limited Edition Merch",
+        "icon": "🧢"
+      },
+      {
+        "min_tokens": 500,
+        "label": "Studio Session Behind-the-scenes",
+        "icon": "🎧"
+      }
+    ]
   },
   {
     "id": "1516524629",
@@ -747,7 +1155,24 @@
     "youtube_channel_id": "channel_164376380",
     "youtube_channel_name": "Jay Wheeler, DJ Nelson & Myke Towers Oficial",
     "youtube_channel_subscribers": 12544851,
-    "is_official_video": true
+    "is_official_video": true,
+    "perks": [
+      {
+        "min_tokens": 50,
+        "label": "Early Access to Tickets",
+        "icon": "🎟️"
+      },
+      {
+        "min_tokens": 150,
+        "label": "Limited Edition Merch",
+        "icon": "🧢"
+      },
+      {
+        "min_tokens": 500,
+        "label": "Studio Session Behind-the-scenes",
+        "icon": "🎧"
+      }
+    ]
   },
   {
     "id": "1822994489",
@@ -777,7 +1202,24 @@
     "youtube_channel_id": "channel_1210225867",
     "youtube_channel_name": "Myke Towers Oficial",
     "youtube_channel_subscribers": 1227403,
-    "is_official_video": true
+    "is_official_video": true,
+    "perks": [
+      {
+        "min_tokens": 50,
+        "label": "Early Access to Tickets",
+        "icon": "🎟️"
+      },
+      {
+        "min_tokens": 150,
+        "label": "Limited Edition Merch",
+        "icon": "🧢"
+      },
+      {
+        "min_tokens": 500,
+        "label": "Studio Session Behind-the-scenes",
+        "icon": "🎧"
+      }
+    ]
   },
   {
     "id": "1540386768",
@@ -807,7 +1249,24 @@
     "youtube_channel_id": "channel_1210225867",
     "youtube_channel_name": "Myke Towers & Juhn Oficial",
     "youtube_channel_subscribers": 8359330,
-    "is_official_video": true
+    "is_official_video": true,
+    "perks": [
+      {
+        "min_tokens": 50,
+        "label": "Early Access to Tickets",
+        "icon": "🎟️"
+      },
+      {
+        "min_tokens": 150,
+        "label": "Limited Edition Merch",
+        "icon": "🧢"
+      },
+      {
+        "min_tokens": 500,
+        "label": "Studio Session Behind-the-scenes",
+        "icon": "🎧"
+      }
+    ]
   },
   {
     "id": "1635422908",
@@ -837,7 +1296,24 @@
     "youtube_channel_id": "channel_408527217",
     "youtube_channel_name": "Duki & Mora Oficial",
     "youtube_channel_subscribers": 13754939,
-    "is_official_video": true
+    "is_official_video": true,
+    "perks": [
+      {
+        "min_tokens": 50,
+        "label": "Early Access to Tickets",
+        "icon": "🎟️"
+      },
+      {
+        "min_tokens": 150,
+        "label": "Limited Edition Merch",
+        "icon": "🧢"
+      },
+      {
+        "min_tokens": 500,
+        "label": "Studio Session Behind-the-scenes",
+        "icon": "🎧"
+      }
+    ]
   },
   {
     "id": "1617074066",
@@ -867,7 +1343,24 @@
     "youtube_channel_id": "channel_1329561467",
     "youtube_channel_name": "Mora & JHAYCO Oficial",
     "youtube_channel_subscribers": 10205895,
-    "is_official_video": true
+    "is_official_video": true,
+    "perks": [
+      {
+        "min_tokens": 50,
+        "label": "Early Access to Tickets",
+        "icon": "🎟️"
+      },
+      {
+        "min_tokens": 150,
+        "label": "Limited Edition Merch",
+        "icon": "🧢"
+      },
+      {
+        "min_tokens": 500,
+        "label": "Studio Session Behind-the-scenes",
+        "icon": "🎧"
+      }
+    ]
   },
   {
     "id": "1617074066",
@@ -897,7 +1390,24 @@
     "youtube_channel_id": "channel_1329561467",
     "youtube_channel_name": "Mora & JHAYCO Oficial",
     "youtube_channel_subscribers": 4280309,
-    "is_official_video": true
+    "is_official_video": true,
+    "perks": [
+      {
+        "min_tokens": 50,
+        "label": "Early Access to Tickets",
+        "icon": "🎟️"
+      },
+      {
+        "min_tokens": 150,
+        "label": "Limited Edition Merch",
+        "icon": "🧢"
+      },
+      {
+        "min_tokens": 500,
+        "label": "Studio Session Behind-the-scenes",
+        "icon": "🎧"
+      }
+    ]
   },
   {
     "id": "1632746802",
@@ -927,7 +1437,24 @@
     "youtube_channel_id": "channel_1239658213",
     "youtube_channel_name": "Bizarrap & Quevedo Oficial",
     "youtube_channel_subscribers": 3186179,
-    "is_official_video": false
+    "is_official_video": false,
+    "perks": [
+      {
+        "min_tokens": 50,
+        "label": "Early Access to Tickets",
+        "icon": "🎟️"
+      },
+      {
+        "min_tokens": 150,
+        "label": "Limited Edition Merch",
+        "icon": "🧢"
+      },
+      {
+        "min_tokens": 500,
+        "label": "Studio Session Behind-the-scenes",
+        "icon": "🎧"
+      }
+    ]
   },
   {
     "id": "1542129887",
@@ -957,7 +1484,24 @@
     "youtube_channel_id": "channel_1239658213",
     "youtube_channel_name": "Bizarrap & Nathy Peluso Oficial",
     "youtube_channel_subscribers": 2336502,
-    "is_official_video": true
+    "is_official_video": true,
+    "perks": [
+      {
+        "min_tokens": 50,
+        "label": "Early Access to Tickets",
+        "icon": "🎟️"
+      },
+      {
+        "min_tokens": 150,
+        "label": "Limited Edition Merch",
+        "icon": "🧢"
+      },
+      {
+        "min_tokens": 500,
+        "label": "Studio Session Behind-the-scenes",
+        "icon": "🎧"
+      }
+    ]
   },
   {
     "id": "1709901887",
@@ -987,7 +1531,24 @@
     "youtube_channel_id": "channel_1239658213",
     "youtube_channel_name": "Bizarrap & Milo j Oficial",
     "youtube_channel_subscribers": 11646256,
-    "is_official_video": true
+    "is_official_video": true,
+    "perks": [
+      {
+        "min_tokens": 50,
+        "label": "Early Access to Tickets",
+        "icon": "🎟️"
+      },
+      {
+        "min_tokens": 150,
+        "label": "Limited Edition Merch",
+        "icon": "🧢"
+      },
+      {
+        "min_tokens": 500,
+        "label": "Studio Session Behind-the-scenes",
+        "icon": "🎧"
+      }
+    ]
   },
   {
     "id": "1794418219",
@@ -1017,7 +1578,24 @@
     "youtube_channel_id": "channel_377761784",
     "youtube_channel_name": "Quevedo Oficial",
     "youtube_channel_subscribers": 3711095,
-    "is_official_video": true
+    "is_official_video": true,
+    "perks": [
+      {
+        "min_tokens": 50,
+        "label": "Early Access to Tickets",
+        "icon": "🎟️"
+      },
+      {
+        "min_tokens": 150,
+        "label": "Limited Edition Merch",
+        "icon": "🧢"
+      },
+      {
+        "min_tokens": 500,
+        "label": "Studio Session Behind-the-scenes",
+        "icon": "🎧"
+      }
+    ]
   },
   {
     "id": "1794433126",
@@ -1047,7 +1625,24 @@
     "youtube_channel_id": "channel_377761784",
     "youtube_channel_name": "Quevedo Oficial",
     "youtube_channel_subscribers": 13519060,
-    "is_official_video": true
+    "is_official_video": true,
+    "perks": [
+      {
+        "min_tokens": 50,
+        "label": "Early Access to Tickets",
+        "icon": "🎟️"
+      },
+      {
+        "min_tokens": 150,
+        "label": "Limited Edition Merch",
+        "icon": "🧢"
+      },
+      {
+        "min_tokens": 500,
+        "label": "Studio Session Behind-the-scenes",
+        "icon": "🎧"
+      }
+    ]
   },
   {
     "id": "1657390881",
@@ -1077,7 +1672,24 @@
     "youtube_channel_id": "channel_377761784",
     "youtube_channel_name": "Quevedo & Myke Towers Oficial",
     "youtube_channel_subscribers": 5648881,
-    "is_official_video": true
+    "is_official_video": true,
+    "perks": [
+      {
+        "min_tokens": 50,
+        "label": "Early Access to Tickets",
+        "icon": "🎟️"
+      },
+      {
+        "min_tokens": 150,
+        "label": "Limited Edition Merch",
+        "icon": "🧢"
+      },
+      {
+        "min_tokens": 500,
+        "label": "Studio Session Behind-the-scenes",
+        "icon": "🎧"
+      }
+    ]
   },
   {
     "id": "1368816792",
@@ -1107,7 +1719,24 @@
     "youtube_channel_id": "channel_444520760",
     "youtube_channel_name": "J Balvin & Willy William Oficial",
     "youtube_channel_subscribers": 11259835,
-    "is_official_video": false
+    "is_official_video": false,
+    "perks": [
+      {
+        "min_tokens": 50,
+        "label": "Early Access to Tickets",
+        "icon": "🎟️"
+      },
+      {
+        "min_tokens": 150,
+        "label": "Limited Edition Merch",
+        "icon": "🧢"
+      },
+      {
+        "min_tokens": 500,
+        "label": "Studio Session Behind-the-scenes",
+        "icon": "🎧"
+      }
+    ]
   },
   {
     "id": "1440817278",
@@ -1137,7 +1766,24 @@
     "youtube_channel_id": "channel_444520760",
     "youtube_channel_name": "J Balvin Oficial",
     "youtube_channel_subscribers": 10824337,
-    "is_official_video": true
+    "is_official_video": true,
+    "perks": [
+      {
+        "min_tokens": 50,
+        "label": "Early Access to Tickets",
+        "icon": "🎟️"
+      },
+      {
+        "min_tokens": 150,
+        "label": "Limited Edition Merch",
+        "icon": "🧢"
+      },
+      {
+        "min_tokens": 500,
+        "label": "Studio Session Behind-the-scenes",
+        "icon": "🎧"
+      }
+    ]
   },
   {
     "id": "1440835180",
@@ -1167,7 +1813,24 @@
     "youtube_channel_id": "channel_444520760",
     "youtube_channel_name": "J Balvin Oficial",
     "youtube_channel_subscribers": 1521237,
-    "is_official_video": false
+    "is_official_video": false,
+    "perks": [
+      {
+        "min_tokens": 50,
+        "label": "Early Access to Tickets",
+        "icon": "🎟️"
+      },
+      {
+        "min_tokens": 150,
+        "label": "Limited Edition Merch",
+        "icon": "🧢"
+      },
+      {
+        "min_tokens": 500,
+        "label": "Studio Session Behind-the-scenes",
+        "icon": "🎧"
+      }
+    ]
   },
   {
     "id": "1660334835",
@@ -1197,7 +1860,24 @@
     "youtube_channel_id": "channel_313845115",
     "youtube_channel_name": "ROSALÍA Oficial",
     "youtube_channel_subscribers": 5107686,
-    "is_official_video": true
+    "is_official_video": true,
+    "perks": [
+      {
+        "min_tokens": 50,
+        "label": "Early Access to Tickets",
+        "icon": "🎟️"
+      },
+      {
+        "min_tokens": 150,
+        "label": "Limited Edition Merch",
+        "icon": "🧢"
+      },
+      {
+        "min_tokens": 500,
+        "label": "Studio Session Behind-the-scenes",
+        "icon": "🎧"
+      }
+    ]
   },
   {
     "id": "1457085979",
@@ -1227,7 +1907,24 @@
     "youtube_channel_id": "channel_313845115",
     "youtube_channel_name": "ROSALÍA & J Balvin Oficial",
     "youtube_channel_subscribers": 774208,
-    "is_official_video": true
+    "is_official_video": true,
+    "perks": [
+      {
+        "min_tokens": 50,
+        "label": "Early Access to Tickets",
+        "icon": "🎟️"
+      },
+      {
+        "min_tokens": 150,
+        "label": "Limited Edition Merch",
+        "icon": "🧢"
+      },
+      {
+        "min_tokens": 500,
+        "label": "Studio Session Behind-the-scenes",
+        "icon": "🎧"
+      }
+    ]
   },
   {
     "id": "1654013499",
@@ -1257,7 +1954,24 @@
     "youtube_channel_id": "channel_294697516",
     "youtube_channel_name": "Sweet Little Band Oficial",
     "youtube_channel_subscribers": 1534432,
-    "is_official_video": true
+    "is_official_video": true,
+    "perks": [
+      {
+        "min_tokens": 50,
+        "label": "Early Access to Tickets",
+        "icon": "🎟️"
+      },
+      {
+        "min_tokens": 150,
+        "label": "Limited Edition Merch",
+        "icon": "🧢"
+      },
+      {
+        "min_tokens": 500,
+        "label": "Studio Session Behind-the-scenes",
+        "icon": "🎧"
+      }
+    ]
   },
   {
     "id": "1541731262",
@@ -1287,7 +2001,24 @@
     "youtube_channel_id": "channel_894731301",
     "youtube_channel_name": "Kali Uchis Oficial",
     "youtube_channel_subscribers": 12556694,
-    "is_official_video": true
+    "is_official_video": true,
+    "perks": [
+      {
+        "min_tokens": 50,
+        "label": "Early Access to Tickets",
+        "icon": "🎟️"
+      },
+      {
+        "min_tokens": 150,
+        "label": "Limited Edition Merch",
+        "icon": "🧢"
+      },
+      {
+        "min_tokens": 500,
+        "label": "Studio Session Behind-the-scenes",
+        "icon": "🎧"
+      }
+    ]
   },
   {
     "id": "1665312291",
@@ -1317,7 +2048,24 @@
     "youtube_channel_id": "channel_894731301",
     "youtube_channel_name": "Kali Uchis Oficial",
     "youtube_channel_subscribers": 10871841,
-    "is_official_video": true
+    "is_official_video": true,
+    "perks": [
+      {
+        "min_tokens": 50,
+        "label": "Early Access to Tickets",
+        "icon": "🎟️"
+      },
+      {
+        "min_tokens": 150,
+        "label": "Limited Edition Merch",
+        "icon": "🧢"
+      },
+      {
+        "min_tokens": 500,
+        "label": "Studio Session Behind-the-scenes",
+        "icon": "🎧"
+      }
+    ]
   },
   {
     "id": "1358286224",
@@ -1347,7 +2095,24 @@
     "youtube_channel_id": "channel_894731301",
     "youtube_channel_name": "Kali Uchis Oficial",
     "youtube_channel_subscribers": 13846993,
-    "is_official_video": true
+    "is_official_video": true,
+    "perks": [
+      {
+        "min_tokens": 50,
+        "label": "Early Access to Tickets",
+        "icon": "🎟️"
+      },
+      {
+        "min_tokens": 150,
+        "label": "Limited Edition Merch",
+        "icon": "🧢"
+      },
+      {
+        "min_tokens": 500,
+        "label": "Studio Session Behind-the-scenes",
+        "icon": "🎧"
+      }
+    ]
   },
   {
     "id": "1586673104",
@@ -1377,7 +2142,24 @@
     "youtube_channel_id": "channel_193167653",
     "youtube_channel_name": "Tainy, Bad Bunny & Julieta Venegas Oficial",
     "youtube_channel_subscribers": 9192289,
-    "is_official_video": false
+    "is_official_video": false,
+    "perks": [
+      {
+        "min_tokens": 50,
+        "label": "Early Access to Tickets",
+        "icon": "🎟️"
+      },
+      {
+        "min_tokens": 150,
+        "label": "Limited Edition Merch",
+        "icon": "🧢"
+      },
+      {
+        "min_tokens": 500,
+        "label": "Studio Session Behind-the-scenes",
+        "icon": "🎧"
+      }
+    ]
   },
   {
     "id": "1720558681",
@@ -1407,7 +2189,24 @@
     "youtube_channel_id": "channel_193167653",
     "youtube_channel_name": "Tainy Oficial",
     "youtube_channel_subscribers": 8122926,
-    "is_official_video": true
+    "is_official_video": true,
+    "perks": [
+      {
+        "min_tokens": 50,
+        "label": "Early Access to Tickets",
+        "icon": "🎟️"
+      },
+      {
+        "min_tokens": 150,
+        "label": "Limited Edition Merch",
+        "icon": "🧢"
+      },
+      {
+        "min_tokens": 500,
+        "label": "Studio Session Behind-the-scenes",
+        "icon": "🎧"
+      }
+    ]
   },
   {
     "id": "1674883334",
@@ -1437,7 +2236,24 @@
     "youtube_channel_id": "channel_294697516",
     "youtube_channel_name": "Sweet Little Band Oficial",
     "youtube_channel_subscribers": 9588735,
-    "is_official_video": true
+    "is_official_video": true,
+    "perks": [
+      {
+        "min_tokens": 50,
+        "label": "Early Access to Tickets",
+        "icon": "🎟️"
+      },
+      {
+        "min_tokens": 150,
+        "label": "Limited Edition Merch",
+        "icon": "🧢"
+      },
+      {
+        "min_tokens": 500,
+        "label": "Studio Session Behind-the-scenes",
+        "icon": "🎧"
+      }
+    ]
   },
   {
     "id": "1488056651",
@@ -1467,7 +2283,24 @@
     "youtube_channel_id": "channel_1292945516",
     "youtube_channel_name": "NICKI NICOLE Oficial",
     "youtube_channel_subscribers": 13184457,
-    "is_official_video": false
+    "is_official_video": false,
+    "perks": [
+      {
+        "min_tokens": 50,
+        "label": "Early Access to Tickets",
+        "icon": "🎟️"
+      },
+      {
+        "min_tokens": 150,
+        "label": "Limited Edition Merch",
+        "icon": "🧢"
+      },
+      {
+        "min_tokens": 500,
+        "label": "Studio Session Behind-the-scenes",
+        "icon": "🎧"
+      }
+    ]
   },
   {
     "id": "1535429402",
@@ -1497,7 +2330,24 @@
     "youtube_channel_id": "channel_269919603",
     "youtube_channel_name": "Trueno, NICKI NICOLE, Bizarrap, Taiu & tatool Oficial",
     "youtube_channel_subscribers": 685756,
-    "is_official_video": true
+    "is_official_video": true,
+    "perks": [
+      {
+        "min_tokens": 50,
+        "label": "Early Access to Tickets",
+        "icon": "🎟️"
+      },
+      {
+        "min_tokens": 150,
+        "label": "Limited Edition Merch",
+        "icon": "🧢"
+      },
+      {
+        "min_tokens": 500,
+        "label": "Studio Session Behind-the-scenes",
+        "icon": "🎧"
+      }
+    ]
   },
   {
     "id": "1658249166",
@@ -1527,7 +2377,24 @@
     "youtube_channel_id": "channel_269919603",
     "youtube_channel_name": "Trueno Oficial",
     "youtube_channel_subscribers": 9367428,
-    "is_official_video": false
+    "is_official_video": false,
+    "perks": [
+      {
+        "min_tokens": 50,
+        "label": "Early Access to Tickets",
+        "icon": "🎟️"
+      },
+      {
+        "min_tokens": 150,
+        "label": "Limited Edition Merch",
+        "icon": "🧢"
+      },
+      {
+        "min_tokens": 500,
+        "label": "Studio Session Behind-the-scenes",
+        "icon": "🎧"
+      }
+    ]
   },
   {
     "id": "1853774053",
@@ -1557,7 +2424,24 @@
     "youtube_channel_id": "channel_269919603",
     "youtube_channel_name": "Trueno Oficial",
     "youtube_channel_subscribers": 5340489,
-    "is_official_video": true
+    "is_official_video": true,
+    "perks": [
+      {
+        "min_tokens": 50,
+        "label": "Early Access to Tickets",
+        "icon": "🎟️"
+      },
+      {
+        "min_tokens": 150,
+        "label": "Limited Edition Merch",
+        "icon": "🧢"
+      },
+      {
+        "min_tokens": 500,
+        "label": "Studio Session Behind-the-scenes",
+        "icon": "🎧"
+      }
+    ]
   },
   {
     "id": "1623218584",
@@ -1587,7 +2471,24 @@
     "youtube_channel_id": "channel_269919603",
     "youtube_channel_name": "Trueno Oficial",
     "youtube_channel_subscribers": 409786,
-    "is_official_video": false
+    "is_official_video": false,
+    "perks": [
+      {
+        "min_tokens": 50,
+        "label": "Early Access to Tickets",
+        "icon": "🎟️"
+      },
+      {
+        "min_tokens": 150,
+        "label": "Limited Edition Merch",
+        "icon": "🧢"
+      },
+      {
+        "min_tokens": 500,
+        "label": "Studio Session Behind-the-scenes",
+        "icon": "🎧"
+      }
+    ]
   },
   {
     "id": "mock-1773443426047-0.6189991926433283",
@@ -1617,7 +2518,24 @@
     "youtube_channel_id": "channel_mock-Duki",
     "youtube_channel_name": "Duki Oficial",
     "youtube_channel_subscribers": 5485683,
-    "is_official_video": true
+    "is_official_video": true,
+    "perks": [
+      {
+        "min_tokens": 50,
+        "label": "Early Access to Tickets",
+        "icon": "🎟️"
+      },
+      {
+        "min_tokens": 150,
+        "label": "Limited Edition Merch",
+        "icon": "🧢"
+      },
+      {
+        "min_tokens": 500,
+        "label": "Studio Session Behind-the-scenes",
+        "icon": "🎧"
+      }
+    ]
   },
   {
     "id": "1475300179",
@@ -1647,7 +2565,24 @@
     "youtube_channel_id": "channel_408527217",
     "youtube_channel_name": "Duki Oficial",
     "youtube_channel_subscribers": 8397985,
-    "is_official_video": true
+    "is_official_video": true,
+    "perks": [
+      {
+        "min_tokens": 50,
+        "label": "Early Access to Tickets",
+        "icon": "🎟️"
+      },
+      {
+        "min_tokens": 150,
+        "label": "Limited Edition Merch",
+        "icon": "🧢"
+      },
+      {
+        "min_tokens": 500,
+        "label": "Studio Session Behind-the-scenes",
+        "icon": "🎧"
+      }
+    ]
   },
   {
     "id": "1461515034",
@@ -1677,7 +2612,24 @@
     "youtube_channel_id": "channel_408527217",
     "youtube_channel_name": "Duki & KHEA Oficial",
     "youtube_channel_subscribers": 13905967,
-    "is_official_video": true
+    "is_official_video": true,
+    "perks": [
+      {
+        "min_tokens": 50,
+        "label": "Early Access to Tickets",
+        "icon": "🎟️"
+      },
+      {
+        "min_tokens": 150,
+        "label": "Limited Edition Merch",
+        "icon": "🧢"
+      },
+      {
+        "min_tokens": 500,
+        "label": "Studio Session Behind-the-scenes",
+        "icon": "🎧"
+      }
+    ]
   },
   {
     "id": "1678746191",
@@ -1707,7 +2659,24 @@
     "youtube_channel_id": "channel_1678682334",
     "youtube_channel_name": "Dj Tora Oficial",
     "youtube_channel_subscribers": 4824345,
-    "is_official_video": false
+    "is_official_video": false,
+    "perks": [
+      {
+        "min_tokens": 50,
+        "label": "Early Access to Tickets",
+        "icon": "🎟️"
+      },
+      {
+        "min_tokens": 150,
+        "label": "Limited Edition Merch",
+        "icon": "🧢"
+      },
+      {
+        "min_tokens": 500,
+        "label": "Studio Session Behind-the-scenes",
+        "icon": "🎧"
+      }
+    ]
   },
   {
     "id": "1680967843",
@@ -1737,6 +2706,23 @@
     "youtube_channel_id": "channel_194502100",
     "youtube_channel_name": "Feid & Young Miko Oficial",
     "youtube_channel_subscribers": 10043959,
-    "is_official_video": true
+    "is_official_video": true,
+    "perks": [
+      {
+        "min_tokens": 50,
+        "label": "Early Access to Tickets",
+        "icon": "🎟️"
+      },
+      {
+        "min_tokens": 150,
+        "label": "Limited Edition Merch",
+        "icon": "🧢"
+      },
+      {
+        "min_tokens": 500,
+        "label": "Studio Session Behind-the-scenes",
+        "icon": "🎧"
+      }
+    ]
   }
 ]

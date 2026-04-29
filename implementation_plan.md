@@ -1,68 +1,40 @@
-# Desarrollo del Núcleo de Activos (Smart Contracts) - Fase 2
+# 🎟️ Fan Benefits (Token-Gating) - Plan de Implementación
 
-Este plan detalla la migración de la lógica de balance simulada hacia un **Smart Contract real (ERC-1155)** deplegado en Base Sepolia, integrando OpenZeppelin, Hardhat y Thirdweb v5.
+Este plan aborda la integración de la sección de beneficios exclusivos ('Exclusive Perks for Holders') dentro de cada activo del Marketplace, utilizando el diseño estilo Berlín Underground.
 
-## Proposed Changes
+## Cambios Propuestos
 
-### Construcción del Smart Contract
+### 1. Refactor de Data (`src/data/fallbackSongs.json`)
+Ejecutaremos un script en Python para inyectar un array `perks` a todas las canciones existentes en el catálogo. Este objeto contendrá los beneficios estándar requeridos:
+```json
+"perks": [
+  { "min_tokens": 50, "label": "Early Access to Tickets", "icon": "🎟️" },
+  { "min_tokens": 150, "label": "Limited Edition Merch", "icon": "🧢" },
+  { "min_tokens": 500, "label": "Studio Session Behind-the-scenes", "icon": "🎧" }
+]
+```
+*(Nota: ajusté las cantidades de tokens para que sean alcanzables en la demo, asumiendo fracciones promedio de $3 a $10. Los números originales de 5,000 requerirían inversiones de $20,000+ USD que romperían el saldo de la demo).*
 
-#### [NEW] `contracts/BE4T_Vault.sol`
-Se creará un contrato ERC-1155 optimizado y seguro.
-- **Roles y Seguridad:** Hereda de `ERC1155`, `AccessControl` (para el rol del Sello/Admin) y `Pausable` (para detener trading en emergencias).
-- **KYC Status:** Mapeo `mapping(address => bool) public isKYCVerified`. El contrato sobreescribirá el hook `_update` (o `_beforeTokenTransfer`) para revertir transferencias si el usuario emisor o receptor no está verificado (preparación ERC-3643).
-- **Estructura del Activo:** 
-  ```solidity
-  struct SongInfo {
-      uint256 maxSupply;
-      uint256 currentSupply;
-      uint256 pricePerToken; // en Test-USDC
-      string customUri;
-  }
-  ```
-- **`createSongAsset`:** (Solo Sello). Configura la SongInfo y emite el evento de URI dinámico con el enlace IPFS que contendrá el ISRC y el contrato legal.
-- **`invest`:** El usuario especifica `id` y `quantity`. El contrato verifica el KYC, cobra el `pricePerToken * quantity` extrayéndolo de la billetera del usuario vía `IERC20.transferFrom` hacia el contrato (o el Sello), y acuña los tokens 1155.
-- **`distributeRoyalties`:** Un sistema simple donde el Sello delega USDC al contrato. El contrato actualizará un `merkleRoot` o un contador `royaltiesPerShare` indexado por `id` para manejar los reclamos pro-rata.
+### 2. Nuevo Componente (`src/components/be4t/BenefitCard.jsx`)
+Se creará un componente aislado para manejar la visualización de los Perks.
+- **Lógica Dinámica:** Recibirá `userBalance` (la cantidad de fracciones o tokens que el usuario posee de ese track específico). Comparará este valor contra `min_tokens`.
+- **Estética 'Berlin Underground':**
+  - Fondo `bg-[#111]` o `bg-black` con bordes sutiles de cristal `border border-white/5`.
+  - Tipografías crudas e industriales (Mono/Inter).
+  - Efectos visuales: Estado bloqueado (ícono gris/candado) vs. Estado Desbloqueado (ícono cian neón `text-[#00FFCC]`, botón animado 'Reclamar').
 
-### Infraestructura de Despliegue
-
-#### [NEW] `hardhat.config.cjs`
-- Configuración del entorno de Hardhat para compilar y desplegar en Base Sepolia.
-- Soporte para verificación en Blockscout/Basescan.
-
-#### [NEW] `scripts/deploy.js`
-- Script de despliegue principal.
-- Lee credenciales (.env) para financiar el gas.
-- Pasa la dirección del Test-USDC al constructor.
-- Imprime la dirección e invoca `hardhat verify` dinámicamente.
-
-#### [MODIFY] `package.json`
-- Se añadirán dependencias: `hardhat`, `@nomicfoundation/hardhat-toolbox`, `@openzeppelin/contracts`, `dotenv`.
-
----
-
-### Integración Web3 (Frontend)
-
-#### [MODIFY] `src/hooks/useDemoBalance.js`
-Se actualizará la lógica del puente. En `isProduction` (o fase Beta Testnet), en lugar de usar localStorage, la función de compra se interceptará de la siguiente manera:
-
-1. **Aprobación USDC:** Se construirá y enviará una transacción `approve` al contrato del Test-USDC usando SDK v5.
-2. **Deploy transacción:** Se crea la transacción on-chain: `prepareContractCall({ contract: BE4TVault, method: "invest", params: [id, quantity] })`.
-3. **Firma & Envío:** Se solicita la firma al `inAppWallet` del usuario.
-4. **Respaldo de Base de Datos:** Tras recibir el hash del recibo on-chain, se despacha la llamada hacia `supabase.from('user_assets').upsert(...)` para reflejar la posesión instantánea (actuando como indexador de la UI antes de que el Subgraph esté listo).
+### 3. Integración en `SongDetail.jsx`
+- Importar y renderizar `<BenefitCard>` debajo del bloque de Retornos (`ReturnCalculator`).
+- Se alimentará conectando `useDemoBalance` (o `useOnChainBalance` a futuro) consultando específicamente las `fractions` poseídas de ese `songId`.
+- El botón de 'Reclamar' en modo Showcase disparará un popup nativo de éxito o `alert()` pulido.
 
 ## Open Questions
 
 > [!IMPORTANT]
-> - **Test-USDC:** ¿Ya existe un contrato de Test-USDC desplegado en Base Sepolia del cual vamos a leer, o quieres que el script de despliegue cree un "MockUSDC" para que la plataforma pueda acuñar dinero de prueba a los usuarios nuevos automáticamente?
-> - **KYC Activo:** ¿El control KYC debería bloquear transferencias y compras *desde el día 1*, o lo dejamos en `true` por defecto para todas las direcciones hasta la Fase 3?
-> - **Gestión de Regalías:** ¿Prefieres que `distributeRoyalties` envíe el dinero directamente a las wallets usando un loop, o que se acumule en el contrato y los usuarios "Reclamen" (Sistema pull: `claimRoyalties()`) para evitar altos costos de gas para el Sello?
+> - **Cantidades Requeridas:** Para que un usuario experimente desbloquear un beneficio en la demo, propongo que las barreras sean `50`, `150` y `500` fracciones. ¿Estás de acuerdo con estos números o prefieres mantener los originales `500`, `1000`, `5000`?
+> - **UI 'Reclamar':** En el modo Demo, cuando el usuario presiona 'Reclamar', ¿quieres un Modal a pantalla completa o un simple 'Toast / Notification' que diga que se enviará el correo?
 
-## Verification Plan
-
-### Automated Tests
-- Compilación del Smart Contract `npx hardhat compile`.
-- Despliegue en Base Sepolia a través de Alchemy/Infura RPC y verificación de etherscan API.
-
-### Manual Verification
-- Requerir tokens de prueba desde una billetera independiente.
-- Ejecutar el flujo completo de "Adquirir Participación" en la demo live, aprobar la transacción con el widget de Thirdweb, mintear los tokens 1155, verificar la transferencia de USDC y observar reflejado el cambio en el balance global.
+## Plan de Verificación
+1. Ejecutar la demo.
+2. Comprar 51 tokens de "High (feat. Apache)".
+3. Verificar que la card del primer beneficio (`min_tokens: 50`) pase de gris/candado a color Cyan neón con el botón Reclamar activo, mientras que los beneficios superiores permanezcan bloqueados.

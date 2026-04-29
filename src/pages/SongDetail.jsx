@@ -18,6 +18,7 @@ import { isProduction, isShowcase } from '../core/env';
 import { useDemoBalance } from '../hooks/useDemoBalance';
 import { useActiveAccount } from 'thirdweb/react';
 import ConfettiBlast from '../components/be4t/ConfettiBlast';
+import BenefitCard from '../components/be4t/BenefitCard';
 const AcquisitionModal = lazy(() => import('../components/be4t/AcquisitionModal'));
 
 // ── Minimal mono-color platform icons (Anti-Notion: single fill color) ───────
@@ -816,6 +817,24 @@ const SongDetail = ({ onBack, songId, songData, onRequireAuth, isAuthenticated, 
                         </p>
                     </div>
                 </section>
+                
+                {/* ── Fan Benefits (Token-Gating) ── */}
+                {song.perks && song.perks.length > 0 && (
+                    <section style={{ marginTop: '2rem' }}>
+                        <h3 className="mb-4 text-xl font-bold tracking-tight text-white font-mono">
+                            EXCLUSIVE PERKS
+                        </h3>
+                        <div className="flex flex-col space-y-3">
+                            {song.perks.map((perk, idx) => (
+                                <BenefitCard 
+                                    key={idx} 
+                                    perk={perk} 
+                                    userBalance={isAcquired(song.id)?.fractions || 0} 
+                                />
+                            ))}
+                        </div>
+                    </section>
+                )}
             </div>
 
             {/* ── Neon Confetti on showcase success ── */}
