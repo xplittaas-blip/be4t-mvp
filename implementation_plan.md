@@ -1,40 +1,40 @@
-# 🎟️ Fan Benefits (Token-Gating) - Plan de Implementación
+# 💎 Plan de Evolución: Fan Perks (Tier System)
 
-Este plan aborda la integración de la sección de beneficios exclusivos ('Exclusive Perks for Holders') dentro de cada activo del Marketplace, utilizando el diseño estilo Berlín Underground.
+Este plan detalla la reestructuración del motor de beneficios para adoptar un modelo de "Bóveda" de 3 Niveles (Tiers) con estética 'Berlin Underground', y mejoras de persuasión visual en las tarjetas del Marketplace.
 
 ## Cambios Propuestos
 
-### 1. Refactor de Data (`src/data/fallbackSongs.json`)
-Ejecutaremos un script en Python para inyectar un array `perks` a todas las canciones existentes en el catálogo. Este objeto contendrá los beneficios estándar requeridos:
+### 1. Refactor del Schema de Datos (`src/data/fallbackSongs.json`)
+Ejecutaremos un nuevo script en Python para actualizar el array `perks` en todas las canciones hacia la estructura avanzada de 3 niveles:
 ```json
 "perks": [
-  { "min_tokens": 50, "label": "Early Access to Tickets", "icon": "🎟️" },
-  { "min_tokens": 150, "label": "Limited Edition Merch", "icon": "🧢" },
-  { "min_tokens": 500, "label": "Studio Session Behind-the-scenes", "icon": "🎧" }
+  { "min_tokens": 50, "label": "Preventa VIP", "description": "Acceso anticipado a boletería de la próxima gira.", "icon": "🎟️", "category": "Boletería" },
+  { "min_tokens": 150, "label": "Merch Limitado", "description": "Gorra o Hoodie exclusivo para holders.", "icon": "🧢", "category": "Merch" },
+  { "min_tokens": 500, "label": "Studio Session", "description": "Acceso detrás de escena o Meet & Greet virtual.", "icon": "🎧", "category": "Experiencia" }
 ]
 ```
-*(Nota: ajusté las cantidades de tokens para que sean alcanzables en la demo, asumiendo fracciones promedio de $3 a $10. Los números originales de 5,000 requerirían inversiones de $20,000+ USD que romperían el saldo de la demo).*
 
-### 2. Nuevo Componente (`src/components/be4t/BenefitCard.jsx`)
-Se creará un componente aislado para manejar la visualización de los Perks.
-- **Lógica Dinámica:** Recibirá `userBalance` (la cantidad de fracciones o tokens que el usuario posee de ese track específico). Comparará este valor contra `min_tokens`.
-- **Estética 'Berlin Underground':**
-  - Fondo `bg-[#111]` o `bg-black` con bordes sutiles de cristal `border border-white/5`.
-  - Tipografías crudas e industriales (Mono/Inter).
-  - Efectos visuales: Estado bloqueado (ícono gris/candado) vs. Estado Desbloqueado (ícono cian neón `text-[#00FFCC]`, botón animado 'Reclamar').
+### 2. UI: El 'Abre Bocas' (`src/components/be4t/SongCard.jsx`)
+Para aumentar la conversión y el valor percibido desde el feed principal:
+- **[MODIFY]** Añadiremos un badge `PERKS DISPONIBLES` superpuesto en la tarjeta.
+- **[MODIFY]** Debajo del nombre del artista insertaremos el texto luminoso: `🎁 Desbloquea: Preventa VIP + Merch Exclusivo`.
+- **[MODIFY]** Colocaremos indicadores `BLUE CHIP` (si APY >= 15%) y `HOT` (si las reproducciones superan 1M) sobre el cover art, usando un diseño glassmorphism.
 
-### 3. Integración en `SongDetail.jsx`
-- Importar y renderizar `<BenefitCard>` debajo del bloque de Retornos (`ReturnCalculator`).
-- Se alimentará conectando `useDemoBalance` (o `useOnChainBalance` a futuro) consultando específicamente las `fractions` poseídas de ese `songId`.
-- El botón de 'Reclamar' en modo Showcase disparará un popup nativo de éxito o `alert()` pulido.
+### 3. UI: 'Benefits Vault' (`src/components/be4t/BenefitCard.jsx` & `SongDetail.jsx`)
+- **[MODIFY] `SongDetail.jsx`:** Cambiaremos el título simple por "🎉 BÓVEDA DE BENEFICIOS DEL ARTISTA". Contendrá una rejilla (`grid-cols-1 md:grid-cols-3`) para que los 3 Tiers se muestren lado a lado como pilares de inversión.
+- **[MODIFY] `BenefitCard.jsx`:** Pasará de ser una franja horizontal a una tarjeta vertical tipo pilar.
+  - *Estado Bloqueado:* Escala de grises, opacidad baja, texto "Invierte X tokens más para desbloquear".
+  - *Estado Desbloqueado:* Gradiente de fondo oscuro (`bg-[#0c0c0c]`), borde brillante (`border-[#00FFCC]`), efecto `box-shadow` pulsante y botón "RECLAMAR BENEFICIO".
+  - *Feedback:* Integraré un micro-efecto de "confeti digital" (reutilizando el `ConfettiBlast` o CSS puro) que se dispare al presionar el botón de reclamo.
 
 ## Open Questions
 
 > [!IMPORTANT]
-> - **Cantidades Requeridas:** Para que un usuario experimente desbloquear un beneficio en la demo, propongo que las barreras sean `50`, `150` y `500` fracciones. ¿Estás de acuerdo con estos números o prefieres mantener los originales `500`, `1000`, `5000`?
-> - **UI 'Reclamar':** En el modo Demo, cuando el usuario presiona 'Reclamar', ¿quieres un Modal a pantalla completa o un simple 'Toast / Notification' que diga que se enviará el correo?
+> - **Cantidades del Nivel 3 (VIP):** Hemos fijado el Nivel 3 en 500 tokens. Si la fracción vale ~$5, el VIP cuesta ~$2,500 USD. ¿Están bien estos valores para la demo o reducimos el VIP a 250 tokens para que el tester llegue más fácil?
+> - **Etiquetas en la SongCard:** ¿El texto `🎁 Desbloquea...` debajo del artista debe aparecer en *todas* las tarjetas o sólo en las que tengan la bandera `isPremiumAsset` / `BLUE CHIP`?
 
 ## Plan de Verificación
-1. Ejecutar la demo.
-2. Comprar 51 tokens de "High (feat. Apache)".
-3. Verificar que la card del primer beneficio (`min_tokens: 50`) pase de gris/candado a color Cyan neón con el botón Reclamar activo, mientras que los beneficios superiores permanezcan bloqueados.
+1. Inyectar la metadata a nivel local.
+2. Comprobar visualmente la portada del Marketplace: revisar si los badges `BLUE CHIP`, `HOT` y `PERKS DISPONIBLES` se alinean sin romper el diseño responsive.
+3. Entrar a una canción con 0 tokens: verificar que los 3 pilares se muestran bloqueados.
+4. Adquirir 51 tokens: verificar que el Nivel 1 se ilumina en cyan y muestra el botón de Reclamar.

@@ -1,8 +1,7 @@
-# Fan Benefits Integration
+# Fan Perks (Tier System) & Marketplace Card Improvements
 
-- [x] Write python script to inject standard `perks` array into `fallbackSongs.json`
-- [x] Execute script to modify data layer
-- [x] Create `BenefitCard.jsx` component with Berlin/Underground UI
-- [x] Import and place `BenefitCard.jsx` within `SongDetail.jsx`
-- [x] Connect `BenefitCard` to user's fractional balance state
-- [x] Create demo mode success Toast/Modal logic when clicking 'Reclamar'
+- [x] Write and run python script to inject 3-tier perks (`50`, `150`, `250` tokens) with `description` and `category` into `fallbackSongs.json`
+- [x] Update `SongCard.jsx` to include `PERKS DISPONIBLES` badge, `HOT`/`BLUE CHIP` tags, and `🎁 Desbloquea...` text
+- [ ] Refactor `BenefitCard.jsx` to a vertical pillar design (glassmorphism) for 3-tier grid layout
+- [ ] Update `SongDetail.jsx` to use a 3-column grid and rename section to `BACKSTAGE ACCESS`
+- [ ] Build and verify UI

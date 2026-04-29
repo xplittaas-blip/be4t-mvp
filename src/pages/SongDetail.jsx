@@ -818,16 +818,20 @@ const SongDetail = ({ onBack, songId, songData, onRequireAuth, isAuthenticated, 
                     </div>
                 </section>
                 
-                {/* ── Fan Benefits (Token-Gating) ── */}
+                {/* ── Fan Benefits (Token-Gating 3-Tier) ── */}
                 {song.perks && song.perks.length > 0 && (
-                    <section style={{ marginTop: '2rem' }}>
-                        <h3 className="mb-4 text-xl font-bold tracking-tight text-white font-mono">
-                            EXCLUSIVE PERKS
-                        </h3>
-                        <div className="flex flex-col space-y-3">
+                    <section style={{ marginTop: '3rem' }}>
+                        <div className="flex items-center space-x-3 mb-6">
+                            <span className="text-2xl">🎫</span>
+                            <h3 className="text-xl font-bold tracking-tight text-white font-mono uppercase text-transparent bg-clip-text bg-gradient-to-r from-white to-neutral-500">
+                                VIP Backstage
+                            </h3>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                             {song.perks.map((perk, idx) => (
                                 <BenefitCard 
                                     key={idx} 
+                                    tierIndex={idx}
                                     perk={perk} 
                                     userBalance={isAcquired(song.id)?.fractions || 0} 
                                 />

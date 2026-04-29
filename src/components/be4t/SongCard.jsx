@@ -297,14 +297,25 @@ const SongCard = ({ song, userMode, index = 0, onDetailClick }) => {
                     <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '55%',
                         background: 'linear-gradient(to top, rgba(8,4,20,0.97) 0%, transparent 100%)', zIndex: 2 }} />
 
-                    {/* MUSIC / RWA badge */}
+                    {/* MUSIC / RWA badge + PERKS */}
                     <div style={{
-                        position: 'absolute', top: '10px', left: '10px',
-                        background: badgeColor.bg, border: `1px solid ${badgeColor.border}`,
-                        borderRadius: '100px', padding: '3px 9px',
-                        fontSize: '0.62rem', fontWeight: '700', color: badgeColor.text,
-                        letterSpacing: '1px', textTransform: 'uppercase', zIndex: 5,
-                    }}>{song.tag || song.asset_type}</div>
+                        position: 'absolute', top: '10px', left: '10px', display: 'flex', gap: '6px', zIndex: 5
+                    }}>
+                        <div style={{
+                            background: badgeColor.bg, border: `1px solid ${badgeColor.border}`,
+                            borderRadius: '100px', padding: '3px 9px',
+                            fontSize: '0.62rem', fontWeight: '700', color: badgeColor.text,
+                            letterSpacing: '1px', textTransform: 'uppercase',
+                        }}>{song.tag || song.asset_type}</div>
+                        
+                        <div style={{
+                            background: 'rgba(0, 255, 204, 0.15)', border: '1px solid rgba(0, 255, 204, 0.4)',
+                            borderRadius: '100px', padding: '3px 9px',
+                            fontSize: '0.58rem', fontWeight: '800', color: '#00FFCC',
+                            letterSpacing: '0.5px', textTransform: 'uppercase',
+                            boxShadow: '0 0 10px rgba(0, 255, 204, 0.2)'
+                        }}>PERKS DISPONIBLES</div>
+                    </div>
 
                     {song.isP2P && (
                         <div style={{
@@ -421,6 +432,9 @@ const SongCard = ({ song, userMode, index = 0, onDetailClick }) => {
                                     Live
                                 </span>
                             )}
+                        </p>
+                        <p style={{ color: '#00FFCC', fontSize: '0.68rem', margin: '0.4rem 0 0', fontWeight: '600', letterSpacing: '0.3px', textShadow: '0 0 8px rgba(0,255,204,0.3)' }}>
+                            🎁 Desbloquea: Preventa VIP + Merch Exclusivo
                         </p>
                     </div>
 

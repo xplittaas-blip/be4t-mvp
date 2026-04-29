@@ -1,44 +1,28 @@
-# 🎧 Fase 2: BE4T_Vault & Web3 Ledger
+# 🎫 Walkthrough: Beneficios Fan (Token-Gating)
 
-La fundación técnica para la Fase 2 en Base Sepolia está construida e integrada al repositorio. Ahora la plataforma está técnicamente equipada para mintear tokens fraccionados reales.
+La funcionalidad de Beneficios Exclusivos ('Exclusive Perks') ha sido exitosamente construida e integrada en la UI, replicando el modelo de Subvert.fm con el estilo estético premium y "underground" de BE4T.
 
-## ¿Qué se ha implementado?
+## 🛠️ ¿Qué hemos modificado?
 
-### 1. Hardhat y OpenZeppelin en el Repositorio
-Se ha configurado un entorno completo de compilación de Solidity v0.8.24 (Cancun EVM EVM-compatible) directamente en la carpeta raíz.
-* Se ha generado el archivo `hardhat.config.cjs` apuntando al RPC de Base Sepolia y con soporte nativo de Blockscout para la verificación del código fuente.
+### 1. Inyección Dinámica de Metadata
+Ejecuté un script en Python que recorrió nuestro catálogo musical de `fallbackSongs.json` inyectando nativamente los `perks` base. Ahora cada canción expone sus beneficios condicionando el número de tokens requeridos.
 
-### 2. MockUSDC (Moneda de Pruebas BE4T)
-Dado que a veces es difícil obtener USDC oficial en redes Testnet (o la liquidez falla), he creado un contrato `MockUSDC`.
-* Cuenta con seis decimales, estándar del USDC real.
-* Tiene un mecanismo `faucet()` restringido al rol de Dueño (Owner), de modo de que el administrador pueda enviar saldo a voluntad a las billeteras de Demo InAppWallet que usen los inversionistas.
+### 2. Componente de UI: `BenefitCard.jsx`
+Creamos un componente asilado para controlar el *Token-Gating*.
+- **Estado Bloqueado:** Muestra un diseño oscuro con cristal empañado, ícono grisáceo y candado pequeño junto a los *TOKENS REQ*. Debajo, una sutil barra de progreso te muestra el porcentaje adquirido sobre la meta.
+- **Estado Desbloqueado (Neón Berlin):** Si la cantidad de tokens (fracciones) del usuario cumple o supera la barrera, la tarjeta de inmediato enciende sus bordes, su ícono, y el botón pasa a un estado pulsante de Cyan Neón para habilitar la acción.
 
-### 3. BE4T_Vault (El Smart Contract RWA Principal)
-El Smart Contract es un hibrido institucional. Utiliza el estándar **ERC-1155** (Multi-Token Standard).
+### 3. Integración Directa con la Inversión
+El componente de Beneficios ha sido anclado nativamente en `SongDetail.jsx` y enlazado con la lógica de `useDemoBalance(walletAddress)`. 
+Dado que `SongDetail` ya observa el hook `isAcquired`, basta con que el usuario adquiera más fracciones (tokens) desde la misma pantalla de `ReturnCalculator` para ver cómo los candados caen en tiempo real sin necesidad de recargar la página.
+
+### 4. Flujo de Reclamo Integrado
+Al pulsar **Reclamar**:
+- **En la Demo (Showcase):** El botón queda bloqueado con "✅ Reclamado" y dispara una alerta nativa amigable informando que las instrucciones llegarán por correo, dando fin exitoso al *user-journey*.
+- **Modo en Vivo:** Hemos preparado la estructura condicional (`if (!isShowcase)`) donde el trigger podrá integrarse de manera transparente con el webhook CRM del sello en un futuro.
+
+---
 
 > [!TIP]
-> **Componentes del Contrato:**
-> - **KYC Gating:** Se hace uso del método `_update` heredado de OpenZeppelin v5 para truncar transferencias secundarias si el address receptor no está validado (`isKYCVerified`). Posee también el método `manualVerify(address)`.
-> - **Mint & Buy (invest):** Reclama los USDC usando `safeTransferFrom` y emite tokens de la canción basándose en la disponibilidad. 
-> - **Metadatos y Transparencia:** La función `uri(id)` está expuesta y soporta el enlace dinámico al hash maestro legal en IPFS.
-> - **Sistema PULL de Regalías:** En lugar de emitir cientos de micropagos con alto Gas (método Push), las regalías se depositan usando `distributeRoyalties`. Cada holder retira libre y pro-porcionalmente usando `claimRoyalties(id)`, calculando su alícuota en tiempo real respecto al global de tokens emitidos. 
-
-### 4. Setup de Variables de Entorno
-El archivo `.env.example` y `.env.local.example` se actualizaron con los bloques requeridos por el script:
-```env
-# ── Hardhat / Smart Contracts ───────────────────────────────────────────────
-PRIVATE_KEY=0xYourPrivateKeyHere
-BASE_SEPOLIA_RPC=https://sepolia.base.org
-BLOCKSCOUT_API_KEY=YourBlockscoutApiKey
-```
-
-## Siguientes Pasos (Ejecución del Usuario)
-
-Antes de avanzar con el rediseño del hook frontend de Inversión (el refactor de `useDemoBalance.js`), necesitamos desplegar estos contratos para obtener sus direcciones definitivas y embeberlas en las variables de entorno de React.
-
-1. Añade tu `PRIVATE_KEY` en el archivo `.env.local`. (Debe tener algo de ETH de Base Sepolia para el gas).
-2. Ejecuta en tu terminal el script de despliegue:
-   ```bash
-   npx hardhat run scripts/deploy.js --network base-sepolia
-   ```
-3. El script imprimirá 2 direcciones (`MockUSDC` y `BE4T_Vault`). Pásamelas por aquí y procederé a engancharlas con el SDK de Thirdweb en el Frontend.
+> **Pruébalo ya mismo en Producción / Vercel.** 
+> Al entrar al detalle de cualquier canción (p.ej. "High"), verás la sección de *EXCLUSIVE PERKS*. Compra 51 tokens en la demo y observarás cómo el primer beneficio se desbloquea instantáneamente ante tus ojos.

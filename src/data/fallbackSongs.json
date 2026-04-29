@@ -31,18 +31,24 @@
     "perks": [
       {
         "min_tokens": 50,
-        "label": "Early Access to Tickets",
-        "icon": "🎟️"
+        "label": "Preventa VIP",
+        "description": "Acceso garantizado a boletos antes de la venta general.",
+        "icon": "🎟️",
+        "category": "Boletería"
       },
       {
         "min_tokens": 150,
-        "label": "Limited Edition Merch",
-        "icon": "🧢"
+        "label": "Merch Limitado",
+        "description": "Edición especial exclusiva (Gorra o Hoodie) para holders.",
+        "icon": "🧢",
+        "category": "Merch"
       },
       {
-        "min_tokens": 500,
-        "label": "Studio Session Behind-the-scenes",
-        "icon": "🎧"
+        "min_tokens": 250,
+        "label": "Studio Session",
+        "description": "Acceso detrás de escena o Meet & Greet virtual íntimo.",
+        "icon": "🎧",
+        "category": "Experiencia"
       }
     ]
   },
@@ -78,18 +84,24 @@
     "perks": [
       {
         "min_tokens": 50,
-        "label": "Early Access to Tickets",
-        "icon": "🎟️"
+        "label": "Preventa VIP",
+        "description": "Acceso garantizado a boletos antes de la venta general.",
+        "icon": "🎟️",
+        "category": "Boletería"
       },
       {
         "min_tokens": 150,
-        "label": "Limited Edition Merch",
-        "icon": "🧢"
+        "label": "Merch Limitado",
+        "description": "Edición especial exclusiva (Gorra o Hoodie) para holders.",
+        "icon": "🧢",
+        "category": "Merch"
       },
       {
-        "min_tokens": 500,
-        "label": "Studio Session Behind-the-scenes",
-        "icon": "🎧"
+        "min_tokens": 250,
+        "label": "Studio Session",
+        "description": "Acceso detrás de escena o Meet & Greet virtual íntimo.",
+        "icon": "🎧",
+        "category": "Experiencia"
       }
     ]
   },
@@ -125,18 +137,24 @@
     "perks": [
       {
         "min_tokens": 50,
-        "label": "Early Access to Tickets",
-        "icon": "🎟️"
+        "label": "Preventa VIP",
+        "description": "Acceso garantizado a boletos antes de la venta general.",
+        "icon": "🎟️",
+        "category": "Boletería"
       },
       {
         "min_tokens": 150,
-        "label": "Limited Edition Merch",
-        "icon": "🧢"
+        "label": "Merch Limitado",
+        "description": "Edición especial exclusiva (Gorra o Hoodie) para holders.",
+        "icon": "🧢",
+        "category": "Merch"
       },
       {
-        "min_tokens": 500,
-        "label": "Studio Session Behind-the-scenes",
-        "icon": "🎧"
+        "min_tokens": 250,
+        "label": "Studio Session",
+        "description": "Acceso detrás de escena o Meet & Greet virtual íntimo.",
+        "icon": "🎧",
+        "category": "Experiencia"
       }
     ]
   },
@@ -172,18 +190,24 @@
     "perks": [
       {
         "min_tokens": 50,
-        "label": "Early Access to Tickets",
-        "icon": "🎟️"
+        "label": "Preventa VIP",
+        "description": "Acceso garantizado a boletos antes de la venta general.",
+        "icon": "🎟️",
+        "category": "Boletería"
       },
       {
         "min_tokens": 150,
-        "label": "Limited Edition Merch",
-        "icon": "🧢"
+        "label": "Merch Limitado",
+        "description": "Edición especial exclusiva (Gorra o Hoodie) para holders.",
+        "icon": "🧢",
+        "category": "Merch"
       },
       {
-        "min_tokens": 500,
-        "label": "Studio Session Behind-the-scenes",
-        "icon": "🎧"
+        "min_tokens": 250,
+        "label": "Studio Session",
+        "description": "Acceso detrás de escena o Meet & Greet virtual íntimo.",
+        "icon": "🎧",
+        "category": "Experiencia"
       }
     ]
   },
@@ -219,18 +243,24 @@
     "perks": [
       {
         "min_tokens": 50,
-        "label": "Early Access to Tickets",
-        "icon": "🎟️"
+        "label": "Preventa VIP",
+        "description": "Acceso garantizado a boletos antes de la venta general.",
+        "icon": "🎟️",
+        "category": "Boletería"
       },
       {
         "min_tokens": 150,
-        "label": "Limited Edition Merch",
-        "icon": "🧢"
+        "label": "Merch Limitado",
+        "description": "Edición especial exclusiva (Gorra o Hoodie) para holders.",
+        "icon": "🧢",
+        "category": "Merch"
       },
       {
-        "min_tokens": 500,
-        "label": "Studio Session Behind-the-scenes",
-        "icon": "🎧"
+        "min_tokens": 250,
+        "label": "Studio Session",
+        "description": "Acceso detrás de escena o Meet & Greet virtual íntimo.",
+        "icon": "🎧",
+        "category": "Experiencia"
       }
     ]
   },
@@ -266,18 +296,24 @@
     "perks": [
       {
         "min_tokens": 50,
-        "label": "Early Access to Tickets",
-        "icon": "🎟️"
+        "label": "Preventa VIP",
+        "description": "Acceso garantizado a boletos antes de la venta general.",
+        "icon": "🎟️",
+        "category": "Boletería"
       },
       {
         "min_tokens": 150,
-        "label": "Limited Edition Merch",
-        "icon": "🧢"
+        "label": "Merch Limitado",
+        "description": "Edición especial exclusiva (Gorra o Hoodie) para holders.",
+        "icon": "🧢",
+        "category": "Merch"
       },
       {
-        "min_tokens": 500,
-        "label": "Studio Session Behind-the-scenes",
-        "icon": "🎧"
+        "min_tokens": 250,
+        "label": "Studio Session",
+        "description": "Acceso detrás de escena o Meet & Greet virtual íntimo.",
+        "icon": "🎧",
+        "category": "Experiencia"
       }
     ]
   },
@@ -313,18 +349,24 @@
     "perks": [
       {
         "min_tokens": 50,
-        "label": "Early Access to Tickets",
-        "icon": "🎟️"
+        "label": "Preventa VIP",
+        "description": "Acceso garantizado a boletos antes de la venta general.",
+        "icon": "🎟️",
+        "category": "Boletería"
       },
       {
         "min_tokens": 150,
-        "label": "Limited Edition Merch",
-        "icon": "🧢"
+        "label": "Merch Limitado",
+        "description": "Edición especial exclusiva (Gorra o Hoodie) para holders.",
+        "icon": "🧢",
+        "category": "Merch"
       },
       {
-        "min_tokens": 500,
-        "label": "Studio Session Behind-the-scenes",
-        "icon": "🎧"
+        "min_tokens": 250,
+        "label": "Studio Session",
+        "description": "Acceso detrás de escena o Meet & Greet virtual íntimo.",
+        "icon": "🎧",
+        "category": "Experiencia"
       }
     ]
   },
@@ -360,18 +402,24 @@
     "perks": [
       {
         "min_tokens": 50,
-        "label": "Early Access to Tickets",
-        "icon": "🎟️"
+        "label": "Preventa VIP",
+        "description": "Acceso garantizado a boletos antes de la venta general.",
+        "icon": "🎟️",
+        "category": "Boletería"
       },
       {
         "min_tokens": 150,
-        "label": "Limited Edition Merch",
-        "icon": "🧢"
+        "label": "Merch Limitado",
+        "description": "Edición especial exclusiva (Gorra o Hoodie) para holders.",
+        "icon": "🧢",
+        "category": "Merch"
       },
       {
-        "min_tokens": 500,
-        "label": "Studio Session Behind-the-scenes",
-        "icon": "🎧"
+        "min_tokens": 250,
+        "label": "Studio Session",
+        "description": "Acceso detrás de escena o Meet & Greet virtual íntimo.",
+        "icon": "🎧",
+        "category": "Experiencia"
       }
     ]
   },
@@ -407,18 +455,24 @@
     "perks": [
       {
         "min_tokens": 50,
-        "label": "Early Access to Tickets",
-        "icon": "🎟️"
+        "label": "Preventa VIP",
+        "description": "Acceso garantizado a boletos antes de la venta general.",
+        "icon": "🎟️",
+        "category": "Boletería"
       },
       {
         "min_tokens": 150,
-        "label": "Limited Edition Merch",
-        "icon": "🧢"
+        "label": "Merch Limitado",
+        "description": "Edición especial exclusiva (Gorra o Hoodie) para holders.",
+        "icon": "🧢",
+        "category": "Merch"
       },
       {
-        "min_tokens": 500,
-        "label": "Studio Session Behind-the-scenes",
-        "icon": "🎧"
+        "min_tokens": 250,
+        "label": "Studio Session",
+        "description": "Acceso detrás de escena o Meet & Greet virtual íntimo.",
+        "icon": "🎧",
+        "category": "Experiencia"
       }
     ]
   },
@@ -454,18 +508,24 @@
     "perks": [
       {
         "min_tokens": 50,
-        "label": "Early Access to Tickets",
-        "icon": "🎟️"
+        "label": "Preventa VIP",
+        "description": "Acceso garantizado a boletos antes de la venta general.",
+        "icon": "🎟️",
+        "category": "Boletería"
       },
       {
         "min_tokens": 150,
-        "label": "Limited Edition Merch",
-        "icon": "🧢"
+        "label": "Merch Limitado",
+        "description": "Edición especial exclusiva (Gorra o Hoodie) para holders.",
+        "icon": "🧢",
+        "category": "Merch"
       },
       {
-        "min_tokens": 500,
-        "label": "Studio Session Behind-the-scenes",
-        "icon": "🎧"
+        "min_tokens": 250,
+        "label": "Studio Session",
+        "description": "Acceso detrás de escena o Meet & Greet virtual íntimo.",
+        "icon": "🎧",
+        "category": "Experiencia"
       }
     ]
   },
@@ -501,18 +561,24 @@
     "perks": [
       {
         "min_tokens": 50,
-        "label": "Early Access to Tickets",
-        "icon": "🎟️"
+        "label": "Preventa VIP",
+        "description": "Acceso garantizado a boletos antes de la venta general.",
+        "icon": "🎟️",
+        "category": "Boletería"
       },
       {
         "min_tokens": 150,
-        "label": "Limited Edition Merch",
-        "icon": "🧢"
+        "label": "Merch Limitado",
+        "description": "Edición especial exclusiva (Gorra o Hoodie) para holders.",
+        "icon": "🧢",
+        "category": "Merch"
       },
       {
-        "min_tokens": 500,
-        "label": "Studio Session Behind-the-scenes",
-        "icon": "🎧"
+        "min_tokens": 250,
+        "label": "Studio Session",
+        "description": "Acceso detrás de escena o Meet & Greet virtual íntimo.",
+        "icon": "🎧",
+        "category": "Experiencia"
       }
     ]
   },
@@ -548,18 +614,24 @@
     "perks": [
       {
         "min_tokens": 50,
-        "label": "Early Access to Tickets",
-        "icon": "🎟️"
+        "label": "Preventa VIP",
+        "description": "Acceso garantizado a boletos antes de la venta general.",
+        "icon": "🎟️",
+        "category": "Boletería"
       },
       {
         "min_tokens": 150,
-        "label": "Limited Edition Merch",
-        "icon": "🧢"
+        "label": "Merch Limitado",
+        "description": "Edición especial exclusiva (Gorra o Hoodie) para holders.",
+        "icon": "🧢",
+        "category": "Merch"
       },
       {
-        "min_tokens": 500,
-        "label": "Studio Session Behind-the-scenes",
-        "icon": "🎧"
+        "min_tokens": 250,
+        "label": "Studio Session",
+        "description": "Acceso detrás de escena o Meet & Greet virtual íntimo.",
+        "icon": "🎧",
+        "category": "Experiencia"
       }
     ]
   },
@@ -595,18 +667,24 @@
     "perks": [
       {
         "min_tokens": 50,
-        "label": "Early Access to Tickets",
-        "icon": "🎟️"
+        "label": "Preventa VIP",
+        "description": "Acceso garantizado a boletos antes de la venta general.",
+        "icon": "🎟️",
+        "category": "Boletería"
       },
       {
         "min_tokens": 150,
-        "label": "Limited Edition Merch",
-        "icon": "🧢"
+        "label": "Merch Limitado",
+        "description": "Edición especial exclusiva (Gorra o Hoodie) para holders.",
+        "icon": "🧢",
+        "category": "Merch"
       },
       {
-        "min_tokens": 500,
-        "label": "Studio Session Behind-the-scenes",
-        "icon": "🎧"
+        "min_tokens": 250,
+        "label": "Studio Session",
+        "description": "Acceso detrás de escena o Meet & Greet virtual íntimo.",
+        "icon": "🎧",
+        "category": "Experiencia"
       }
     ]
   },
@@ -642,18 +720,24 @@
     "perks": [
       {
         "min_tokens": 50,
-        "label": "Early Access to Tickets",
-        "icon": "🎟️"
+        "label": "Preventa VIP",
+        "description": "Acceso garantizado a boletos antes de la venta general.",
+        "icon": "🎟️",
+        "category": "Boletería"
       },
       {
         "min_tokens": 150,
-        "label": "Limited Edition Merch",
-        "icon": "🧢"
+        "label": "Merch Limitado",
+        "description": "Edición especial exclusiva (Gorra o Hoodie) para holders.",
+        "icon": "🧢",
+        "category": "Merch"
       },
       {
-        "min_tokens": 500,
-        "label": "Studio Session Behind-the-scenes",
-        "icon": "🎧"
+        "min_tokens": 250,
+        "label": "Studio Session",
+        "description": "Acceso detrás de escena o Meet & Greet virtual íntimo.",
+        "icon": "🎧",
+        "category": "Experiencia"
       }
     ]
   },
@@ -689,18 +773,24 @@
     "perks": [
       {
         "min_tokens": 50,
-        "label": "Early Access to Tickets",
-        "icon": "🎟️"
+        "label": "Preventa VIP",
+        "description": "Acceso garantizado a boletos antes de la venta general.",
+        "icon": "🎟️",
+        "category": "Boletería"
       },
       {
         "min_tokens": 150,
-        "label": "Limited Edition Merch",
-        "icon": "🧢"
+        "label": "Merch Limitado",
+        "description": "Edición especial exclusiva (Gorra o Hoodie) para holders.",
+        "icon": "🧢",
+        "category": "Merch"
       },
       {
-        "min_tokens": 500,
-        "label": "Studio Session Behind-the-scenes",
-        "icon": "🎧"
+        "min_tokens": 250,
+        "label": "Studio Session",
+        "description": "Acceso detrás de escena o Meet & Greet virtual íntimo.",
+        "icon": "🎧",
+        "category": "Experiencia"
       }
     ]
   },
@@ -736,18 +826,24 @@
     "perks": [
       {
         "min_tokens": 50,
-        "label": "Early Access to Tickets",
-        "icon": "🎟️"
+        "label": "Preventa VIP",
+        "description": "Acceso garantizado a boletos antes de la venta general.",
+        "icon": "🎟️",
+        "category": "Boletería"
       },
       {
         "min_tokens": 150,
-        "label": "Limited Edition Merch",
-        "icon": "🧢"
+        "label": "Merch Limitado",
+        "description": "Edición especial exclusiva (Gorra o Hoodie) para holders.",
+        "icon": "🧢",
+        "category": "Merch"
       },
       {
-        "min_tokens": 500,
-        "label": "Studio Session Behind-the-scenes",
-        "icon": "🎧"
+        "min_tokens": 250,
+        "label": "Studio Session",
+        "description": "Acceso detrás de escena o Meet & Greet virtual íntimo.",
+        "icon": "🎧",
+        "category": "Experiencia"
       }
     ]
   },
@@ -783,18 +879,24 @@
     "perks": [
       {
         "min_tokens": 50,
-        "label": "Early Access to Tickets",
-        "icon": "🎟️"
+        "label": "Preventa VIP",
+        "description": "Acceso garantizado a boletos antes de la venta general.",
+        "icon": "🎟️",
+        "category": "Boletería"
       },
       {
         "min_tokens": 150,
-        "label": "Limited Edition Merch",
-        "icon": "🧢"
+        "label": "Merch Limitado",
+        "description": "Edición especial exclusiva (Gorra o Hoodie) para holders.",
+        "icon": "🧢",
+        "category": "Merch"
       },
       {
-        "min_tokens": 500,
-        "label": "Studio Session Behind-the-scenes",
-        "icon": "🎧"
+        "min_tokens": 250,
+        "label": "Studio Session",
+        "description": "Acceso detrás de escena o Meet & Greet virtual íntimo.",
+        "icon": "🎧",
+        "category": "Experiencia"
       }
     ]
   },
@@ -830,18 +932,24 @@
     "perks": [
       {
         "min_tokens": 50,
-        "label": "Early Access to Tickets",
-        "icon": "🎟️"
+        "label": "Preventa VIP",
+        "description": "Acceso garantizado a boletos antes de la venta general.",
+        "icon": "🎟️",
+        "category": "Boletería"
       },
       {
         "min_tokens": 150,
-        "label": "Limited Edition Merch",
-        "icon": "🧢"
+        "label": "Merch Limitado",
+        "description": "Edición especial exclusiva (Gorra o Hoodie) para holders.",
+        "icon": "🧢",
+        "category": "Merch"
       },
       {
-        "min_tokens": 500,
-        "label": "Studio Session Behind-the-scenes",
-        "icon": "🎧"
+        "min_tokens": 250,
+        "label": "Studio Session",
+        "description": "Acceso detrás de escena o Meet & Greet virtual íntimo.",
+        "icon": "🎧",
+        "category": "Experiencia"
       }
     ]
   },
@@ -877,18 +985,24 @@
     "perks": [
       {
         "min_tokens": 50,
-        "label": "Early Access to Tickets",
-        "icon": "🎟️"
+        "label": "Preventa VIP",
+        "description": "Acceso garantizado a boletos antes de la venta general.",
+        "icon": "🎟️",
+        "category": "Boletería"
       },
       {
         "min_tokens": 150,
-        "label": "Limited Edition Merch",
-        "icon": "🧢"
+        "label": "Merch Limitado",
+        "description": "Edición especial exclusiva (Gorra o Hoodie) para holders.",
+        "icon": "🧢",
+        "category": "Merch"
       },
       {
-        "min_tokens": 500,
-        "label": "Studio Session Behind-the-scenes",
-        "icon": "🎧"
+        "min_tokens": 250,
+        "label": "Studio Session",
+        "description": "Acceso detrás de escena o Meet & Greet virtual íntimo.",
+        "icon": "🎧",
+        "category": "Experiencia"
       }
     ]
   },
@@ -924,18 +1038,24 @@
     "perks": [
       {
         "min_tokens": 50,
-        "label": "Early Access to Tickets",
-        "icon": "🎟️"
+        "label": "Preventa VIP",
+        "description": "Acceso garantizado a boletos antes de la venta general.",
+        "icon": "🎟️",
+        "category": "Boletería"
       },
       {
         "min_tokens": 150,
-        "label": "Limited Edition Merch",
-        "icon": "🧢"
+        "label": "Merch Limitado",
+        "description": "Edición especial exclusiva (Gorra o Hoodie) para holders.",
+        "icon": "🧢",
+        "category": "Merch"
       },
       {
-        "min_tokens": 500,
-        "label": "Studio Session Behind-the-scenes",
-        "icon": "🎧"
+        "min_tokens": 250,
+        "label": "Studio Session",
+        "description": "Acceso detrás de escena o Meet & Greet virtual íntimo.",
+        "icon": "🎧",
+        "category": "Experiencia"
       }
     ]
   },
@@ -971,18 +1091,24 @@
     "perks": [
       {
         "min_tokens": 50,
-        "label": "Early Access to Tickets",
-        "icon": "🎟️"
+        "label": "Preventa VIP",
+        "description": "Acceso garantizado a boletos antes de la venta general.",
+        "icon": "🎟️",
+        "category": "Boletería"
       },
       {
         "min_tokens": 150,
-        "label": "Limited Edition Merch",
-        "icon": "🧢"
+        "label": "Merch Limitado",
+        "description": "Edición especial exclusiva (Gorra o Hoodie) para holders.",
+        "icon": "🧢",
+        "category": "Merch"
       },
       {
-        "min_tokens": 500,
-        "label": "Studio Session Behind-the-scenes",
-        "icon": "🎧"
+        "min_tokens": 250,
+        "label": "Studio Session",
+        "description": "Acceso detrás de escena o Meet & Greet virtual íntimo.",
+        "icon": "🎧",
+        "category": "Experiencia"
       }
     ]
   },
@@ -1018,18 +1144,24 @@
     "perks": [
       {
         "min_tokens": 50,
-        "label": "Early Access to Tickets",
-        "icon": "🎟️"
+        "label": "Preventa VIP",
+        "description": "Acceso garantizado a boletos antes de la venta general.",
+        "icon": "🎟️",
+        "category": "Boletería"
       },
       {
         "min_tokens": 150,
-        "label": "Limited Edition Merch",
-        "icon": "🧢"
+        "label": "Merch Limitado",
+        "description": "Edición especial exclusiva (Gorra o Hoodie) para holders.",
+        "icon": "🧢",
+        "category": "Merch"
       },
       {
-        "min_tokens": 500,
-        "label": "Studio Session Behind-the-scenes",
-        "icon": "🎧"
+        "min_tokens": 250,
+        "label": "Studio Session",
+        "description": "Acceso detrás de escena o Meet & Greet virtual íntimo.",
+        "icon": "🎧",
+        "category": "Experiencia"
       }
     ]
   },
@@ -1065,18 +1197,24 @@
     "perks": [
       {
         "min_tokens": 50,
-        "label": "Early Access to Tickets",
-        "icon": "🎟️"
+        "label": "Preventa VIP",
+        "description": "Acceso garantizado a boletos antes de la venta general.",
+        "icon": "🎟️",
+        "category": "Boletería"
       },
       {
         "min_tokens": 150,
-        "label": "Limited Edition Merch",
-        "icon": "🧢"
+        "label": "Merch Limitado",
+        "description": "Edición especial exclusiva (Gorra o Hoodie) para holders.",
+        "icon": "🧢",
+        "category": "Merch"
       },
       {
-        "min_tokens": 500,
-        "label": "Studio Session Behind-the-scenes",
-        "icon": "🎧"
+        "min_tokens": 250,
+        "label": "Studio Session",
+        "description": "Acceso detrás de escena o Meet & Greet virtual íntimo.",
+        "icon": "🎧",
+        "category": "Experiencia"
       }
     ]
   },
@@ -1112,18 +1250,24 @@
     "perks": [
       {
         "min_tokens": 50,
-        "label": "Early Access to Tickets",
-        "icon": "🎟️"
+        "label": "Preventa VIP",
+        "description": "Acceso garantizado a boletos antes de la venta general.",
+        "icon": "🎟️",
+        "category": "Boletería"
       },
       {
         "min_tokens": 150,
-        "label": "Limited Edition Merch",
-        "icon": "🧢"
+        "label": "Merch Limitado",
+        "description": "Edición especial exclusiva (Gorra o Hoodie) para holders.",
+        "icon": "🧢",
+        "category": "Merch"
       },
       {
-        "min_tokens": 500,
-        "label": "Studio Session Behind-the-scenes",
-        "icon": "🎧"
+        "min_tokens": 250,
+        "label": "Studio Session",
+        "description": "Acceso detrás de escena o Meet & Greet virtual íntimo.",
+        "icon": "🎧",
+        "category": "Experiencia"
       }
     ]
   },
@@ -1159,18 +1303,24 @@
     "perks": [
       {
         "min_tokens": 50,
-        "label": "Early Access to Tickets",
-        "icon": "🎟️"
+        "label": "Preventa VIP",
+        "description": "Acceso garantizado a boletos antes de la venta general.",
+        "icon": "🎟️",
+        "category": "Boletería"
       },
       {
         "min_tokens": 150,
-        "label": "Limited Edition Merch",
-        "icon": "🧢"
+        "label": "Merch Limitado",
+        "description": "Edición especial exclusiva (Gorra o Hoodie) para holders.",
+        "icon": "🧢",
+        "category": "Merch"
       },
       {
-        "min_tokens": 500,
-        "label": "Studio Session Behind-the-scenes",
-        "icon": "🎧"
+        "min_tokens": 250,
+        "label": "Studio Session",
+        "description": "Acceso detrás de escena o Meet & Greet virtual íntimo.",
+        "icon": "🎧",
+        "category": "Experiencia"
       }
     ]
   },
@@ -1206,18 +1356,24 @@
     "perks": [
       {
         "min_tokens": 50,
-        "label": "Early Access to Tickets",
-        "icon": "🎟️"
+        "label": "Preventa VIP",
+        "description": "Acceso garantizado a boletos antes de la venta general.",
+        "icon": "🎟️",
+        "category": "Boletería"
       },
       {
         "min_tokens": 150,
-        "label": "Limited Edition Merch",
-        "icon": "🧢"
+        "label": "Merch Limitado",
+        "description": "Edición especial exclusiva (Gorra o Hoodie) para holders.",
+        "icon": "🧢",
+        "category": "Merch"
       },
       {
-        "min_tokens": 500,
-        "label": "Studio Session Behind-the-scenes",
-        "icon": "🎧"
+        "min_tokens": 250,
+        "label": "Studio Session",
+        "description": "Acceso detrás de escena o Meet & Greet virtual íntimo.",
+        "icon": "🎧",
+        "category": "Experiencia"
       }
     ]
   },
@@ -1253,18 +1409,24 @@
     "perks": [
       {
         "min_tokens": 50,
-        "label": "Early Access to Tickets",
-        "icon": "🎟️"
+        "label": "Preventa VIP",
+        "description": "Acceso garantizado a boletos antes de la venta general.",
+        "icon": "🎟️",
+        "category": "Boletería"
       },
       {
         "min_tokens": 150,
-        "label": "Limited Edition Merch",
-        "icon": "🧢"
+        "label": "Merch Limitado",
+        "description": "Edición especial exclusiva (Gorra o Hoodie) para holders.",
+        "icon": "🧢",
+        "category": "Merch"
       },
       {
-        "min_tokens": 500,
-        "label": "Studio Session Behind-the-scenes",
-        "icon": "🎧"
+        "min_tokens": 250,
+        "label": "Studio Session",
+        "description": "Acceso detrás de escena o Meet & Greet virtual íntimo.",
+        "icon": "🎧",
+        "category": "Experiencia"
       }
     ]
   },
@@ -1300,18 +1462,24 @@
     "perks": [
       {
         "min_tokens": 50,
-        "label": "Early Access to Tickets",
-        "icon": "🎟️"
+        "label": "Preventa VIP",
+        "description": "Acceso garantizado a boletos antes de la venta general.",
+        "icon": "🎟️",
+        "category": "Boletería"
       },
       {
         "min_tokens": 150,
-        "label": "Limited Edition Merch",
-        "icon": "🧢"
+        "label": "Merch Limitado",
+        "description": "Edición especial exclusiva (Gorra o Hoodie) para holders.",
+        "icon": "🧢",
+        "category": "Merch"
       },
       {
-        "min_tokens": 500,
-        "label": "Studio Session Behind-the-scenes",
-        "icon": "🎧"
+        "min_tokens": 250,
+        "label": "Studio Session",
+        "description": "Acceso detrás de escena o Meet & Greet virtual íntimo.",
+        "icon": "🎧",
+        "category": "Experiencia"
       }
     ]
   },
@@ -1347,18 +1515,24 @@
     "perks": [
       {
         "min_tokens": 50,
-        "label": "Early Access to Tickets",
-        "icon": "🎟️"
+        "label": "Preventa VIP",
+        "description": "Acceso garantizado a boletos antes de la venta general.",
+        "icon": "🎟️",
+        "category": "Boletería"
       },
       {
         "min_tokens": 150,
-        "label": "Limited Edition Merch",
-        "icon": "🧢"
+        "label": "Merch Limitado",
+        "description": "Edición especial exclusiva (Gorra o Hoodie) para holders.",
+        "icon": "🧢",
+        "category": "Merch"
       },
       {
-        "min_tokens": 500,
-        "label": "Studio Session Behind-the-scenes",
-        "icon": "🎧"
+        "min_tokens": 250,
+        "label": "Studio Session",
+        "description": "Acceso detrás de escena o Meet & Greet virtual íntimo.",
+        "icon": "🎧",
+        "category": "Experiencia"
       }
     ]
   },
@@ -1394,18 +1568,24 @@
     "perks": [
       {
         "min_tokens": 50,
-        "label": "Early Access to Tickets",
-        "icon": "🎟️"
+        "label": "Preventa VIP",
+        "description": "Acceso garantizado a boletos antes de la venta general.",
+        "icon": "🎟️",
+        "category": "Boletería"
       },
       {
         "min_tokens": 150,
-        "label": "Limited Edition Merch",
-        "icon": "🧢"
+        "label": "Merch Limitado",
+        "description": "Edición especial exclusiva (Gorra o Hoodie) para holders.",
+        "icon": "🧢",
+        "category": "Merch"
       },
       {
-        "min_tokens": 500,
-        "label": "Studio Session Behind-the-scenes",
-        "icon": "🎧"
+        "min_tokens": 250,
+        "label": "Studio Session",
+        "description": "Acceso detrás de escena o Meet & Greet virtual íntimo.",
+        "icon": "🎧",
+        "category": "Experiencia"
       }
     ]
   },
@@ -1441,18 +1621,24 @@
     "perks": [
       {
         "min_tokens": 50,
-        "label": "Early Access to Tickets",
-        "icon": "🎟️"
+        "label": "Preventa VIP",
+        "description": "Acceso garantizado a boletos antes de la venta general.",
+        "icon": "🎟️",
+        "category": "Boletería"
       },
       {
         "min_tokens": 150,
-        "label": "Limited Edition Merch",
-        "icon": "🧢"
+        "label": "Merch Limitado",
+        "description": "Edición especial exclusiva (Gorra o Hoodie) para holders.",
+        "icon": "🧢",
+        "category": "Merch"
       },
       {
-        "min_tokens": 500,
-        "label": "Studio Session Behind-the-scenes",
-        "icon": "🎧"
+        "min_tokens": 250,
+        "label": "Studio Session",
+        "description": "Acceso detrás de escena o Meet & Greet virtual íntimo.",
+        "icon": "🎧",
+        "category": "Experiencia"
       }
     ]
   },
@@ -1488,18 +1674,24 @@
     "perks": [
       {
         "min_tokens": 50,
-        "label": "Early Access to Tickets",
-        "icon": "🎟️"
+        "label": "Preventa VIP",
+        "description": "Acceso garantizado a boletos antes de la venta general.",
+        "icon": "🎟️",
+        "category": "Boletería"
       },
       {
         "min_tokens": 150,
-        "label": "Limited Edition Merch",
-        "icon": "🧢"
+        "label": "Merch Limitado",
+        "description": "Edición especial exclusiva (Gorra o Hoodie) para holders.",
+        "icon": "🧢",
+        "category": "Merch"
       },
       {
-        "min_tokens": 500,
-        "label": "Studio Session Behind-the-scenes",
-        "icon": "🎧"
+        "min_tokens": 250,
+        "label": "Studio Session",
+        "description": "Acceso detrás de escena o Meet & Greet virtual íntimo.",
+        "icon": "🎧",
+        "category": "Experiencia"
       }
     ]
   },
@@ -1535,18 +1727,24 @@
     "perks": [
       {
         "min_tokens": 50,
-        "label": "Early Access to Tickets",
-        "icon": "🎟️"
+        "label": "Preventa VIP",
+        "description": "Acceso garantizado a boletos antes de la venta general.",
+        "icon": "🎟️",
+        "category": "Boletería"
       },
       {
         "min_tokens": 150,
-        "label": "Limited Edition Merch",
-        "icon": "🧢"
+        "label": "Merch Limitado",
+        "description": "Edición especial exclusiva (Gorra o Hoodie) para holders.",
+        "icon": "🧢",
+        "category": "Merch"
       },
       {
-        "min_tokens": 500,
-        "label": "Studio Session Behind-the-scenes",
-        "icon": "🎧"
+        "min_tokens": 250,
+        "label": "Studio Session",
+        "description": "Acceso detrás de escena o Meet & Greet virtual íntimo.",
+        "icon": "🎧",
+        "category": "Experiencia"
       }
     ]
   },
@@ -1582,18 +1780,24 @@
     "perks": [
       {
         "min_tokens": 50,
-        "label": "Early Access to Tickets",
-        "icon": "🎟️"
+        "label": "Preventa VIP",
+        "description": "Acceso garantizado a boletos antes de la venta general.",
+        "icon": "🎟️",
+        "category": "Boletería"
       },
       {
         "min_tokens": 150,
-        "label": "Limited Edition Merch",
-        "icon": "🧢"
+        "label": "Merch Limitado",
+        "description": "Edición especial exclusiva (Gorra o Hoodie) para holders.",
+        "icon": "🧢",
+        "category": "Merch"
       },
       {
-        "min_tokens": 500,
-        "label": "Studio Session Behind-the-scenes",
-        "icon": "🎧"
+        "min_tokens": 250,
+        "label": "Studio Session",
+        "description": "Acceso detrás de escena o Meet & Greet virtual íntimo.",
+        "icon": "🎧",
+        "category": "Experiencia"
       }
     ]
   },
@@ -1629,18 +1833,24 @@
     "perks": [
       {
         "min_tokens": 50,
-        "label": "Early Access to Tickets",
-        "icon": "🎟️"
+        "label": "Preventa VIP",
+        "description": "Acceso garantizado a boletos antes de la venta general.",
+        "icon": "🎟️",
+        "category": "Boletería"
       },
       {
         "min_tokens": 150,
-        "label": "Limited Edition Merch",
-        "icon": "🧢"
+        "label": "Merch Limitado",
+        "description": "Edición especial exclusiva (Gorra o Hoodie) para holders.",
+        "icon": "🧢",
+        "category": "Merch"
       },
       {
-        "min_tokens": 500,
-        "label": "Studio Session Behind-the-scenes",
-        "icon": "🎧"
+        "min_tokens": 250,
+        "label": "Studio Session",
+        "description": "Acceso detrás de escena o Meet & Greet virtual íntimo.",
+        "icon": "🎧",
+        "category": "Experiencia"
       }
     ]
   },
@@ -1676,18 +1886,24 @@
     "perks": [
       {
         "min_tokens": 50,
-        "label": "Early Access to Tickets",
-        "icon": "🎟️"
+        "label": "Preventa VIP",
+        "description": "Acceso garantizado a boletos antes de la venta general.",
+        "icon": "🎟️",
+        "category": "Boletería"
       },
       {
         "min_tokens": 150,
-        "label": "Limited Edition Merch",
-        "icon": "🧢"
+        "label": "Merch Limitado",
+        "description": "Edición especial exclusiva (Gorra o Hoodie) para holders.",
+        "icon": "🧢",
+        "category": "Merch"
       },
       {
-        "min_tokens": 500,
-        "label": "Studio Session Behind-the-scenes",
-        "icon": "🎧"
+        "min_tokens": 250,
+        "label": "Studio Session",
+        "description": "Acceso detrás de escena o Meet & Greet virtual íntimo.",
+        "icon": "🎧",
+        "category": "Experiencia"
       }
     ]
   },
@@ -1723,18 +1939,24 @@
     "perks": [
       {
         "min_tokens": 50,
-        "label": "Early Access to Tickets",
-        "icon": "🎟️"
+        "label": "Preventa VIP",
+        "description": "Acceso garantizado a boletos antes de la venta general.",
+        "icon": "🎟️",
+        "category": "Boletería"
       },
       {
         "min_tokens": 150,
-        "label": "Limited Edition Merch",
-        "icon": "🧢"
+        "label": "Merch Limitado",
+        "description": "Edición especial exclusiva (Gorra o Hoodie) para holders.",
+        "icon": "🧢",
+        "category": "Merch"
       },
       {
-        "min_tokens": 500,
-        "label": "Studio Session Behind-the-scenes",
-        "icon": "🎧"
+        "min_tokens": 250,
+        "label": "Studio Session",
+        "description": "Acceso detrás de escena o Meet & Greet virtual íntimo.",
+        "icon": "🎧",
+        "category": "Experiencia"
       }
     ]
   },
@@ -1770,18 +1992,24 @@
     "perks": [
       {
         "min_tokens": 50,
-        "label": "Early Access to Tickets",
-        "icon": "🎟️"
+        "label": "Preventa VIP",
+        "description": "Acceso garantizado a boletos antes de la venta general.",
+        "icon": "🎟️",
+        "category": "Boletería"
       },
       {
         "min_tokens": 150,
-        "label": "Limited Edition Merch",
-        "icon": "🧢"
+        "label": "Merch Limitado",
+        "description": "Edición especial exclusiva (Gorra o Hoodie) para holders.",
+        "icon": "🧢",
+        "category": "Merch"
       },
       {
-        "min_tokens": 500,
-        "label": "Studio Session Behind-the-scenes",
-        "icon": "🎧"
+        "min_tokens": 250,
+        "label": "Studio Session",
+        "description": "Acceso detrás de escena o Meet & Greet virtual íntimo.",
+        "icon": "🎧",
+        "category": "Experiencia"
       }
     ]
   },
@@ -1817,18 +2045,24 @@
     "perks": [
       {
         "min_tokens": 50,
-        "label": "Early Access to Tickets",
-        "icon": "🎟️"
+        "label": "Preventa VIP",
+        "description": "Acceso garantizado a boletos antes de la venta general.",
+        "icon": "🎟️",
+        "category": "Boletería"
       },
       {
         "min_tokens": 150,
-        "label": "Limited Edition Merch",
-        "icon": "🧢"
+        "label": "Merch Limitado",
+        "description": "Edición especial exclusiva (Gorra o Hoodie) para holders.",
+        "icon": "🧢",
+        "category": "Merch"
       },
       {
-        "min_tokens": 500,
-        "label": "Studio Session Behind-the-scenes",
-        "icon": "🎧"
+        "min_tokens": 250,
+        "label": "Studio Session",
+        "description": "Acceso detrás de escena o Meet & Greet virtual íntimo.",
+        "icon": "🎧",
+        "category": "Experiencia"
       }
     ]
   },
@@ -1864,18 +2098,24 @@
     "perks": [
       {
         "min_tokens": 50,
-        "label": "Early Access to Tickets",
-        "icon": "🎟️"
+        "label": "Preventa VIP",
+        "description": "Acceso garantizado a boletos antes de la venta general.",
+        "icon": "🎟️",
+        "category": "Boletería"
       },
       {
         "min_tokens": 150,
-        "label": "Limited Edition Merch",
-        "icon": "🧢"
+        "label": "Merch Limitado",
+        "description": "Edición especial exclusiva (Gorra o Hoodie) para holders.",
+        "icon": "🧢",
+        "category": "Merch"
       },
       {
-        "min_tokens": 500,
-        "label": "Studio Session Behind-the-scenes",
-        "icon": "🎧"
+        "min_tokens": 250,
+        "label": "Studio Session",
+        "description": "Acceso detrás de escena o Meet & Greet virtual íntimo.",
+        "icon": "🎧",
+        "category": "Experiencia"
       }
     ]
   },
@@ -1911,18 +2151,24 @@
     "perks": [
       {
         "min_tokens": 50,
-        "label": "Early Access to Tickets",
-        "icon": "🎟️"
+        "label": "Preventa VIP",
+        "description": "Acceso garantizado a boletos antes de la venta general.",
+        "icon": "🎟️",
+        "category": "Boletería"
       },
       {
         "min_tokens": 150,
-        "label": "Limited Edition Merch",
-        "icon": "🧢"
+        "label": "Merch Limitado",
+        "description": "Edición especial exclusiva (Gorra o Hoodie) para holders.",
+        "icon": "🧢",
+        "category": "Merch"
       },
       {
-        "min_tokens": 500,
-        "label": "Studio Session Behind-the-scenes",
-        "icon": "🎧"
+        "min_tokens": 250,
+        "label": "Studio Session",
+        "description": "Acceso detrás de escena o Meet & Greet virtual íntimo.",
+        "icon": "🎧",
+        "category": "Experiencia"
       }
     ]
   },
@@ -1958,18 +2204,24 @@
     "perks": [
       {
         "min_tokens": 50,
-        "label": "Early Access to Tickets",
-        "icon": "🎟️"
+        "label": "Preventa VIP",
+        "description": "Acceso garantizado a boletos antes de la venta general.",
+        "icon": "🎟️",
+        "category": "Boletería"
       },
       {
         "min_tokens": 150,
-        "label": "Limited Edition Merch",
-        "icon": "🧢"
+        "label": "Merch Limitado",
+        "description": "Edición especial exclusiva (Gorra o Hoodie) para holders.",
+        "icon": "🧢",
+        "category": "Merch"
       },
       {
-        "min_tokens": 500,
-        "label": "Studio Session Behind-the-scenes",
-        "icon": "🎧"
+        "min_tokens": 250,
+        "label": "Studio Session",
+        "description": "Acceso detrás de escena o Meet & Greet virtual íntimo.",
+        "icon": "🎧",
+        "category": "Experiencia"
       }
     ]
   },
@@ -2005,18 +2257,24 @@
     "perks": [
       {
         "min_tokens": 50,
-        "label": "Early Access to Tickets",
-        "icon": "🎟️"
+        "label": "Preventa VIP",
+        "description": "Acceso garantizado a boletos antes de la venta general.",
+        "icon": "🎟️",
+        "category": "Boletería"
       },
       {
         "min_tokens": 150,
-        "label": "Limited Edition Merch",
-        "icon": "🧢"
+        "label": "Merch Limitado",
+        "description": "Edición especial exclusiva (Gorra o Hoodie) para holders.",
+        "icon": "🧢",
+        "category": "Merch"
       },
       {
-        "min_tokens": 500,
-        "label": "Studio Session Behind-the-scenes",
-        "icon": "🎧"
+        "min_tokens": 250,
+        "label": "Studio Session",
+        "description": "Acceso detrás de escena o Meet & Greet virtual íntimo.",
+        "icon": "🎧",
+        "category": "Experiencia"
       }
     ]
   },
@@ -2052,18 +2310,24 @@
     "perks": [
       {
         "min_tokens": 50,
-        "label": "Early Access to Tickets",
-        "icon": "🎟️"
+        "label": "Preventa VIP",
+        "description": "Acceso garantizado a boletos antes de la venta general.",
+        "icon": "🎟️",
+        "category": "Boletería"
       },
       {
         "min_tokens": 150,
-        "label": "Limited Edition Merch",
-        "icon": "🧢"
+        "label": "Merch Limitado",
+        "description": "Edición especial exclusiva (Gorra o Hoodie) para holders.",
+        "icon": "🧢",
+        "category": "Merch"
       },
       {
-        "min_tokens": 500,
-        "label": "Studio Session Behind-the-scenes",
-        "icon": "🎧"
+        "min_tokens": 250,
+        "label": "Studio Session",
+        "description": "Acceso detrás de escena o Meet & Greet virtual íntimo.",
+        "icon": "🎧",
+        "category": "Experiencia"
       }
     ]
   },
@@ -2099,18 +2363,24 @@
     "perks": [
       {
         "min_tokens": 50,
-        "label": "Early Access to Tickets",
-        "icon": "🎟️"
+        "label": "Preventa VIP",
+        "description": "Acceso garantizado a boletos antes de la venta general.",
+        "icon": "🎟️",
+        "category": "Boletería"
       },
       {
         "min_tokens": 150,
-        "label": "Limited Edition Merch",
-        "icon": "🧢"
+        "label": "Merch Limitado",
+        "description": "Edición especial exclusiva (Gorra o Hoodie) para holders.",
+        "icon": "🧢",
+        "category": "Merch"
       },
       {
-        "min_tokens": 500,
-        "label": "Studio Session Behind-the-scenes",
-        "icon": "🎧"
+        "min_tokens": 250,
+        "label": "Studio Session",
+        "description": "Acceso detrás de escena o Meet & Greet virtual íntimo.",
+        "icon": "🎧",
+        "category": "Experiencia"
       }
     ]
   },
@@ -2146,18 +2416,24 @@
     "perks": [
       {
         "min_tokens": 50,
-        "label": "Early Access to Tickets",
-        "icon": "🎟️"
+        "label": "Preventa VIP",
+        "description": "Acceso garantizado a boletos antes de la venta general.",
+        "icon": "🎟️",
+        "category": "Boletería"
       },
       {
         "min_tokens": 150,
-        "label": "Limited Edition Merch",
-        "icon": "🧢"
+        "label": "Merch Limitado",
+        "description": "Edición especial exclusiva (Gorra o Hoodie) para holders.",
+        "icon": "🧢",
+        "category": "Merch"
       },
       {
-        "min_tokens": 500,
-        "label": "Studio Session Behind-the-scenes",
-        "icon": "🎧"
+        "min_tokens": 250,
+        "label": "Studio Session",
+        "description": "Acceso detrás de escena o Meet & Greet virtual íntimo.",
+        "icon": "🎧",
+        "category": "Experiencia"
       }
     ]
   },
@@ -2193,18 +2469,24 @@
     "perks": [
       {
         "min_tokens": 50,
-        "label": "Early Access to Tickets",
-        "icon": "🎟️"
+        "label": "Preventa VIP",
+        "description": "Acceso garantizado a boletos antes de la venta general.",
+        "icon": "🎟️",
+        "category": "Boletería"
       },
       {
         "min_tokens": 150,
-        "label": "Limited Edition Merch",
-        "icon": "🧢"
+        "label": "Merch Limitado",
+        "description": "Edición especial exclusiva (Gorra o Hoodie) para holders.",
+        "icon": "🧢",
+        "category": "Merch"
       },
       {
-        "min_tokens": 500,
-        "label": "Studio Session Behind-the-scenes",
-        "icon": "🎧"
+        "min_tokens": 250,
+        "label": "Studio Session",
+        "description": "Acceso detrás de escena o Meet & Greet virtual íntimo.",
+        "icon": "🎧",
+        "category": "Experiencia"
       }
     ]
   },
@@ -2240,18 +2522,24 @@
     "perks": [
       {
         "min_tokens": 50,
-        "label": "Early Access to Tickets",
-        "icon": "🎟️"
+        "label": "Preventa VIP",
+        "description": "Acceso garantizado a boletos antes de la venta general.",
+        "icon": "🎟️",
+        "category": "Boletería"
       },
       {
         "min_tokens": 150,
-        "label": "Limited Edition Merch",
-        "icon": "🧢"
+        "label": "Merch Limitado",
+        "description": "Edición especial exclusiva (Gorra o Hoodie) para holders.",
+        "icon": "🧢",
+        "category": "Merch"
       },
       {
-        "min_tokens": 500,
-        "label": "Studio Session Behind-the-scenes",
-        "icon": "🎧"
+        "min_tokens": 250,
+        "label": "Studio Session",
+        "description": "Acceso detrás de escena o Meet & Greet virtual íntimo.",
+        "icon": "🎧",
+        "category": "Experiencia"
       }
     ]
   },
@@ -2287,18 +2575,24 @@
     "perks": [
       {
         "min_tokens": 50,
-        "label": "Early Access to Tickets",
-        "icon": "🎟️"
+        "label": "Preventa VIP",
+        "description": "Acceso garantizado a boletos antes de la venta general.",
+        "icon": "🎟️",
+        "category": "Boletería"
       },
       {
         "min_tokens": 150,
-        "label": "Limited Edition Merch",
-        "icon": "🧢"
+        "label": "Merch Limitado",
+        "description": "Edición especial exclusiva (Gorra o Hoodie) para holders.",
+        "icon": "🧢",
+        "category": "Merch"
       },
       {
-        "min_tokens": 500,
-        "label": "Studio Session Behind-the-scenes",
-        "icon": "🎧"
+        "min_tokens": 250,
+        "label": "Studio Session",
+        "description": "Acceso detrás de escena o Meet & Greet virtual íntimo.",
+        "icon": "🎧",
+        "category": "Experiencia"
       }
     ]
   },
@@ -2334,18 +2628,24 @@
     "perks": [
       {
         "min_tokens": 50,
-        "label": "Early Access to Tickets",
-        "icon": "🎟️"
+        "label": "Preventa VIP",
+        "description": "Acceso garantizado a boletos antes de la venta general.",
+        "icon": "🎟️",
+        "category": "Boletería"
       },
       {
         "min_tokens": 150,
-        "label": "Limited Edition Merch",
-        "icon": "🧢"
+        "label": "Merch Limitado",
+        "description": "Edición especial exclusiva (Gorra o Hoodie) para holders.",
+        "icon": "🧢",
+        "category": "Merch"
       },
       {
-        "min_tokens": 500,
-        "label": "Studio Session Behind-the-scenes",
-        "icon": "🎧"
+        "min_tokens": 250,
+        "label": "Studio Session",
+        "description": "Acceso detrás de escena o Meet & Greet virtual íntimo.",
+        "icon": "🎧",
+        "category": "Experiencia"
       }
     ]
   },
@@ -2381,18 +2681,24 @@
     "perks": [
       {
         "min_tokens": 50,
-        "label": "Early Access to Tickets",
-        "icon": "🎟️"
+        "label": "Preventa VIP",
+        "description": "Acceso garantizado a boletos antes de la venta general.",
+        "icon": "🎟️",
+        "category": "Boletería"
       },
       {
         "min_tokens": 150,
-        "label": "Limited Edition Merch",
-        "icon": "🧢"
+        "label": "Merch Limitado",
+        "description": "Edición especial exclusiva (Gorra o Hoodie) para holders.",
+        "icon": "🧢",
+        "category": "Merch"
       },
       {
-        "min_tokens": 500,
-        "label": "Studio Session Behind-the-scenes",
-        "icon": "🎧"
+        "min_tokens": 250,
+        "label": "Studio Session",
+        "description": "Acceso detrás de escena o Meet & Greet virtual íntimo.",
+        "icon": "🎧",
+        "category": "Experiencia"
       }
     ]
   },
@@ -2428,18 +2734,24 @@
     "perks": [
       {
         "min_tokens": 50,
-        "label": "Early Access to Tickets",
-        "icon": "🎟️"
+        "label": "Preventa VIP",
+        "description": "Acceso garantizado a boletos antes de la venta general.",
+        "icon": "🎟️",
+        "category": "Boletería"
       },
       {
         "min_tokens": 150,
-        "label": "Limited Edition Merch",
-        "icon": "🧢"
+        "label": "Merch Limitado",
+        "description": "Edición especial exclusiva (Gorra o Hoodie) para holders.",
+        "icon": "🧢",
+        "category": "Merch"
       },
       {
-        "min_tokens": 500,
-        "label": "Studio Session Behind-the-scenes",
-        "icon": "🎧"
+        "min_tokens": 250,
+        "label": "Studio Session",
+        "description": "Acceso detrás de escena o Meet & Greet virtual íntimo.",
+        "icon": "🎧",
+        "category": "Experiencia"
       }
     ]
   },
@@ -2475,18 +2787,24 @@
     "perks": [
       {
         "min_tokens": 50,
-        "label": "Early Access to Tickets",
-        "icon": "🎟️"
+        "label": "Preventa VIP",
+        "description": "Acceso garantizado a boletos antes de la venta general.",
+        "icon": "🎟️",
+        "category": "Boletería"
       },
       {
         "min_tokens": 150,
-        "label": "Limited Edition Merch",
-        "icon": "🧢"
+        "label": "Merch Limitado",
+        "description": "Edición especial exclusiva (Gorra o Hoodie) para holders.",
+        "icon": "🧢",
+        "category": "Merch"
       },
       {
-        "min_tokens": 500,
-        "label": "Studio Session Behind-the-scenes",
-        "icon": "🎧"
+        "min_tokens": 250,
+        "label": "Studio Session",
+        "description": "Acceso detrás de escena o Meet & Greet virtual íntimo.",
+        "icon": "🎧",
+        "category": "Experiencia"
       }
     ]
   },
@@ -2522,18 +2840,24 @@
     "perks": [
       {
         "min_tokens": 50,
-        "label": "Early Access to Tickets",
-        "icon": "🎟️"
+        "label": "Preventa VIP",
+        "description": "Acceso garantizado a boletos antes de la venta general.",
+        "icon": "🎟️",
+        "category": "Boletería"
       },
       {
         "min_tokens": 150,
-        "label": "Limited Edition Merch",
-        "icon": "🧢"
+        "label": "Merch Limitado",
+        "description": "Edición especial exclusiva (Gorra o Hoodie) para holders.",
+        "icon": "🧢",
+        "category": "Merch"
       },
       {
-        "min_tokens": 500,
-        "label": "Studio Session Behind-the-scenes",
-        "icon": "🎧"
+        "min_tokens": 250,
+        "label": "Studio Session",
+        "description": "Acceso detrás de escena o Meet & Greet virtual íntimo.",
+        "icon": "🎧",
+        "category": "Experiencia"
       }
     ]
   },
@@ -2569,18 +2893,24 @@
     "perks": [
       {
         "min_tokens": 50,
-        "label": "Early Access to Tickets",
-        "icon": "🎟️"
+        "label": "Preventa VIP",
+        "description": "Acceso garantizado a boletos antes de la venta general.",
+        "icon": "🎟️",
+        "category": "Boletería"
       },
       {
         "min_tokens": 150,
-        "label": "Limited Edition Merch",
-        "icon": "🧢"
+        "label": "Merch Limitado",
+        "description": "Edición especial exclusiva (Gorra o Hoodie) para holders.",
+        "icon": "🧢",
+        "category": "Merch"
       },
       {
-        "min_tokens": 500,
-        "label": "Studio Session Behind-the-scenes",
-        "icon": "🎧"
+        "min_tokens": 250,
+        "label": "Studio Session",
+        "description": "Acceso detrás de escena o Meet & Greet virtual íntimo.",
+        "icon": "🎧",
+        "category": "Experiencia"
       }
     ]
   },
@@ -2616,18 +2946,24 @@
     "perks": [
       {
         "min_tokens": 50,
-        "label": "Early Access to Tickets",
-        "icon": "🎟️"
+        "label": "Preventa VIP",
+        "description": "Acceso garantizado a boletos antes de la venta general.",
+        "icon": "🎟️",
+        "category": "Boletería"
       },
       {
         "min_tokens": 150,
-        "label": "Limited Edition Merch",
-        "icon": "🧢"
+        "label": "Merch Limitado",
+        "description": "Edición especial exclusiva (Gorra o Hoodie) para holders.",
+        "icon": "🧢",
+        "category": "Merch"
       },
       {
-        "min_tokens": 500,
-        "label": "Studio Session Behind-the-scenes",
-        "icon": "🎧"
+        "min_tokens": 250,
+        "label": "Studio Session",
+        "description": "Acceso detrás de escena o Meet & Greet virtual íntimo.",
+        "icon": "🎧",
+        "category": "Experiencia"
       }
     ]
   },
@@ -2663,18 +2999,24 @@
     "perks": [
       {
         "min_tokens": 50,
-        "label": "Early Access to Tickets",
-        "icon": "🎟️"
+        "label": "Preventa VIP",
+        "description": "Acceso garantizado a boletos antes de la venta general.",
+        "icon": "🎟️",
+        "category": "Boletería"
       },
       {
         "min_tokens": 150,
-        "label": "Limited Edition Merch",
-        "icon": "🧢"
+        "label": "Merch Limitado",
+        "description": "Edición especial exclusiva (Gorra o Hoodie) para holders.",
+        "icon": "🧢",
+        "category": "Merch"
       },
       {
-        "min_tokens": 500,
-        "label": "Studio Session Behind-the-scenes",
-        "icon": "🎧"
+        "min_tokens": 250,
+        "label": "Studio Session",
+        "description": "Acceso detrás de escena o Meet & Greet virtual íntimo.",
+        "icon": "🎧",
+        "category": "Experiencia"
       }
     ]
   },
@@ -2710,18 +3052,24 @@
     "perks": [
       {
         "min_tokens": 50,
-        "label": "Early Access to Tickets",
-        "icon": "🎟️"
+        "label": "Preventa VIP",
+        "description": "Acceso garantizado a boletos antes de la venta general.",
+        "icon": "🎟️",
+        "category": "Boletería"
       },
       {
         "min_tokens": 150,
-        "label": "Limited Edition Merch",
-        "icon": "🧢"
+        "label": "Merch Limitado",
+        "description": "Edición especial exclusiva (Gorra o Hoodie) para holders.",
+        "icon": "🧢",
+        "category": "Merch"
       },
       {
-        "min_tokens": 500,
-        "label": "Studio Session Behind-the-scenes",
-        "icon": "🎧"
+        "min_tokens": 250,
+        "label": "Studio Session",
+        "description": "Acceso detrás de escena o Meet & Greet virtual íntimo.",
+        "icon": "🎧",
+        "category": "Experiencia"
       }
     ]
   }
