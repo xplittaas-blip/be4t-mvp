@@ -823,6 +823,9 @@ const SongDetail = ({ onBack, songId, songData, onRequireAuth, isAuthenticated, 
                             perks={forcedPerks}
                             currentTokens={currentTokens}
                             projectedTokens={projectedTokens}
+                            calcAmount={calcAmount}
+                            tokenPrice={tokenPrice}
+                            onScrollToSlider={() => calculatorRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })}
                         />
                     </div>
 
