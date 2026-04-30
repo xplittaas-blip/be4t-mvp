@@ -337,6 +337,7 @@ const SongDetail = ({ onBack, songId, songData, onRequireAuth, isAuthenticated, 
                         tiktok:    fmtMetric(songData.metadata?.tiktok_creations || 0),
                         saves:     ((songData.metadata?.popularity || 90) * 1200).toLocaleString(),
                         artistListeners: fmtMetric((songData.metadata?.spotify_streams || 0) * 1.5),
+                        perks:            songData.perks || songData.metadata?.perks || [],
                     };
                 } else {
                     const allSongs = await getMarketplaceData();
@@ -365,6 +366,7 @@ const SongDetail = ({ onBack, songId, songData, onRequireAuth, isAuthenticated, 
                         tiktok:    fmtMetric(getSocialGrowth(raw.streams_estimate, raw.popularity)),
                         saves:     ((raw.popularity ?? 90) * 1200).toLocaleString(),
                         artistListeners: formatViews(raw.streams_estimate * 1.5),
+                        perks:            raw.perks || [],
                     };
                 }
 
