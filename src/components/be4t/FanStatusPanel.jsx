@@ -1,83 +1,168 @@
 import React from 'react';
-import { Lock, Check } from 'lucide-react';
 
-export default function FanStatusPanel({ perks, currentTokens = 0, projectedTokens = 0 }) {
-    if (!perks || perks.length === 0) return null;
-
-    const totalTokens = currentTokens + projectedTokens;
+export default function FanStatusPanel({ perks = [], currentTokens = 0, projectedTokens = 0 }) {
+    // Always render — perks are always provided as forcedPerks from SongDetail
+    const totalTokens = (currentTokens || 0) + (projectedTokens || 0);
     const unlockedCount = perks.filter(p => totalTokens >= p.min_tokens).length;
 
+    const TIER_COLORS = {
+        FAN:   { accent: '#00FFCC', glow: 'rgba(0,255,204,0.15)', border: 'rgba(0,255,204,0.35)' },
+        SOCIO: { accent: '#a855f7', glow: 'rgba(168,85,247,0.15)', border: 'rgba(168,85,247,0.35)' },
+        VIP:   { accent: '#f59e0b', glow: 'rgba(245,158,11,0.15)', border: 'rgba(245,158,11,0.35)' },
+    };
+
     return (
-        <div className="bg-[#080808] border border-white/5 rounded-2xl p-4 w-full">
-            <div className="flex items-center justify-between mb-4 px-1">
-                <h3 className="text-[0.65rem] font-bold tracking-widest text-[#00FFCC] uppercase flex items-center gap-2">
-                    <span className="text-lg">✨</span> TU ESTATUS DE FAN: BENEFICIOS EXCLUSIVOS
-                </h3>
-                <span className="text-xs text-neutral-500 font-mono">{unlockedCount}/{perks.length}</span>
+        <div style={{
+            background: 'rgba(5,5,15,0.85)',
+            border: '1px solid rgba(255,255,255,0.07)',
+            borderRadius: '16px',
+            padding: '16px',
+            width: '100%',
+        }}>
+            {/* Header */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+                <span style={{
+                    fontSize: '0.6rem',
+                    fontWeight: '800',
+                    letterSpacing: '0.15em',
+                    color: '#00FFCC',
+                    textTransform: 'uppercase',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                }}>
+                    <span style={{ fontSize: '1rem' }}>✨</span>
+                    TU ESTATUS DE FAN: BENEFICIOS EXCLUSIVOS
+                </span>
+                <span style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.3)', fontFamily: 'monospace' }}>
+                    {unlockedCount}/{perks.length}
+                </span>
             </div>
 
-            <div className="flex flex-col space-y-2">
+            {/* Tier cards */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 {perks.map((perk, idx) => {
-                    const { min_tokens, label, description, icon, category } = perk;
-                    const isUnlocked = totalTokens >= min_tokens;
+                    const isUnlocked = totalTokens >= perk.min_tokens;
+                    const colors = TIER_COLORS[perk.category] || TIER_COLORS.FAN;
 
                     return (
-                        <div 
+                        <div
                             key={idx}
-                            className={`
-                                relative overflow-hidden rounded-xl p-3 flex items-center transition-all duration-500
-                                ${isUnlocked 
-                                    ? 'bg-gradient-to-r from-[#00FFCC]/10 to-transparent border border-[#00FFCC]/30 shadow-[0_0_15px_rgba(0,255,204,0.1)]' 
-                                    : 'bg-[#111]/40 border border-white/5 grayscale opacity-60'
-                                }
-                            `}
+                            style={{
+                                borderRadius: '12px',
+                                padding: '12px 14px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '12px',
+                                transition: 'all 0.4s ease',
+                                background: isUnlocked
+                                    ? `linear-gradient(135deg, ${colors.glow} 0%, transparent 100%)`
+                                    : 'rgba(255,255,255,0.025)',
+                                border: `1px solid ${isUnlocked ? colors.border : 'rgba(255,255,255,0.05)'}`,
+                                boxShadow: isUnlocked ? `0 0 20px ${colors.glow}` : 'none',
+                                filter: isUnlocked ? 'none' : 'grayscale(80%)',
+                                opacity: isUnlocked ? 1 : 0.55,
+                            }}
                         >
-                            {/* Icon */}
-                            <div className={`
-                                w-10 h-10 flex-shrink-0 flex items-center justify-center rounded-lg text-lg mr-3
-                                ${isUnlocked ? 'bg-[#00FFCC]/20 shadow-[0_0_10px_rgba(0,255,204,0.2)]' : 'bg-white/5'}
-                            `}>
-                                {icon}
+                            {/* Icon bubble */}
+                            <div style={{
+                                width: '40px',
+                                height: '40px',
+                                flexShrink: 0,
+                                borderRadius: '10px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                fontSize: '1.4rem',
+                                background: isUnlocked ? colors.glow : 'rgba(255,255,255,0.04)',
+                                border: `1px solid ${isUnlocked ? colors.border : 'transparent'}`,
+                                boxShadow: isUnlocked ? `0 0 12px ${colors.glow}` : 'none',
+                            }}>
+                                {perk.icon}
                             </div>
 
-                            {/* Text Info */}
-                            <div className="flex-1 min-w-0">
-                                <div className="flex items-center gap-2 mb-0.5">
-                                    <span className={`text-[0.55rem] font-bold uppercase tracking-widest ${isUnlocked ? 'text-[#00FFCC]' : 'text-neutral-500'}`}>
-                                        TIER • {category}
-                                    </span>
-                                    <span className="text-[0.55rem] font-mono text-neutral-600">
-                                        {min_tokens}+ tokens
-                                    </span>
+                            {/* Text */}
+                            <div style={{ flex: 1, minWidth: 0 }}>
+                                <div style={{
+                                    fontSize: '0.52rem',
+                                    fontWeight: '700',
+                                    letterSpacing: '0.12em',
+                                    textTransform: 'uppercase',
+                                    color: isUnlocked ? colors.accent : 'rgba(255,255,255,0.3)',
+                                    marginBottom: '2px',
+                                }}>
+                                    TIER · {perk.category} · {perk.min_tokens.toLocaleString()}+ tokens
                                 </div>
-                                <h4 className={`text-sm font-bold truncate ${isUnlocked ? 'text-white' : 'text-neutral-400'}`}>
-                                    {label}
-                                </h4>
-                                <p className="text-[0.65rem] text-neutral-500 truncate mt-0.5">
-                                    {description}
-                                </p>
+                                <div style={{
+                                    fontSize: '0.85rem',
+                                    fontWeight: '700',
+                                    color: isUnlocked ? 'white' : 'rgba(255,255,255,0.4)',
+                                    overflow: 'hidden',
+                                    textOverflow: 'ellipsis',
+                                    whiteSpace: 'nowrap',
+                                }}>
+                                    {perk.label}
+                                </div>
+                                <div style={{
+                                    fontSize: '0.65rem',
+                                    color: 'rgba(255,255,255,0.35)',
+                                    marginTop: '2px',
+                                    overflow: 'hidden',
+                                    textOverflow: 'ellipsis',
+                                    whiteSpace: 'nowrap',
+                                }}>
+                                    {perk.description}
+                                </div>
                             </div>
 
-                            {/* Status Icon */}
-                            <div className="ml-2 flex-shrink-0">
-                                {isUnlocked ? (
-                                    <div className="w-6 h-6 rounded-full bg-[#00FFCC]/20 flex items-center justify-center border border-[#00FFCC]/40 shadow-[0_0_10px_rgba(0,255,204,0.3)]">
-                                        <Check size={12} className="text-[#00FFCC]" />
-                                    </div>
-                                ) : (
-                                    <Lock size={14} className="text-neutral-600" />
-                                )}
+                            {/* Status icon */}
+                            <div style={{
+                                width: '24px',
+                                height: '24px',
+                                borderRadius: '50%',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                flexShrink: 0,
+                                fontSize: '0.75rem',
+                                background: isUnlocked ? colors.glow : 'rgba(255,255,255,0.04)',
+                                border: `1px solid ${isUnlocked ? colors.border : 'rgba(255,255,255,0.08)'}`,
+                                boxShadow: isUnlocked ? `0 0 10px ${colors.glow}` : 'none',
+                                color: isUnlocked ? colors.accent : 'rgba(255,255,255,0.3)',
+                                fontWeight: '800',
+                            }}>
+                                {isUnlocked ? '✓' : '🔒'}
                             </div>
                         </div>
                     );
                 })}
             </div>
 
+            {/* Footer hint */}
             {unlockedCount < perks.length && (
-                <div className="mt-4 text-center">
-                    <p className="text-[0.55rem] tracking-[0.2em] text-neutral-500 uppercase font-semibold">
-                        Sube tu inversión para desbloquear más perks ↑
-                    </p>
+                <div style={{
+                    marginTop: '10px',
+                    textAlign: 'center',
+                    fontSize: '0.55rem',
+                    fontWeight: '700',
+                    letterSpacing: '0.15em',
+                    textTransform: 'uppercase',
+                    color: 'rgba(255,255,255,0.25)',
+                }}>
+                    ↑ Sube tu inversión para desbloquear más perks
+                </div>
+            )}
+            {unlockedCount === perks.length && (
+                <div style={{
+                    marginTop: '10px',
+                    textAlign: 'center',
+                    fontSize: '0.6rem',
+                    fontWeight: '800',
+                    color: '#00FFCC',
+                    letterSpacing: '0.1em',
+                    textShadow: '0 0 10px rgba(0,255,204,0.5)',
+                }}>
+                    🎉 TODOS LOS PERKS DESBLOQUEADOS
                 </div>
             )}
         </div>

@@ -115,7 +115,7 @@
     display: grid;
     grid-template-columns: 1.5fr 1fr;
     gap: 3rem;
-    align-items: start;
+    align-items: start; /* critical for sticky to work */
 }
 
 .detail-left-column {
@@ -124,9 +124,10 @@
     gap: 2rem;
 }
 
+/* aside sticky is now set inline — just strip the sticky from .calculator-section */
 .calculator-section {
-    position: sticky;
-    top: 100px;
+    position: static !important;
+    top: auto !important;
 }
 
 @media (max-width: 992px) {

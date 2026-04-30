@@ -523,6 +523,34 @@ const SongDetail = ({ onBack, songId, songData, onRequireAuth, isAuthenticated, 
     const roiEst          = song.roi_est ?? 18;
     const ytVideoId       = YOUTUBE_VIDEO_IDS[songId] ?? null;
 
+    // ── HARDCODED PERKS — always visible, never DB-dependent ─────────────────
+    const forcedPerks = [
+        {
+            min_tokens:  100,
+            label:       'Preventa VIP',
+            description: 'Acceso anticipado a boletería.',
+            icon:        '🎟️',
+            category:    'FAN',
+        },
+        {
+            min_tokens:  500,
+            label:       'Merch Edición Limitada',
+            description: 'Gorra + Vinilo exclusivo.',
+            icon:        '🧢',
+            category:    'SOCIO',
+        },
+        {
+            min_tokens:  2500,
+            label:       'VIP Backstage Session',
+            description: 'Meet & Greet con el Artista.',
+            icon:        '🎧',
+            category:    'VIP',
+        },
+    ];
+    const tokenPrice     = song.price ?? song.token_price_usd ?? 10;
+    const currentTokens  = isAcquired(song.id)?.fractions || 0;
+    const projectedTokens = Math.floor(calcAmount / tokenPrice);
+
     return (
         <div className="song-detail-page animate-fade-in">
             <button className="back-btn" onClick={onBack}>
@@ -726,9 +754,19 @@ const SongDetail = ({ onBack, songId, songData, onRequireAuth, isAuthenticated, 
                     </section>
                 </div>
 
+                {/* ── RIGHT COLUMN: Sticky Calculator + Fan Status + Invest ── */}
+                <aside style={{
+                    position: 'sticky',
+                    top: '100px',
+                    alignSelf: 'flex-start',
+                    zIndex: 50,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '0',
+                }}>
 
                 {/* ── 5. RETURN CALCULATOR ── */}
-                <section ref={calculatorRef} className="detail-section calculator-section glass-panel highlight-border">
+                <section ref={calculatorRef} className="detail-section calculator-section glass-panel highlight-border" style={{ position: 'static' }}>
 
                     {/* Header */}
                     <div style={{ marginBottom: '1.5rem' }}>
@@ -779,12 +817,12 @@ const SongDetail = ({ onBack, songId, songData, onRequireAuth, isAuthenticated, 
                         </p>
                     </div>
 
-                    {/* Fan Status Panel (Bóveda de Beneficios) */}
+                    {/* Fan Status Panel — HARDCODED, always visible */}
                     <div style={{ marginTop: '1.5rem' }}>
                         <FanStatusPanel 
-                            perks={song.perks}
-                            currentTokens={isAcquired(song.id)?.fractions || 0}
-                            projectedTokens={Math.floor(calcAmount / (song.price ?? song.token_price_usd ?? 10))}
+                            perks={forcedPerks}
+                            currentTokens={currentTokens}
+                            projectedTokens={projectedTokens}
                         />
                     </div>
 
@@ -834,6 +872,7 @@ const SongDetail = ({ onBack, songId, songData, onRequireAuth, isAuthenticated, 
                         </p>
                     </div>
                 </section>
+                </aside>
             </div>
 
             {/* ── Neon Confetti on showcase success ── */}
