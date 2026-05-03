@@ -214,29 +214,31 @@ const ReturnCalculator = ({ streamCount, roiEst, isTrending, paymentFreq = 'mont
                 ))}
             </div>
 
-            <div className="neon-border-glow" style={{ padding: '1.2rem' }}>
+            <div style={{ padding: '0', marginTop: '1.5rem' }}>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-                    <div style={{ background: 'rgba(0, 240, 255, 0.03)', border: '1px solid rgba(0, 240, 255, 0.1)', borderRadius: '12px', padding: '0.9rem 1rem' }}>
-                        <div style={{ fontSize: '0.58rem', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: '700' }}>TEA (APY)</div>
-                        <div style={{ fontSize: '1.8rem', fontWeight: '900', color: 'white', letterSpacing: '-0.04em' }} className="calc-anim">
+                    <div style={{ background: 'rgba(0, 240, 255, 0.03)', border: '1px solid rgba(0, 240, 255, 0.1)', borderRadius: '16px', padding: '1rem' }}>
+                        <div style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: '700', marginBottom: '8px' }}>TEA (APY)</div>
+                        <div style={{ fontSize: '2.2rem', fontWeight: '900', color: '#c4b5fd', letterSpacing: '-0.04em', lineHeight: 1 }} className="calc-anim">
                             {teaRate.toFixed(1)}%
                         </div>
-                        {isTrending && <div style={{ fontSize: '0.55rem', color: '#00f0ff', marginTop: '2px', fontWeight: '700' }}>⚡ +8% trending</div>}
+                        {isTrending && <div style={{ fontSize: '0.65rem', color: '#00f0ff', marginTop: '6px', fontWeight: '700' }}>⚡ +8% trending</div>}
                     </div>
 
-                    <div style={{ background: 'rgba(34, 197, 94, 0.03)', border: '1px solid rgba(34, 197, 94, 0.1)', borderRadius: '12px', padding: '0.9rem 1rem' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
-                            <div style={{ fontSize: '0.58rem', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: '700' }}>Pago Trimestral</div>
+                    <div style={{ background: 'rgba(34, 197, 94, 0.03)', border: '1px solid rgba(34, 197, 94, 0.1)', borderRadius: '16px', padding: '1rem' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                            <div style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: '700' }}>Pago Trimestral</div>
                         </div>
-                        <div style={{ fontSize: '1.8rem', fontWeight: '900', color: '#22c55e', letterSpacing: '-0.03em' }} className="calc-anim">
+                        <div style={{ fontSize: '2.2rem', fontWeight: '900', color: '#22c55e', letterSpacing: '-0.03em', lineHeight: 1 }} className="calc-anim">
                             {sym}{quarterlyReturn.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                         </div>
-                        <div style={{ fontSize: '0.55rem', color: 'rgba(255,255,255,0.3)', marginTop: '2px' }}>
+                        <div style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.3)', marginTop: '6px' }}>
                             {sym}{annualReturn.toLocaleString('en-US', { maximumFractionDigits: 0 })} / año
                         </div>
                     </div>
+                </div>
 
-                    <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '12px', padding: '0.9rem 1rem' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginTop: '10px' }}>
+                    <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '16px', padding: '1rem' }}>
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
                             <div style={{ fontSize: '0.58rem', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: '700' }}>Tokens Disp.</div>
                         </div>
@@ -244,11 +246,11 @@ const ReturnCalculator = ({ streamCount, roiEst, isTrending, paymentFreq = 'mont
                             {tokensAvailable.toLocaleString('es-ES')} <span style={{ color: 'rgba(255,255,255,0.2)', fontSize: '0.8rem', fontWeight: '400' }}>/ {tokensTotal.toLocaleString('es-ES')}</span>
                         </div>
                         <div style={{ height: '3px', background: 'rgba(255,255,255,0.07)', borderRadius: '100px', overflow: 'hidden', marginTop: '10px' }}>
-                            <div style={{ height: '100%', width: `${Math.min(100, 100 - tokensPct)}%`, background: '#7c3aed', borderRadius: '100px', transition: 'width 0.5s ease' }} />
+                            <div style={{ height: '100%', width: `${Math.min(100, 100 - tokensPct)}%`, background: 'linear-gradient(90deg, #00f0ff, #a855f7)', borderRadius: '100px', transition: 'width 0.5s ease' }} />
                         </div>
                     </div>
 
-                    <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '12px', padding: '0.9rem 1rem' }}>
+                    <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '16px', padding: '1rem' }}>
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
                             <div style={{ fontSize: '0.58rem', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: '700' }}>Tu compra</div>
                         </div>
@@ -260,24 +262,6 @@ const ReturnCalculator = ({ streamCount, roiEst, isTrending, paymentFreq = 'mont
                         </div>
                     </div>
                 </div>
-            </div>
-
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '0.75rem 1rem', background: 'rgba(251,191,36,0.06)', border: '1px solid rgba(251,191,36,0.18)', borderRadius: '12px' }}>
-                <span style={{ fontSize: '1.1rem' }}>🏆</span>
-                <span style={{ fontSize: '0.78rem', color: 'rgba(255,255,255,0.65)', lineHeight: 1.4 }}>
-                    Esta rentabilidad es{' '}
-                    <strong style={{ color: '#fbbf24', fontSize: '0.92rem' }}>{bondMultiplier}×</strong>
-                    {' '}mayor que el promedio de <strong>bonos del Estado</strong> ({(GOV_BOND_RATE * 100).toFixed(0)}% TEA)
-                </span>
-            </div>
-
-            <div style={{ padding: '0.75rem', background: 'rgba(255,255,255,0.025)', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.055)' }}>
-                <p style={{ fontSize: '0.68rem', color: 'rgba(255,255,255,0.28)', margin: 0, lineHeight: 1.6 }}>
-                    TEA estimada: <strong style={{ color: '#c4b5fd' }}>{teaRate.toFixed(1)}%</strong>.
-                    Proyección basada en {((streamCount ?? 0) / 1_000_000).toFixed(0)}M streams actuales
-                    {isTrending ? ' con boost del 8% por tendencia activa' : ''}.
-                    Los retornos pasados no garantizan futuros. Inversión sujeta a riesgo.
-                </p>
             </div>
         </div>
     );
@@ -759,7 +743,7 @@ const SongDetail = ({ onBack, songId, songData, onRequireAuth, isAuthenticated, 
                 }}>
 
                 {/* ── 5. RETURN CALCULATOR ── */}
-                <section ref={calculatorRef} className="detail-section calculator-section glass-panel highlight-border" style={{ position: 'static' }}>
+                <section ref={calculatorRef} className="detail-section calculator-section neon-border-glow" style={{ position: 'static', padding: '1.5rem', background: 'rgba(10,15,40,0.4)' }}>
 
                     {/* Header */}
                     <div style={{ marginBottom: '1.5rem' }}>
@@ -800,16 +784,6 @@ const SongDetail = ({ onBack, songId, songData, onRequireAuth, isAuthenticated, 
                         isDemo={isShowcase}
                     />
 
-                    {/* Social proof */}
-                    <div style={{ marginTop: '1.5rem', textAlign: 'center', padding: '0.75rem', background: 'rgba(139,92,246,0.06)', borderRadius: '12px', border: '1px solid rgba(139,92,246,0.12)' }}>
-                        <p style={{ fontWeight: '700', margin: 0, fontSize: '0.9rem' }}>
-                            {tCalc('social_proof', { count: song.fansParticipating })}
-                        </p>
-                        <p style={{ color: '#f97316', fontSize: '0.8rem', margin: '0.3rem 0 0', fontWeight: '600' }}>
-                            {tCalc('micro_fomo')}
-                        </p>
-                    </div>
-
                     {/* Fan Status Panel — HARDCODED, always visible */}
                     <div style={{ marginTop: '1.5rem' }}>
                         <FanStatusPanel 
@@ -829,7 +803,53 @@ const SongDetail = ({ onBack, songId, songData, onRequireAuth, isAuthenticated, 
                         </div>
                     )}
 
-                    {/* Inline invest button removed — replaced by universal sticky bar */}
+                    {/* Main Invest Button inside Calculator */}
+                    <div style={{ marginTop: '2rem' }}>
+                        <button
+                            className="sd-invest-btn"
+                            disabled={txState === 'processing'}
+                            onClick={() => executeInvestment()}
+                            style={{
+                                width: '100%',
+                                padding: '1.2rem',
+                                background: txState === 'processing'
+                                    ? 'rgba(255,255,255,0.08)'
+                                    : txState === 'error'
+                                        ? 'rgba(239,68,68,0.2)'
+                                        : 'linear-gradient(90deg, #00f0ff 0%, #a855f7 100%)',
+                                backgroundSize: '200% auto',
+                                border: 'none', 
+                                borderRadius: '16px',
+                                color: txState === 'processing' ? 'rgba(255,255,255,0.5)' : 'white',
+                                fontWeight: '900', 
+                                fontSize: '1.15rem', 
+                                cursor: 'pointer',
+                                boxShadow: txState === 'idle' ? '0 8px 32px rgba(0, 240, 255, 0.4)' : 'none',
+                                WebkitTapHighlightColor: 'transparent',
+                                transition: 'all 0.3s ease',
+                                letterSpacing: '0.5px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: '10px'
+                            }}
+                            onMouseOver={e => { if (txState === 'idle') { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 12px 40px rgba(0, 240, 255, 0.6)'; }}}
+                            onMouseOut={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = txState === 'idle' ? '0 8px 32px rgba(0, 240, 255, 0.4)' : 'none'; }}
+                        >
+                            <Briefcase size={22} />
+                            {txState === 'processing' && '⏳ Procesando...'}
+                            {txState === 'error'      && '❌ Error'}
+                            {txState === 'idle'       && 'INVERTIR EN ESTA CANCIÓN'}
+                        </button>
+                        
+                        <div style={{ marginTop: '0.75rem', textAlign: 'center', fontSize: '0.8rem', color: 'rgba(255,255,255,0.4)', fontWeight: '600' }}>
+                            {isShowcase ? (
+                                <>Saldo disponible: <strong style={{ color: 'rgba(255,255,255,0.7)' }}>${balance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong></>
+                            ) : (
+                                'Transacción Segura Web3'
+                            )}
+                        </div>
+                    </div>
                 </section>
                 </aside>
             </div>
@@ -926,59 +946,7 @@ const SongDetail = ({ onBack, songId, songData, onRequireAuth, isAuthenticated, 
                 document.body
             )}
 
-            {/* ── Universal Sticky Invest Bar (Chases user everywhere) ── */}
-            {song && txState !== 'success' && (
-                <div className="sd-sticky-invest-bar">
-                    <div className="sd-sticky-content">
-                        <div className="sd-sticky-info">
-                            <span style={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.6)', textTransform: 'uppercase', letterSpacing: '1px' }}>Inversión:</span>
-                            <span style={{ fontSize: '1.5rem', fontWeight: '900', color: '#fff', marginLeft: '12px', fontFamily: "'Courier New', monospace" }}>
-                                ${calcAmount.toLocaleString('en-US', { maximumFractionDigits: 0 })}
-                            </span>
-                        </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
-                            <p className="sd-balance-tag" style={{ textAlign: 'right', fontSize: '0.75rem', color: 'rgba(255,255,255,0.4)', margin: 0 }}>
-                                {isShowcase 
-                                    ? <>Saldo Demo: <strong style={{ color: '#4ade80' }}>${balance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong></>
-                                    : 'Transacción Web3 Segura'}
-                            </p>
-                            <button
-                                className="sd-invest-btn"
-                                disabled={txState === 'processing'}
-                                onClick={handleParticipate}
-                                style={{
-                                    padding: '1.1rem 2.5rem',
-                                    background: txState === 'processing'
-                                        ? 'rgba(255,255,255,0.08)'
-                                        : txState === 'error'
-                                            ? 'rgba(239,68,68,0.2)'
-                                            : 'linear-gradient(135deg, #7c3aed 0%, #a855f7 50%, #06b6d4 100%)',
-                                    backgroundSize: '200% auto',
-                                    border: 'none', borderRadius: '16px',
-                                    color: txState === 'processing' ? 'rgba(255,255,255,0.5)' : 'white',
-                                    fontWeight: '800', fontSize: '1.15rem', cursor: 'pointer',
-                                    boxShadow: txState === 'idle' ? '0 4px 24px rgba(124,58,237,0.5)' : 'none',
-                                    WebkitTapHighlightColor: 'transparent',
-                                    transition: 'all 0.3s ease',
-                                    minWidth: '240px',
-                                    letterSpacing: '-0.01em',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    gap: '10px'
-                                }}
-                                onMouseOver={e => { if (txState === 'idle') { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 8px 32px rgba(124,58,237,0.65)'; }}}
-                                onMouseOut={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = txState === 'idle' ? '0 4px 24px rgba(124,58,237,0.5)' : 'none'; }}
-                            >
-                                <Briefcase size={20} />
-                                {txState === 'processing' && '⏳ Procesando...'}
-                                {txState === 'error'      && '❌ Error'}
-                                {txState === 'idle'       && 'INVERTIR EN ESTA CANCIÓN'}
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
+            {/* Sticky Invest Bar Removed — Button now exists inside the Calculator */}
         </div>
     );
 };
