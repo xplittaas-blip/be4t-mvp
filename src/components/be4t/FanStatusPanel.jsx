@@ -350,8 +350,14 @@ export default function FanStatusPanel({
                             color: progressPct > 90 ? '#00FFCC' : 'rgba(255,255,255,0.7)',
                             margin: 0,
                             fontWeight: progressPct > 90 ? '800' : '600',
-                            letterSpacing: '0.02em',
-                            animation: p                {/* Tier cards horizontal grid */}
+                            letterSpacing: '0.02em'
+                        }}>
+                            {isFullyUnlocked ? '¡Nivel máximo alcanzado!' : `Estás a solo ${nextLockedPerk?.min_tokens - totalTokens} tokens del nivel ${nextLockedPerk?.label}`}
+                        </p>
+                    </div>
+                </div>
+
+                {/* Tier cards horizontal grid */}
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px' }}>
                     {perks.map((perk, idx) => {
                         const isUnlocked = totalTokens >= perk.min_tokens;
