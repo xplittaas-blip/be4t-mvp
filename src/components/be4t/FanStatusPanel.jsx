@@ -395,8 +395,8 @@ export default function FanStatusPanel({
                             >
                                 {/* Badge Image */}
                                 <div style={{
-                                    width: '60px',
-                                    height: '60px',
+                                    width: '65px',
+                                    height: '65px',
                                     borderRadius: '50%',
                                     marginBottom: '12px',
                                     position: 'relative',
@@ -405,7 +405,12 @@ export default function FanStatusPanel({
                                     justifyContent: 'center',
                                     background: `radial-gradient(circle, ${colors.glow} 0%, transparent 70%)`
                                 }}>
-                                    <img src={detail.badgeUrl} alt={perk.label} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%', boxShadow: `0 0 15px ${colors.glow}` }} />
+                                    <img 
+                                        src={detail.badgeUrl} 
+                                        alt={perk.label} 
+                                        className="perk-badge-coin"
+                                        style={{ border: `2px solid ${colors.accent}` }}
+                                    />
                                     {isUnlocked && (
                                         <div style={{ position: 'absolute', top: '-4px', right: '-4px', width: '20px', height: '20px', borderRadius: '50%', background: colors.accent, display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid #0a0a0a', fontSize: '0.65rem', color: 'black' }}>
                                             ✓

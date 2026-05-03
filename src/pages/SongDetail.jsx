@@ -1,3 +1,4 @@
+/* BE4T Dashboard V2.1.0 - Full UI Sync with BICHOTA reference */
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { ArrowLeft, Play, Pause, CheckCircle, Info, Briefcase } from 'lucide-react';
@@ -174,7 +175,7 @@ const ReturnCalculator = ({ streamCount, roiEst, isTrending, paymentFreq = 'mont
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '0.4rem' }}>
                     <div>
                         <div style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '2px' }}>Monto a Invertir</div>
-                        <div style={{ fontSize: '2.8rem', fontWeight: '900', letterSpacing: '-0.04em', lineHeight: 1, color: '#00f0ff' }} className="calc-anim">
+                        <div style={{ fontSize: '2.8rem', fontWeight: '900', letterSpacing: '-0.04em', lineHeight: 1 }} className="calc-anim text-cyan">
                             {sym}{amount.toLocaleString('es-ES')}
                         </div>
                     </div>
@@ -213,59 +214,50 @@ const ReturnCalculator = ({ streamCount, roiEst, isTrending, paymentFreq = 'mont
                 ))}
             </div>
 
-            <div style={{
-                display: 'grid',
-                gridTemplateColumns: '1fr 1fr',
-                gap: '10px',
-                border: '2px solid transparent',
-                borderRadius: '16px',
-                background: 'linear-gradient(rgba(15,10,30,0.9), rgba(15,10,30,0.9)) padding-box, linear-gradient(135deg, #00f0ff, #7c3aed) border-box',
-                padding: '1.2rem',
-                boxShadow: '0 0 30px rgba(0, 240, 255, 0.1)'
-            }}>
-                <div style={{ background: 'rgba(0, 240, 255, 0.03)', border: '1px solid rgba(0, 240, 255, 0.1)', borderRadius: '12px', padding: '0.9rem 1rem' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
+            <div className="neon-border-glow" style={{ padding: '1.2rem' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                    <div style={{ background: 'rgba(0, 240, 255, 0.03)', border: '1px solid rgba(0, 240, 255, 0.1)', borderRadius: '12px', padding: '0.9rem 1rem' }}>
                         <div style={{ fontSize: '0.58rem', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: '700' }}>TEA (APY)</div>
+                        <div style={{ fontSize: '1.8rem', fontWeight: '900', color: 'white', letterSpacing: '-0.04em' }} className="calc-anim">
+                            {teaRate.toFixed(1)}%
+                        </div>
+                        {isTrending && <div style={{ fontSize: '0.55rem', color: '#00f0ff', marginTop: '2px', fontWeight: '700' }}>⚡ +8% trending</div>}
                     </div>
-                    <div style={{ fontSize: '1.8rem', fontWeight: '900', color: 'white', letterSpacing: '-0.04em' }} className="calc-anim">
-                        {teaRate.toFixed(1)}%
-                    </div>
-                    {isTrending && <div style={{ fontSize: '0.55rem', color: '#00f0ff', marginTop: '2px', fontWeight: '700' }}>⚡ +8% trending</div>}
-                </div>
 
-                <div style={{ background: 'rgba(34, 197, 94, 0.03)', border: '1px solid rgba(34, 197, 94, 0.1)', borderRadius: '12px', padding: '0.9rem 1rem' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
-                        <div style={{ fontSize: '0.58rem', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: '700' }}>Pago Trimestral</div>
+                    <div style={{ background: 'rgba(34, 197, 94, 0.03)', border: '1px solid rgba(34, 197, 94, 0.1)', borderRadius: '12px', padding: '0.9rem 1rem' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
+                            <div style={{ fontSize: '0.58rem', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: '700' }}>Pago Trimestral</div>
+                        </div>
+                        <div style={{ fontSize: '1.8rem', fontWeight: '900', color: '#22c55e', letterSpacing: '-0.03em' }} className="calc-anim">
+                            {sym}{quarterlyReturn.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        </div>
+                        <div style={{ fontSize: '0.55rem', color: 'rgba(255,255,255,0.3)', marginTop: '2px' }}>
+                            {sym}{annualReturn.toLocaleString('en-US', { maximumFractionDigits: 0 })} / año
+                        </div>
                     </div>
-                    <div style={{ fontSize: '1.8rem', fontWeight: '900', color: '#22c55e', letterSpacing: '-0.03em' }} className="calc-anim">
-                        {sym}{quarterlyReturn.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                    </div>
-                    <div style={{ fontSize: '0.55rem', color: 'rgba(255,255,255,0.3)', marginTop: '2px' }}>
-                        {sym}{annualReturn.toLocaleString('en-US', { maximumFractionDigits: 0 })} / año
-                    </div>
-                </div>
 
-                <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '12px', padding: '0.9rem 1rem' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
-                        <div style={{ fontSize: '0.58rem', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: '700' }}>Tokens Disp.</div>
+                    <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '12px', padding: '0.9rem 1rem' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
+                            <div style={{ fontSize: '0.58rem', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: '700' }}>Tokens Disp.</div>
+                        </div>
+                        <div style={{ fontSize: '1.4rem', fontWeight: '900', letterSpacing: '-0.02em', color: 'white' }} className="calc-anim">
+                            {tokensAvailable.toLocaleString('es-ES')} <span style={{ color: 'rgba(255,255,255,0.2)', fontSize: '0.8rem', fontWeight: '400' }}>/ {tokensTotal.toLocaleString('es-ES')}</span>
+                        </div>
+                        <div style={{ height: '3px', background: 'rgba(255,255,255,0.07)', borderRadius: '100px', overflow: 'hidden', marginTop: '10px' }}>
+                            <div style={{ height: '100%', width: `${Math.min(100, 100 - tokensPct)}%`, background: '#7c3aed', borderRadius: '100px', transition: 'width 0.5s ease' }} />
+                        </div>
                     </div>
-                    <div style={{ fontSize: '1.4rem', fontWeight: '900', letterSpacing: '-0.02em', color: 'white' }} className="calc-anim">
-                        {tokensAvailable.toLocaleString('es-ES')} <span style={{ color: 'rgba(255,255,255,0.2)', fontSize: '0.8rem', fontWeight: '400' }}>/ {tokensTotal.toLocaleString('es-ES')}</span>
-                    </div>
-                    <div style={{ height: '3px', background: 'rgba(255,255,255,0.07)', borderRadius: '100px', overflow: 'hidden', marginTop: '10px' }}>
-                        <div style={{ height: '100%', width: `${Math.min(100, 100 - tokensPct)}%`, background: '#7c3aed', borderRadius: '100px', transition: 'width 0.5s ease' }} />
-                    </div>
-                </div>
 
-                <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '12px', padding: '0.9rem 1rem' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
-                        <div style={{ fontSize: '0.58rem', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: '700' }}>Tu compra</div>
-                    </div>
-                    <div style={{ fontSize: '1.4rem', fontWeight: '900', color: 'white', letterSpacing: '-0.03em' }} className="calc-anim">
-                        {tokensBought.toLocaleString('es-ES')} <span style={{ color: 'rgba(255,255,255,0.2)', fontSize: '0.8rem', fontWeight: '400' }}>tk</span>
-                    </div>
-                    <div style={{ fontSize: '0.55rem', color: 'rgba(255,255,255,0.3)', marginTop: '2px' }}>
-                        {sym}{(tokenPrice * fxr).toFixed(2)} c/u
+                    <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '12px', padding: '0.9rem 1rem' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
+                            <div style={{ fontSize: '0.58rem', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: '700' }}>Tu compra</div>
+                        </div>
+                        <div style={{ fontSize: '1.4rem', fontWeight: '900', color: 'white', letterSpacing: '-0.03em' }} className="calc-anim">
+                            {tokensBought.toLocaleString('es-ES')} <span style={{ color: 'rgba(255,255,255,0.2)', fontSize: '0.8rem', fontWeight: '400' }}>tk</span>
+                        </div>
+                        <div style={{ fontSize: '0.55rem', color: 'rgba(255,255,255,0.3)', marginTop: '2px' }}>
+                            {sym}{(tokenPrice * fxr).toFixed(2)} c/u
+                        </div>
                     </div>
                 </div>
             </div>
@@ -655,18 +647,14 @@ const SongDetail = ({ onBack, songId, songData, onRequireAuth, isAuthenticated, 
                             )}
                         </div>
 
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.75rem' }}>
+                        <div className="compact-metrics-grid">
                             {[
                                 { icon: <SpotifyIcon />, label: 'SPOTIFY',    value: song.spotify,  accent: '#1DB954' },
                                 { icon: <YouTubeIcon />, label: 'YOUTUBE',      value: song.youtube,  accent: '#FF0000' },
                                 { icon: <TikTokIcon />,  label: 'TIKTOK', value: song.tiktok,   accent: 'rgba(255,255,255,0.5)' },
                             ].map(({ icon, label, value, accent }) => (
-                                <div key={label} style={{
-                                    background: 'rgba(255,255,255,0.03)',
-                                    border: '1px solid rgba(255,255,255,0.07)',
-                                    borderRadius: '12px', padding: '0.9rem 1rem',
-                                }}>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '5px', marginBottom: '0.4rem' }}>
+                                <div key={label} className="metric-item">
+                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px', marginBottom: '0.4rem' }}>
                                         {icon}
                                         <span style={{ fontSize: '0.58rem', color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: '700' }}>{label}</span>
                                     </div>
