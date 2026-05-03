@@ -352,7 +352,7 @@ export default function FanStatusPanel({
                             fontWeight: progressPct > 90 ? '800' : '600',
                             letterSpacing: '0.02em'
                         }}>
-                            {isFullyUnlocked ? '¡Nivel máximo alcanzado!' : `Estás a solo ${nextLockedPerk?.min_tokens - totalTokens} tokens del nivel ${nextLockedPerk?.label}`}
+                            {!nextLockedPerk ? '¡Nivel máximo alcanzado!' : `Estás a solo ${nextLockedPerk?.min_tokens - totalTokens} tokens del nivel ${nextLockedPerk?.label}`}
                         </p>
                     </div>
                 )}
