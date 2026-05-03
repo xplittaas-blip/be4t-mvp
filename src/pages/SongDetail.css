@@ -628,36 +628,65 @@
     }
 }
 
-/* Sticky invest bar on smallest screens only (< 480px) */
-@media (max-width: 480px) {
-    .sd-sticky-invest-bar {
-        position: fixed;
-        bottom: 0; left: 0; right: 0;
-        z-index: 900;
-        padding: 0.75rem 1rem calc(0.75rem + env(safe-area-inset-bottom));
-        background: linear-gradient(to top, rgba(8,8,18,0.98) 0%, rgba(8,8,18,0.85) 100%);
-        backdrop-filter: blur(16px);
-        -webkit-backdrop-filter: blur(16px);
-        border-top: 1px solid rgba(255,255,255,0.06);
-        display: flex;
-        flex-direction: column;
-        gap: 4px;
-    }
-
-    /* Add padding to page so sticky bar doesn't cover content */
-    .song-detail-page {
-        padding-bottom: 8rem;
-    }
-
-    /* Hide the inline button — sticky bar is used instead */
-    .sd-inline-invest {
-        display: none !important;
-    }
+/* ── Universal Sticky Invest Bar (Chases user on all screens) ───────────── */
+.sd-sticky-invest-bar {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    z-index: 900;
+    padding: 1rem 1.5rem calc(1rem + env(safe-area-inset-bottom));
+    background: linear-gradient(to top, rgba(8,8,18,0.98) 0%, rgba(8,8,18,0.85) 100%);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-top: 1px solid rgba(255,255,255,0.06);
+    box-shadow: 0 -10px 40px rgba(0,0,0,0.5);
+    display: flex;
+    justify-content: center;
+    animation: slideUpBar 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Hide sticky bar on larger screens */
-@media (min-width: 481px) {
+@keyframes slideUpBar {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+}
+
+.sd-sticky-content {
+    max-width: 1200px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+/* Hide the old inline button completely */
+.sd-inline-invest {
+    display: none !important;
+}
+
+/* Add padding to page so sticky bar doesn't cover content */
+.song-detail-page {
+    padding-bottom: 7rem;
+}
+
+@media (max-width: 768px) {
     .sd-sticky-invest-bar {
-        display: none !important;
+        padding: 0.75rem 1rem calc(0.75rem + env(safe-area-inset-bottom));
+    }
+    .sd-sticky-content {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    .sd-sticky-info {
+        display: none; /* Hide label on mobile to save space */
+    }
+    .sd-sticky-content > div {
+        width: 100%;
+        flex-direction: column-reverse;
+        gap: 0.4rem;
+    }
+    .sd-invest-btn {
+        width: 100%;
+    }
+    .sd-balance-tag {
+        text-align: center !important;
     }
 }

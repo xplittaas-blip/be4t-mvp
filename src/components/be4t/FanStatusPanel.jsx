@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { createPortal } from 'react-dom';
 
 // ── Perk rich metadata (images via gradient art + emoji) ──────────────────────
@@ -289,6 +289,17 @@ export default function FanStatusPanel({
     const totalTokens = (currentTokens || 0) + (projectedTokens || 0);
     const unlockedCount = perks.filter(p => totalTokens >= p.min_tokens).length;
 
+    // Audio Feedback for Unlocks
+    const prevUnlockedCount = useRef(unlockedCount);
+    useEffect(() => {
+        if (unlockedCount > prevUnlockedCount.current && unlockedCount > 0) {
+            const audio = new Audio('https://cdn.freesound.org/previews/411/411460_5121236-lq.mp3');
+            audio.volume = 0.4;
+            audio.play().catch(() => {});
+        }
+        prevUnlockedCount.current = unlockedCount;
+    }, [unlockedCount]);
+
     // Find the next locked perk
     const nextLockedPerk = perks.find(p => totalTokens < p.min_tokens);
     const tokensToNext = nextLockedPerk ? nextLockedPerk.min_tokens - totalTokens : 0;
@@ -307,6 +318,16 @@ export default function FanStatusPanel({
 
     return (
         <>
+            <style>{`
+                @keyframes shimmerPulse {
+                    0% { background-position: 200% center; box-shadow: 0 0 8px rgba(0,255,204,0.4); }
+                    100% { background-position: -200% center; box-shadow: 0 0 16px rgba(0,255,204,0.8); }
+                }
+                @keyframes fomoBlink {
+                    0% { opacity: 1; text-shadow: 0 0 8px rgba(0,255,204,0.8); }
+                    100% { opacity: 0.7; text-shadow: none; }
+                }
+            `}</style>
             <div style={{
                 background: 'rgba(5,5,15,0.9)',
                 border: '1px solid rgba(255,255,255,0.07)',
@@ -329,7 +350,13 @@ export default function FanStatusPanel({
                         <span style={{ fontSize: '0.9rem' }}>✨</span>
                         TU ESTATUS: BENEFICIOS EXCLUSIVOS
                     </span>
-                    <span style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.3)', fontFamily: 'monospace' }}>
+                    <span style={{ 
+                        fontSize: '0.8rem', 
+                        color: unlockedCount === perks.length ? '#00FFCC' : 'rgba(255,255,255,0.4)', 
+                        fontFamily: 'monospace',
+                        fontWeight: '800',
+                        transition: 'color 0.3s ease'
+                    }}>
                         {unlockedCount}/{perks.length}
                     </span>
                 </div>
@@ -347,20 +374,23 @@ export default function FanStatusPanel({
                             <div style={{
                                 height: '100%',
                                 width: `${progressPct}%`,
-                                background: 'linear-gradient(90deg, #00FFCC, #a855f7)',
+                                background: 'linear-gradient(90deg, #00FFCC 0%, #a855f7 50%, #00FFCC 100%)',
+                                backgroundSize: '200% auto',
                                 borderRadius: '100px',
                                 boxShadow: '0 0 8px rgba(0,255,204,0.5)',
                                 transition: 'width 0.5s cubic-bezier(0.25,0.8,0.25,1)',
+                                animation: progressPct > 0 ? 'shimmerPulse 2s linear infinite' : 'none',
                             }} />
                         </div>
                         <p style={{
                             fontSize: '0.6rem',
-                            color: '#00FFCC',
+                            color: progressPct > 90 ? '#00FFCC' : 'rgba(255,255,255,0.7)',
                             margin: 0,
-                            fontWeight: '600',
+                            fontWeight: progressPct > 90 ? '800' : '600',
                             letterSpacing: '0.02em',
+                            animation: progressPct > 90 ? 'fomoBlink 0.8s alternate infinite' : 'none',
                         }}>
-                            ⚡ ¡Estás a solo <strong>${amountToNext.toLocaleString()}</strong> de desbloquear <strong>{nextLockedPerk.label}</strong>!
+                            ⚡ ¡Estás a solo <strong style={{ color: '#00FFCC' }}>${amountToNext.toLocaleString()}</strong> de desbloquear <strong>{nextLockedPerk.label}</strong>!
                         </p>
                     </div>
                 )}
@@ -369,6 +399,7 @@ export default function FanStatusPanel({
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                     {perks.map((perk, idx) => {
                         const isUnlocked = totalTokens >= perk.min_tokens;
+                        const isNext = !isUnlocked && nextLockedPerk?.label === perk.label;
                         const colors = TIER_COLORS[perk.category] || TIER_COLORS.FAN;
                         const detail = PERK_DETAIL[perk.label] || {};
 
@@ -384,30 +415,29 @@ export default function FanStatusPanel({
                                     borderRadius: '12px',
                                     padding: '12px 14px',
                                     cursor: 'pointer',
-                                    transition: 'all 0.35s cubic-bezier(0.25,0.8,0.25,1)',
+                                    transition: 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
                                     background: isUnlocked
-                                        ? `linear-gradient(135deg, ${colors.glow} 0%, transparent 100%)`
+                                        ? `linear-gradient(135deg, rgba(30,10,40,0.8) 0%, rgba(10,15,40,0.8) 100%)`
                                         : 'rgba(255,255,255,0.02)',
-                                    border: `1px solid ${isUnlocked ? colors.border : 'rgba(255,255,255,0.05)'}`,
-                                    boxShadow: isUnlocked ? `0 0 20px ${colors.glow}` : 'none',
-                                    filter: isUnlocked ? 'none' : 'grayscale(70%)',
-                                    opacity: isUnlocked ? 1 : 0.6,
+                                    border: `1px solid ${isUnlocked ? colors.accent : isNext ? 'rgba(0,255,204,0.3)' : 'rgba(255,255,255,0.05)'}`,
+                                    boxShadow: isUnlocked ? `0 0 20px ${colors.glow}, inset 0 0 10px ${colors.glow}` : isNext ? '0 0 15px rgba(0,255,204,0.15)' : 'none',
+                                    filter: isUnlocked ? 'none' : 'grayscale(100%)',
+                                    opacity: isUnlocked ? 1 : 0.4,
+                                    transform: isUnlocked ? 'scale(1.02)' : 'scale(1)',
+                                    backdropFilter: isUnlocked ? 'none' : 'blur(3px)',
+                                    WebkitBackdropFilter: isUnlocked ? 'none' : 'blur(3px)',
                                     width: '100%',
                                     boxSizing: 'border-box',
                                     position: 'relative',
                                     overflow: 'hidden',
                                 }}
                                 onMouseEnter={e => {
-                                    e.currentTarget.style.opacity = '1';
-                                    e.currentTarget.style.filter = 'none';
-                                    e.currentTarget.style.transform = 'translateY(-1px)';
-                                    e.currentTarget.style.boxShadow = isUnlocked ? `0 4px 24px ${colors.glow}` : '0 4px 16px rgba(0,0,0,0.3)';
+                                    e.currentTarget.style.transform = isUnlocked ? 'scale(1.04) translateY(-2px)' : isNext ? 'scale(1.02)' : 'scale(1.01)';
+                                    e.currentTarget.style.boxShadow = isUnlocked ? `0 10px 30px ${colors.glow}, inset 0 0 15px ${colors.glow}` : isNext ? '0 6px 20px rgba(0,255,204,0.25)' : '0 4px 16px rgba(0,0,0,0.3)';
                                 }}
                                 onMouseLeave={e => {
-                                    e.currentTarget.style.opacity = isUnlocked ? '1' : '0.6';
-                                    e.currentTarget.style.filter = isUnlocked ? 'none' : 'grayscale(70%)';
-                                    e.currentTarget.style.transform = 'translateY(0)';
-                                    e.currentTarget.style.boxShadow = isUnlocked ? `0 0 20px ${colors.glow}` : 'none';
+                                    e.currentTarget.style.transform = isUnlocked ? 'scale(1.02)' : 'scale(1)';
+                                    e.currentTarget.style.boxShadow = isUnlocked ? `0 0 20px ${colors.glow}, inset 0 0 10px ${colors.glow}` : isNext ? '0 0 15px rgba(0,255,204,0.15)' : 'none';
                                 }}
                             >
                                 {/* Icon */}
