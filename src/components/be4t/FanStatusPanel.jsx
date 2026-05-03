@@ -250,7 +250,9 @@ export default function FanStatusPanel({
     onScrollToSlider,
 }) {
     const [activePerk, setActivePerk] = useState(null);
-    const totalTokens = (currentTokens || 0) + (projectedTokens || 0);
+    // Para simplificar la demo y alinear los umbrales de 100/500/2500 con el slider (que llega a $5K), 
+    // evaluamos el monto de inversión directo (calcAmount) contra los requisitos (min_tokens).
+    const totalTokens = calcAmount; 
     const unlockedCount = perks.filter(p => totalTokens >= p.min_tokens).length;
 
     // Audio Feedback for Unlocks
@@ -354,7 +356,7 @@ export default function FanStatusPanel({
                             fontWeight: progressPct > 90 ? '800' : '600',
                             letterSpacing: '0.02em'
                         }}>
-                            {!nextLockedPerk ? '¡Nivel máximo alcanzado!' : `Estás a solo ${nextLockedPerk?.min_tokens - totalTokens} tokens del nivel ${nextLockedPerk?.label}`}
+                            {!nextLockedPerk ? '¡Nivel máximo alcanzado!' : `Estás a solo $${nextLockedPerk?.min_tokens - totalTokens} del nivel ${nextLockedPerk?.label}`}
                         </p>
                     </div>
                 )}
@@ -465,7 +467,7 @@ export default function FanStatusPanel({
                                     lineHeight: 1.3,
                                     transition: 'opacity 0.5s ease'
                                 }}>
-                                    {perk.min_tokens}+ tk
+                                    ${perk.min_tokens}+
                                 </div>
                             </button>
                         );
