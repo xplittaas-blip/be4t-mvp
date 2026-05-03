@@ -459,14 +459,6 @@ export default function FanStatusPanel({
                             </button>
                         );
                     })}
-                </div>          }}>
-                                        {isUnlocked ? '✓' : '🔒'}
-                                    </div>
-                                    <span style={{ fontSize: '0.5rem', color: 'rgba(255,255,255,0.2)' }}>ver</span>
-                                </div>
-                            </button>
-                        );
-                    })}
                 </div>
 
                 {/* Footer */}
