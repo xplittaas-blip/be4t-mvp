@@ -311,14 +311,16 @@ export default function FanStatusPanel({
                         alignItems: 'center',
                         gap: '6px',
                     }}>
-                        🔒 BÓVEDA DE <span style={{ color: 'white' }}>EXCLUSIVIDAD</span>
+                        🔒 BÓVEDA DE <span style={{ color: '#00f0ff' }}>EXCLUSIVIDAD</span>
                     </span>
                     <span style={{ 
-                        fontSize: '0.8rem', 
-                        color: unlockedCount === perks.length ? '#00f0ff' : 'rgba(255,255,255,0.4)', 
-                        fontFamily: 'monospace',
-                        fontWeight: '800',
-                        transition: 'color 0.3s ease'
+                        fontSize: '0.65rem', 
+                        color: unlockedCount === perks.length ? '#00f0ff' : 'rgba(255,255,255,0.6)', 
+                        background: 'rgba(255,255,255,0.08)',
+                        padding: '2px 8px',
+                        borderRadius: '100px',
+                        fontWeight: '700',
+                        transition: 'all 0.3s ease'
                     }}>
                         {unlockedCount}/{perks.length}
                     </span>
@@ -377,7 +379,7 @@ export default function FanStatusPanel({
                                     borderRadius: '16px',
                                     padding: '16px 10px',
                                     cursor: 'pointer',
-                                    transition: 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+                                    transition: 'all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
                                     background: isUnlocked
                                         ? `linear-gradient(135deg, rgba(15,10,40,0.8) 0%, rgba(10,15,40,0.8) 100%)`
                                         : 'rgba(255,255,255,0.02)',
