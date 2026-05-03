@@ -385,8 +385,6 @@ export default function FanStatusPanel({
                                         : 'rgba(255,255,255,0.02)',
                                     border: `1px solid ${isUnlocked ? colors.accent : isNext ? 'rgba(0,240,255,0.3)' : 'rgba(255,255,255,0.05)'}`,
                                     boxShadow: isUnlocked ? `0 0 20px ${colors.glow}` : isNext ? '0 0 15px rgba(0,240,255,0.1)' : 'none',
-                                    filter: isUnlocked ? 'none' : 'grayscale(100%) blur(1px)',
-                                    opacity: isUnlocked ? 1 : 0.5,
                                     width: '100%',
                                     boxSizing: 'border-box',
                                     position: 'relative',
@@ -411,13 +409,19 @@ export default function FanStatusPanel({
                                     display: 'flex',
                                     alignItems: 'center',
                                     justifyContent: 'center',
-                                    background: `radial-gradient(circle, ${colors.glow} 0%, transparent 70%)`
+                                    background: isUnlocked ? `radial-gradient(circle, ${colors.glow} 0%, transparent 70%)` : 'transparent',
+                                    transition: 'background 0.5s ease'
                                 }}>
                                     <img 
                                         src={detail.badgeUrl} 
                                         alt={perk.label} 
                                         className="perk-badge-coin"
-                                        style={{ border: `2px solid ${colors.accent}` }}
+                                        style={{ 
+                                            border: `2px solid ${isUnlocked ? colors.accent : 'rgba(255,255,255,0.1)'}`,
+                                            filter: isUnlocked ? 'none' : 'grayscale(100%)',
+                                            opacity: isUnlocked ? 1 : 0.4,
+                                            transition: 'all 0.5s ease'
+                                        }}
                                     />
                                     {isUnlocked && (
                                         <div style={{ position: 'absolute', top: '-4px', right: '-4px', width: '20px', height: '20px', borderRadius: '50%', background: colors.accent, display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid #0a0a0a', fontSize: '0.65rem', color: 'black' }}>
@@ -437,8 +441,9 @@ export default function FanStatusPanel({
                                     fontWeight: '800',
                                     letterSpacing: '0.1em',
                                     textTransform: 'uppercase',
-                                    color: colors.accent,
-                                    marginBottom: '4px'
+                                    color: isUnlocked ? colors.accent : 'rgba(255,255,255,0.4)',
+                                    marginBottom: '4px',
+                                    transition: 'color 0.5s ease'
                                 }}>
                                     {perk.category}
                                 </div>
@@ -446,15 +451,19 @@ export default function FanStatusPanel({
                                     fontSize: '0.72rem',
                                     fontWeight: '800',
                                     color: 'white',
+                                    opacity: isUnlocked ? 1 : 0.65,
                                     marginBottom: '2px',
-                                    lineHeight: 1.2
+                                    lineHeight: 1.2,
+                                    transition: 'opacity 0.5s ease'
                                 }}>
                                     {perk.label}
                                 </div>
                                 <div style={{
                                     fontSize: '0.58rem',
                                     color: 'rgba(255,255,255,0.4)',
-                                    lineHeight: 1.3
+                                    opacity: isUnlocked ? 1 : 0.5,
+                                    lineHeight: 1.3,
+                                    transition: 'opacity 0.5s ease'
                                 }}>
                                     {perk.min_tokens}+ tk
                                 </div>
