@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { createPortal } from 'react-dom';
-import { ArrowLeft, Play, Pause, CheckCircle, Info } from 'lucide-react';
+import { ArrowLeft, Play, Pause, CheckCircle, Info, Briefcase } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useGlobalPlayer } from '../context/GlobalPlayerContext';
 import { getMarketplaceData } from '../core/xplit/spotify';
@@ -174,7 +174,7 @@ const ReturnCalculator = ({ streamCount, roiEst, isTrending, paymentFreq = 'mont
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '0.4rem' }}>
                     <div>
                         <div style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '2px' }}>Monto a Invertir</div>
-                        <div style={{ fontSize: '2rem', fontWeight: '900', letterSpacing: '-0.04em', lineHeight: 1 }} className="calc-anim">
+                        <div style={{ fontSize: '2.8rem', fontWeight: '900', letterSpacing: '-0.04em', lineHeight: 1, color: '#00f0ff' }} className="calc-anim">
                             {sym}{amount.toLocaleString('es-ES')}
                         </div>
                     </div>
@@ -213,49 +213,59 @@ const ReturnCalculator = ({ streamCount, roiEst, isTrending, paymentFreq = 'mont
                 ))}
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
-                <div style={{ background: 'linear-gradient(135deg, rgba(139,92,246,0.15) 0%, rgba(59,130,246,0.08) 100%)', border: '1px solid rgba(139,92,246,0.25)', borderRadius: '14px', padding: '0.9rem 1rem' }}>
-                    <div style={{ fontSize: '0.58rem', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: '700', marginBottom: '4px' }}>TEA (APY)</div>
-                    <div style={{ fontSize: '1.6rem', fontWeight: '900', color: '#a78bfa', letterSpacing: '-0.04em' }} className="calc-anim">
+            <div style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 1fr',
+                gap: '10px',
+                border: '2px solid transparent',
+                borderRadius: '16px',
+                background: 'linear-gradient(rgba(15,10,30,0.9), rgba(15,10,30,0.9)) padding-box, linear-gradient(135deg, #00f0ff, #7c3aed) border-box',
+                padding: '1.2rem',
+                boxShadow: '0 0 30px rgba(0, 240, 255, 0.1)'
+            }}>
+                <div style={{ background: 'rgba(0, 240, 255, 0.03)', border: '1px solid rgba(0, 240, 255, 0.1)', borderRadius: '12px', padding: '0.9rem 1rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
+                        <div style={{ fontSize: '0.58rem', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: '700' }}>TEA (APY)</div>
+                    </div>
+                    <div style={{ fontSize: '1.8rem', fontWeight: '900', color: 'white', letterSpacing: '-0.04em' }} className="calc-anim">
                         {teaRate.toFixed(1)}%
                     </div>
-                    {isTrending && <div style={{ fontSize: '0.55rem', color: '#4ade80', marginTop: '2px', fontWeight: '700' }}>⚡ +8% por tendencia</div>}
+                    {isTrending && <div style={{ fontSize: '0.55rem', color: '#00f0ff', marginTop: '2px', fontWeight: '700' }}>⚡ +8% trending</div>}
                 </div>
 
-                <div style={{ background: 'linear-gradient(135deg, rgba(34,197,94,0.12) 0%, rgba(16,185,129,0.06) 100%)', border: '1px solid rgba(34,197,94,0.2)', borderRadius: '14px', padding: '0.9rem 1rem' }}>
+                <div style={{ background: 'rgba(34, 197, 94, 0.03)', border: '1px solid rgba(34, 197, 94, 0.1)', borderRadius: '12px', padding: '0.9rem 1rem' }}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
-                        <div style={{ fontSize: '0.58rem', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: '700' }}>Pago {displayFreqLabel}</div>
-                        <span style={{ fontSize: '0.48rem', background: 'rgba(34,197,94,0.15)', color: '#4ade80', border: '1px solid rgba(34,197,94,0.25)', borderRadius: '100px', padding: '1px 5px', fontWeight: '700', letterSpacing: '0.5px' }}>{displayFreqLabel.toUpperCase()}</span>
+                        <div style={{ fontSize: '0.58rem', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: '700' }}>Pago Trimestral</div>
                     </div>
-                    <div style={{ fontSize: '1.4rem', fontWeight: '900', color: '#4ade80', letterSpacing: '-0.03em' }} className="calc-anim">
-                        {sym}{displayReturn.toFixed(2)}
+                    <div style={{ fontSize: '1.8rem', fontWeight: '900', color: '#22c55e', letterSpacing: '-0.03em' }} className="calc-anim">
+                        {sym}{quarterlyReturn.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </div>
                     <div style={{ fontSize: '0.55rem', color: 'rgba(255,255,255,0.3)', marginTop: '2px' }}>
-                        {sym}{annualReturn.toFixed(2)} / año
+                        {sym}{annualReturn.toLocaleString('en-US', { maximumFractionDigits: 0 })} / año
                     </div>
                 </div>
 
-                <div style={{ background: 'rgba(255,255,255,0.03)', border: `1px solid ${tokensLow ? 'rgba(249,115,22,0.3)' : 'rgba(255,255,255,0.08)'}`, borderRadius: '14px', padding: '0.9rem 1rem' }}>
+                <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '12px', padding: '0.9rem 1rem' }}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
                         <div style={{ fontSize: '0.58rem', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: '700' }}>Tokens Disp.</div>
-                        {tokensLow && <span style={{ fontSize: '0.48rem', background: 'rgba(249,115,22,0.15)', color: '#fb923c', border: '1px solid rgba(249,115,22,0.3)', borderRadius: '100px', padding: '1px 5px', fontWeight: '700' }}>CASI AGOTADO</span>}
                     </div>
-                    <div style={{ fontSize: '1.2rem', fontWeight: '800', letterSpacing: '-0.02em', color: tokensTextColor }} className="calc-anim">
-                        {tokensAvailable.toLocaleString('es-ES')}
+                    <div style={{ fontSize: '1.4rem', fontWeight: '900', letterSpacing: '-0.02em', color: 'white' }} className="calc-anim">
+                        {tokensAvailable.toLocaleString('es-ES')} <span style={{ color: 'rgba(255,255,255,0.2)', fontSize: '0.8rem', fontWeight: '400' }}>/ {tokensTotal.toLocaleString('es-ES')}</span>
                     </div>
-                    <div style={{ fontSize: '0.52rem', color: 'rgba(255,255,255,0.25)', marginTop: '2px', marginBottom: '6px' }}>de {tokensTotal.toLocaleString('es-ES')} totales</div>
-                    <div style={{ height: '3px', background: 'rgba(255,255,255,0.07)', borderRadius: '100px', overflow: 'hidden' }}>
-                        <div style={{ height: '100%', width: `${Math.min(100, 100 - tokensPct)}%`, background: tokenBarColor, borderRadius: '100px', boxShadow: `0 0 5px ${tokenBarColor}88`, transition: 'width 0.5s ease' }} />
+                    <div style={{ height: '3px', background: 'rgba(255,255,255,0.07)', borderRadius: '100px', overflow: 'hidden', marginTop: '10px' }}>
+                        <div style={{ height: '100%', width: `${Math.min(100, 100 - tokensPct)}%`, background: '#7c3aed', borderRadius: '100px', transition: 'width 0.5s ease' }} />
                     </div>
                 </div>
 
-                <div style={{ background: 'linear-gradient(135deg, rgba(99,102,241,0.12) 0%, rgba(139,92,246,0.07) 100%)', border: '1px solid rgba(99,102,241,0.25)', borderRadius: '14px', padding: '0.9rem 1rem' }}>
-                    <div style={{ fontSize: '0.58rem', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: '700', marginBottom: '4px' }}>Compras</div>
-                    <div style={{ fontSize: '1.4rem', fontWeight: '900', color: '#818cf8', letterSpacing: '-0.03em' }} className="calc-anim">
-                        {tokensBought.toLocaleString('es-ES')}
+                <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '12px', padding: '0.9rem 1rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
+                        <div style={{ fontSize: '0.58rem', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: '700' }}>Tu compra</div>
                     </div>
-                    <div style={{ fontSize: '0.52rem', color: 'rgba(255,255,255,0.3)', marginTop: '2px' }}>
-                        tokens · {sym}{(tokenPrice * fxr).toFixed(2)} c/u
+                    <div style={{ fontSize: '1.4rem', fontWeight: '900', color: 'white', letterSpacing: '-0.03em' }} className="calc-anim">
+                        {tokensBought.toLocaleString('es-ES')} <span style={{ color: 'rgba(255,255,255,0.2)', fontSize: '0.8rem', fontWeight: '400' }}>tk</span>
+                    </div>
+                    <div style={{ fontSize: '0.55rem', color: 'rgba(255,255,255,0.3)', marginTop: '2px' }}>
+                        {sym}{(tokenPrice * fxr).toFixed(2)} c/u
                     </div>
                 </div>
             </div>
@@ -647,107 +657,102 @@ const SongDetail = ({ onBack, songId, songData, onRequireAuth, isAuthenticated, 
 
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.75rem' }}>
                             {[
-                                { icon: <SpotifyIcon />, label: 'STREAMS',    value: song.spotify,  sub: 'en Spotify',  accent: '#1DB954' },
-                                { icon: <YouTubeIcon />, label: 'VIEWS',      value: song.youtube,  sub: 'en YouTube',  accent: '#FF0000' },
-                                { icon: <TikTokIcon />,  label: 'CREACIONES', value: song.tiktok,   sub: 'en TikTok',   accent: 'rgba(255,255,255,0.5)' },
-                            ].map(({ icon, label, value, sub, accent }) => (
+                                { icon: <SpotifyIcon />, label: 'SPOTIFY',    value: song.spotify,  accent: '#1DB954' },
+                                { icon: <YouTubeIcon />, label: 'YOUTUBE',      value: song.youtube,  accent: '#FF0000' },
+                                { icon: <TikTokIcon />,  label: 'TIKTOK', value: song.tiktok,   accent: 'rgba(255,255,255,0.5)' },
+                            ].map(({ icon, label, value, accent }) => (
                                 <div key={label} style={{
                                     background: 'rgba(255,255,255,0.03)',
                                     border: '1px solid rgba(255,255,255,0.07)',
-                                    borderRadius: '12px', padding: '0.9rem 0.75rem',
+                                    borderRadius: '12px', padding: '0.9rem 1rem',
                                 }}>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '5px', marginBottom: '0.4rem' }}>
                                         {icon}
                                         <span style={{ fontSize: '0.58rem', color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: '700' }}>{label}</span>
                                     </div>
-                                    <div style={{ fontSize: '1.5rem', fontWeight: '900', letterSpacing: '-0.04em', color: 'white' }}>{value}</div>
-                                    <div style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.3)', marginTop: '2px' }}>{sub}</div>
+                                    <div style={{ fontSize: '1.6rem', fontWeight: '900', letterSpacing: '-0.04em', color: 'white' }}>{value}</div>
                                 </div>
                             ))}
                         </div>
 
-                        {/* Streams / Mes row */}
-                        <div style={{ marginTop: '0.75rem', padding: '0.65rem 0.9rem', background: 'linear-gradient(90deg, rgba(29,185,84,0.07) 0%, rgba(255,255,255,0.02) 100%)', border: '1px solid rgba(29,185,84,0.15)', borderRadius: '10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '7px' }}>
-                                <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: '#1DB954', display: 'inline-block', boxShadow: '0 0 5px #1DB95488' }} />
-                                <span style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Streams / Mes (prom.)</span>
+                        {/* Combined Secondary Metrics Row */}
+                        <div style={{
+                            marginTop: '1rem',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            padding: '0.65rem 1rem',
+                            background: 'rgba(255,255,255,0.02)',
+                            borderRadius: '12px',
+                            border: '1px solid rgba(255,255,255,0.05)'
+                        }}>
+                            <div style={{ display: 'flex', gap: '2rem' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                    <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#22c55e', boxShadow: '0 0 6px #22c55e' }} />
+                                    <span style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.5)' }}>Streams/mes: <strong style={{ color: '#4ade80' }}>{fmtMetric(Math.round(liveStreamCount / 12))}</strong></span>
+                                </div>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                    <span style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.5)' }}>Playlists: <strong style={{ color: 'white' }}>{song.saves}</strong></span>
+                                </div>
                             </div>
-                            <span style={{ fontWeight: '800', fontSize: '1rem', color: '#4ade80', letterSpacing: '-0.02em' }}>
-                                {fmtMetric(Math.round(liveStreamCount / 12))}
-                            </span>
-                        </div>
 
-                        {/* Saves row */}
-                        <div style={{ marginTop: '0.75rem', padding: '0.65rem 0.9rem', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <span style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Guardados en playlist</span>
-                            <span style={{ fontWeight: '700', fontSize: '0.9rem' }}>{song.saves}</span>
-                        </div>
-
-
-                        {/* YouTube embed link */}
-                        {ytVideoId && (
-                            <div style={{ marginTop: '0.75rem' }}>
+                            {ytVideoId && (
                                 <a
                                     href={`https://www.youtube.com/watch?v=${ytVideoId}`}
                                     target="_blank" rel="noopener noreferrer"
                                     style={{
-                                        display: 'inline-flex', alignItems: 'center', gap: '6px',
-                                        fontSize: '0.75rem', color: 'rgba(255,255,255,0.4)',
+                                        display: 'flex', alignItems: 'center', gap: '6px',
+                                        fontSize: '0.7rem', color: 'rgba(255,255,255,0.4)',
                                         textDecoration: 'none',
-                                        padding: '0.4rem 0.8rem',
+                                        padding: '0.35rem 0.75rem',
                                         border: '1px solid rgba(255,255,255,0.08)',
                                         borderRadius: '8px',
+                                        textTransform: 'uppercase',
+                                        fontWeight: '700'
                                     }}
                                 >
-                                    <YouTubeIcon /> Ver video oficial →
+                                    🎬 Video
                                 </a>
-                            </div>
-                        )}
+                            )}
+                        </div>
                     </section>
 
                     {/* ── 3. SOBRE ESTA CANCIÓN ── */}
                     <section className="detail-section glass-panel mt-4">
                         <h2 className="section-title">Sobre esta canción</h2>
-                        <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '0.9rem', lineHeight: 1.7, marginTop: '0.75rem' }}>
+                        <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '1rem', lineHeight: 1.8, marginTop: '0.75rem' }}>
                             <strong style={{ color: 'white' }}>"{song.title}"</strong> ha acumulado más de{' '}
                             <strong style={{ color: '#c4b5fd' }}>{fmtMetric(liveStreamCount)}</strong> de streams globales.
                             Este activo tokenizado representa una oportunidad premium de inversión en regalías musicales
-                            para fanáticos e inversionistas que creen en {song.artist}.
+                            para fanáticos e inversionistas que creen en <strong style={{ color: 'white' }}>{song.artist}</strong>.
                         </p>
-                        <div style={{ marginTop: '1rem', padding: '0.9rem', borderLeft: '3px solid rgba(139,92,246,0.5)', background: 'rgba(139,92,246,0.05)', borderRadius: '0 8px 8px 0' }}>
-                            <p style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.5)', margin: 0, fontStyle: 'italic' }}>
-                                ""{song.title}" es uno de los tracks más influyentes del género con millones de oyentes
+                        <div style={{ marginTop: '1.2rem', padding: '1rem 1.2rem', borderLeft: '3px solid #7c3aed', background: 'rgba(124,58,237,0.05)', borderRadius: '0 12px 12px 0' }}>
+                            <p style={{ fontSize: '0.95rem', color: 'rgba(255,255,255,0.5)', margin: 0, fontStyle: 'italic', lineHeight: 1.6 }}>
+                                "{song.title}" es uno de los tracks más influyentes del género con millones de oyentes
                                 mensuales en plataformas globales y presencia comprobada en TikTok con{' '}
-                                {song.tiktok} creaciones de sonido."
+                                <strong style={{ color: '#c4b5fd' }}>{song.tiktok}</strong> creaciones de sonido.
                             </p>
                         </div>
                     </section>
 
                     {/* ── 4. ARTISTA ── */}
                     <section className="detail-section mt-4 glass-panel artist-context">
-                        <h2 className="section-title mb-4">{tSong('artist_about')}</h2>
-                        <div className="artist-profile-horizontal">
-                            <div className="artist-avatar-large">
-                                <img src={song.image} alt={song.artist} />
+                        <h2 className="section-title mb-4">About the artist</h2>
+                        <div className="artist-profile-horizontal" style={{ background: 'rgba(255,255,255,0.02)', padding: '2rem', borderRadius: '20px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                            <div className="artist-avatar-large" style={{ width: '100px', height: '100px' }}>
+                                <img src={song.image} alt={song.artist} style={{ borderRadius: '50%' }} />
                             </div>
                             <div className="artist-data">
-                                <h3>{song.artist}</h3>
-                                <p className="text-secondary text-sm mt-1">
+                                <h3 style={{ fontSize: '1.8rem', fontWeight: '800', margin: 0 }}>{song.artist}</h3>
+                                <p className="text-secondary mt-1" style={{ fontSize: '1rem', opacity: 0.7 }}>
                                     Artista independiente definiendo un nuevo sonido para la audiencia global.
                                 </p>
-                                <div className="artist-stats mt-3">
-                                    <div className="stat-pill">
+                                <div className="artist-stats mt-3" style={{ display: 'flex', gap: '1.5rem' }}>
+                                    <div className="stat-pill" style={{ background: 'rgba(0,0,0,0.3)', padding: '0.5rem 1rem', borderRadius: '100px', border: '1px solid rgba(255,255,255,0.1)' }}>
                                         <SpotifyIcon />
-                                        <span className="fw-600 ml-1">{song.artistListeners}</span>
-                                        <span className="text-secondary text-sm ml-1">{tSong('artist_listeners')}</span>
+                                        <span className="fw-800 ml-2" style={{ color: 'white' }}>{song.artistListeners}</span>
+                                        <span className="text-secondary ml-1" style={{ fontSize: '0.8rem' }}>mensuales</span>
                                     </div>
-                                    {ytData?.channelSubscribers && (
-                                        <div className="stat-pill mt-2">
-                                            <YouTubeIcon />
-                                            <span className="fw-600 ml-1">{formatViews(ytData.channelSubscribers)}</span>
-                                            <span className="text-secondary text-sm ml-1">{tSong('yt_subscribers')}</span>
-                                        </div>
-                                    )}
                                 </div>
                             </div>
                         </div>
@@ -968,14 +973,19 @@ const SongDetail = ({ onBack, songId, songData, onRequireAuth, isAuthenticated, 
                                     WebkitTapHighlightColor: 'transparent',
                                     transition: 'all 0.3s ease',
                                     minWidth: '240px',
-                                    letterSpacing: '-0.01em'
+                                    letterSpacing: '-0.01em',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    gap: '10px'
                                 }}
                                 onMouseOver={e => { if (txState === 'idle') { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 8px 32px rgba(124,58,237,0.65)'; }}}
                                 onMouseOut={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = txState === 'idle' ? '0 4px 24px rgba(124,58,237,0.5)' : 'none'; }}
                             >
+                                <Briefcase size={20} />
                                 {txState === 'processing' && '⏳ Procesando...'}
                                 {txState === 'error'      && '❌ Error'}
-                                {txState === 'idle'       && '💰 Invertir Ahora'}
+                                {txState === 'idle'       && 'INVERTIR EN ESTA CANCIÓN'}
                             </button>
                         </div>
                     </div>

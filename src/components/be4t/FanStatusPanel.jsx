@@ -4,31 +4,25 @@ import { createPortal } from 'react-dom';
 // ── Perk rich metadata (images via gradient art + emoji) ──────────────────────
 const PERK_DETAIL = {
     'Preventa VIP': {
-        gradient: 'linear-gradient(135deg, #1a0533 0%, #3b0764 50%, #0c0a1a 100%)',
-        accent: '#00FFCC',
-        glow: 'rgba(0,255,204,0.3)',
-        bg: 'rgba(0,255,204,0.08)',
-        border: 'rgba(0,255,204,0.3)',
+        badgeUrl: '/fan_perk_badge_cyan_1777822449925.png',
+        accent: '#00f0ff',
+        glow: 'rgba(0, 240, 255, 0.4)',
         detailDescription: 'Recibes un código único de preventa 24 horas antes que el público general. Prioridad total en la selección de asientos para el próximo concierto del artista.',
         terms: 'El código se envía al email registrado 7 días antes del evento. Válido para 1 compra de máximo 4 entradas. No transferible.',
         unlockAmount: 100,
     },
     'Merch Edición Limitada': {
-        gradient: 'linear-gradient(135deg, #1a0a2e 0%, #2d1b69 50%, #0f0a1a 100%)',
-        accent: '#a855f7',
-        glow: 'rgba(168,85,247,0.3)',
-        bg: 'rgba(168,85,247,0.08)',
-        border: 'rgba(168,85,247,0.3)',
+        badgeUrl: '/socio_perk_badge_blue_1777822472492.png',
+        accent: '#3b82f6',
+        glow: 'rgba(59, 130, 246, 0.4)',
         detailDescription: 'Gorra snapback premium + Vinilo 7" edición numerada y firmada a mano por el artista. Producción limitada a 500 unidades mundiales.',
         terms: 'Envío a domicilio en 4-6 semanas tras confirmar la inversión. Incluye certificado de autenticidad y número de serie único.',
         unlockAmount: 500,
     },
     'VIP Backstage Session': {
-        gradient: 'linear-gradient(135deg, #1a1000 0%, #78350f 50%, #0a0800 100%)',
-        accent: '#f59e0b',
-        glow: 'rgba(245,158,11,0.3)',
-        bg: 'rgba(245,158,11,0.08)',
-        border: 'rgba(245,158,11,0.3)',
+        badgeUrl: '/vip_perk_badge_gold_1777822496831.png',
+        accent: '#fbbf24',
+        glow: 'rgba(251, 191, 36, 0.4)',
         detailDescription: 'Meet & Greet privado con el artista en el backstage. Acceso a la prueba de sonido 2 horas antes del show y sesión de fotos exclusiva con polaroid.',
         terms: 'Limitado a 10 inversores por concierto. Coordinación por email 2 semanas antes del evento. Requiere verificación de identidad.',
         unlockAmount: 2500,
@@ -41,35 +35,21 @@ const PerkHeroArt = ({ perk, detail }) => (
         width: '100%',
         height: '180px',
         borderRadius: '16px 16px 0 0',
-        background: detail.gradient,
+        background: 'black',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         position: 'relative',
         overflow: 'hidden',
     }}>
-        {/* Neon glow orb */}
-        <div style={{
-            position: 'absolute',
-            width: '200px',
-            height: '200px',
-            borderRadius: '50%',
-            background: `radial-gradient(circle, ${detail.glow} 0%, transparent 70%)`,
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-        }} />
-        {/* Main icon */}
-        <span style={{ fontSize: '5rem', position: 'relative', zIndex: 1, filter: 'drop-shadow(0 0 20px rgba(255,255,255,0.3))' }}>
-            {perk.icon}
-        </span>
+        <img src={detail.badgeUrl} alt={perk.label} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
         {/* Tier badge */}
         <div style={{
             position: 'absolute',
             top: '12px',
             right: '12px',
-            background: detail.bg,
-            border: `1px solid ${detail.border}`,
+            background: 'rgba(0,0,0,0.6)',
+            border: `1px solid ${detail.accent}`,
             borderRadius: '100px',
             padding: '4px 10px',
             fontSize: '0.55rem',
@@ -79,22 +59,6 @@ const PerkHeroArt = ({ perk, detail }) => (
             textTransform: 'uppercase',
         }}>
             TIER · {perk.category}
-        </div>
-        {/* Token requirement */}
-        <div style={{
-            position: 'absolute',
-            bottom: '12px',
-            left: '12px',
-            background: 'rgba(0,0,0,0.6)',
-            backdropFilter: 'blur(8px)',
-            border: '1px solid rgba(255,255,255,0.1)',
-            borderRadius: '100px',
-            padding: '4px 10px',
-            fontSize: '0.6rem',
-            fontWeight: '700',
-            color: 'rgba(255,255,255,0.7)',
-        }}>
-            {perk.min_tokens.toLocaleString()}+ tokens requeridos
         </div>
     </div>
 );
@@ -311,9 +275,9 @@ export default function FanStatusPanel({
     const handleClose = useCallback(() => setActivePerk(null), []);
 
     const TIER_COLORS = {
-        FAN:   { accent: '#00FFCC', glow: 'rgba(0,255,204,0.15)', border: 'rgba(0,255,204,0.35)' },
-        SOCIO: { accent: '#a855f7', glow: 'rgba(168,85,247,0.15)', border: 'rgba(168,85,247,0.35)' },
-        VIP:   { accent: '#f59e0b', glow: 'rgba(245,158,11,0.15)', border: 'rgba(245,158,11,0.35)' },
+        FAN:   { accent: '#00f0ff', glow: 'rgba(0, 240, 255, 0.15)', border: 'rgba(0, 240, 255, 0.35)' },
+        SOCIO: { accent: '#3b82f6', glow: 'rgba(59, 130, 246, 0.15)', border: 'rgba(59, 130, 246, 0.35)' },
+        VIP:   { accent: '#fbbf24', glow: 'rgba(251, 191, 36, 0.15)', border: 'rgba(251, 191, 36, 0.35)' },
     };
 
     return (
@@ -336,23 +300,22 @@ export default function FanStatusPanel({
                 width: '100%',
             }}>
                 {/* Header */}
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
                     <span style={{
-                        fontSize: '0.58rem',
+                        fontSize: '0.62rem',
                         fontWeight: '800',
                         letterSpacing: '0.12em',
-                        color: '#00FFCC',
+                        color: '#00f0ff',
                         textTransform: 'uppercase',
                         display: 'flex',
                         alignItems: 'center',
                         gap: '6px',
                     }}>
-                        <span style={{ fontSize: '0.9rem' }}>✨</span>
-                        TU ESTATUS: BENEFICIOS EXCLUSIVOS
+                        🔒 BÓVEDA DE <span style={{ color: 'white' }}>EXCLUSIVIDAD</span>
                     </span>
                     <span style={{ 
                         fontSize: '0.8rem', 
-                        color: unlockedCount === perks.length ? '#00FFCC' : 'rgba(255,255,255,0.4)', 
+                        color: unlockedCount === perks.length ? '#00f0ff' : 'rgba(255,255,255,0.4)', 
                         fontFamily: 'monospace',
                         fontWeight: '800',
                         transition: 'color 0.3s ease'
@@ -388,15 +351,8 @@ export default function FanStatusPanel({
                             margin: 0,
                             fontWeight: progressPct > 90 ? '800' : '600',
                             letterSpacing: '0.02em',
-                            animation: progressPct > 90 ? 'fomoBlink 0.8s alternate infinite' : 'none',
-                        }}>
-                            ⚡ ¡Estás a solo <strong style={{ color: '#00FFCC' }}>${amountToNext.toLocaleString()}</strong> de desbloquear <strong>{nextLockedPerk.label}</strong>!
-                        </p>
-                    </div>
-                )}
-
-                {/* Tier cards */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                            animation: p                {/* Tier cards horizontal grid */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px' }}>
                     {perks.map((perk, idx) => {
                         const isUnlocked = totalTokens >= perk.min_tokens;
                         const isNext = !isUnlocked && nextLockedPerk?.label === perk.label;
@@ -410,102 +366,89 @@ export default function FanStatusPanel({
                                 style={{
                                     all: 'unset',
                                     display: 'flex',
+                                    flexDirection: 'column',
                                     alignItems: 'center',
-                                    gap: '12px',
-                                    borderRadius: '12px',
-                                    padding: '12px 14px',
+                                    borderRadius: '16px',
+                                    padding: '16px 10px',
                                     cursor: 'pointer',
                                     transition: 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
                                     background: isUnlocked
-                                        ? `linear-gradient(135deg, rgba(30,10,40,0.8) 0%, rgba(10,15,40,0.8) 100%)`
+                                        ? `linear-gradient(135deg, rgba(15,10,40,0.8) 0%, rgba(10,15,40,0.8) 100%)`
                                         : 'rgba(255,255,255,0.02)',
-                                    border: `1px solid ${isUnlocked ? colors.accent : isNext ? 'rgba(0,255,204,0.3)' : 'rgba(255,255,255,0.05)'}`,
-                                    boxShadow: isUnlocked ? `0 0 20px ${colors.glow}, inset 0 0 10px ${colors.glow}` : isNext ? '0 0 15px rgba(0,255,204,0.15)' : 'none',
-                                    filter: isUnlocked ? 'none' : 'grayscale(100%)',
-                                    opacity: isUnlocked ? 1 : 0.4,
-                                    transform: isUnlocked ? 'scale(1.02)' : 'scale(1)',
-                                    backdropFilter: isUnlocked ? 'none' : 'blur(3px)',
-                                    WebkitBackdropFilter: isUnlocked ? 'none' : 'blur(3px)',
+                                    border: `1px solid ${isUnlocked ? colors.accent : isNext ? 'rgba(0,240,255,0.3)' : 'rgba(255,255,255,0.05)'}`,
+                                    boxShadow: isUnlocked ? `0 0 20px ${colors.glow}` : isNext ? '0 0 15px rgba(0,240,255,0.1)' : 'none',
+                                    filter: isUnlocked ? 'none' : 'grayscale(100%) blur(1px)',
+                                    opacity: isUnlocked ? 1 : 0.5,
                                     width: '100%',
                                     boxSizing: 'border-box',
                                     position: 'relative',
-                                    overflow: 'hidden',
+                                    textAlign: 'center'
                                 }}
                                 onMouseEnter={e => {
-                                    e.currentTarget.style.transform = isUnlocked ? 'scale(1.04) translateY(-2px)' : isNext ? 'scale(1.02)' : 'scale(1.01)';
-                                    e.currentTarget.style.boxShadow = isUnlocked ? `0 10px 30px ${colors.glow}, inset 0 0 15px ${colors.glow}` : isNext ? '0 6px 20px rgba(0,255,204,0.25)' : '0 4px 16px rgba(0,0,0,0.3)';
+                                    e.currentTarget.style.transform = 'translateY(-4px) scale(1.02)';
+                                    e.currentTarget.style.boxShadow = `0 12px 30px ${colors.glow}`;
                                 }}
                                 onMouseLeave={e => {
-                                    e.currentTarget.style.transform = isUnlocked ? 'scale(1.02)' : 'scale(1)';
-                                    e.currentTarget.style.boxShadow = isUnlocked ? `0 0 20px ${colors.glow}, inset 0 0 10px ${colors.glow}` : isNext ? '0 0 15px rgba(0,255,204,0.15)' : 'none';
+                                    e.currentTarget.style.transform = 'translateY(0) scale(1)';
+                                    e.currentTarget.style.boxShadow = isUnlocked ? `0 0 20px ${colors.glow}` : 'none';
                                 }}
                             >
-                                {/* Icon */}
+                                {/* Badge Image */}
                                 <div style={{
-                                    width: '40px',
-                                    height: '40px',
-                                    flexShrink: 0,
-                                    borderRadius: '10px',
+                                    width: '60px',
+                                    height: '60px',
+                                    borderRadius: '50%',
+                                    marginBottom: '12px',
+                                    position: 'relative',
                                     display: 'flex',
                                     alignItems: 'center',
                                     justifyContent: 'center',
-                                    fontSize: '1.4rem',
-                                    background: isUnlocked ? colors.glow : 'rgba(255,255,255,0.04)',
-                                    border: `1px solid ${isUnlocked ? colors.border : 'transparent'}`,
-                                    boxShadow: isUnlocked ? `0 0 12px ${colors.glow}` : 'none',
+                                    background: `radial-gradient(circle, ${colors.glow} 0%, transparent 70%)`
                                 }}>
-                                    {perk.icon}
+                                    <img src={detail.badgeUrl} alt={perk.label} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%', boxShadow: `0 0 15px ${colors.glow}` }} />
+                                    {isUnlocked && (
+                                        <div style={{ position: 'absolute', top: '-4px', right: '-4px', width: '20px', height: '20px', borderRadius: '50%', background: colors.accent, display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid #0a0a0a', fontSize: '0.65rem', color: 'black' }}>
+                                            ✓
+                                        </div>
+                                    )}
+                                    {!isUnlocked && (
+                                        <div style={{ position: 'absolute', top: '-4px', right: '-4px', width: '20px', height: '20px', borderRadius: '50%', background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid rgba(255,255,255,0.2)', fontSize: '0.65rem', color: 'rgba(255,255,255,0.5)' }}>
+                                            🔒
+                                        </div>
+                                    )}
                                 </div>
 
-                                {/* Text */}
-                                <div style={{ flex: 1, minWidth: 0, textAlign: 'left' }}>
-                                    <div style={{
-                                        fontSize: '0.52rem',
-                                        fontWeight: '700',
-                                        letterSpacing: '0.12em',
-                                        textTransform: 'uppercase',
-                                        color: isUnlocked ? colors.accent : 'rgba(255,255,255,0.3)',
-                                        marginBottom: '2px',
-                                    }}>
-                                        TIER · {perk.category} · {perk.min_tokens.toLocaleString()}+ tokens
-                                    </div>
-                                    <div style={{
-                                        fontSize: '0.85rem',
-                                        fontWeight: '700',
-                                        color: isUnlocked ? 'white' : 'rgba(255,255,255,0.45)',
-                                        overflow: 'hidden',
-                                        textOverflow: 'ellipsis',
-                                        whiteSpace: 'nowrap',
-                                    }}>
-                                        {perk.label}
-                                    </div>
-                                    <div style={{
-                                        fontSize: '0.62rem',
-                                        color: 'rgba(255,255,255,0.3)',
-                                        marginTop: '1px',
-                                        overflow: 'hidden',
-                                        textOverflow: 'ellipsis',
-                                        whiteSpace: 'nowrap',
-                                    }}>
-                                        {perk.description}
-                                    </div>
+                                {/* Label */}
+                                <div style={{
+                                    fontSize: '0.5rem',
+                                    fontWeight: '800',
+                                    letterSpacing: '0.1em',
+                                    textTransform: 'uppercase',
+                                    color: colors.accent,
+                                    marginBottom: '4px'
+                                }}>
+                                    {perk.category}
                                 </div>
-
-                                {/* Status + arrow */}
-                                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px', flexShrink: 0 }}>
-                                    <div style={{
-                                        width: '22px',
-                                        height: '22px',
-                                        borderRadius: '50%',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        fontSize: '0.7rem',
-                                        background: isUnlocked ? colors.glow : 'rgba(255,255,255,0.04)',
-                                        border: `1px solid ${isUnlocked ? colors.border : 'rgba(255,255,255,0.08)'}`,
-                                        color: isUnlocked ? colors.accent : 'rgba(255,255,255,0.25)',
-                                        fontWeight: '800',
-                                    }}>
+                                <div style={{
+                                    fontSize: '0.72rem',
+                                    fontWeight: '800',
+                                    color: 'white',
+                                    marginBottom: '2px',
+                                    lineHeight: 1.2
+                                }}>
+                                    {perk.label}
+                                </div>
+                                <div style={{
+                                    fontSize: '0.58rem',
+                                    color: 'rgba(255,255,255,0.4)',
+                                    lineHeight: 1.3
+                                }}>
+                                    {perk.min_tokens}+ tk
+                                </div>
+                            </button>
+                        );
+                    })}
+                </div>          }}>
                                         {isUnlocked ? '✓' : '🔒'}
                                     </div>
                                     <span style={{ fontSize: '0.5rem', color: 'rgba(255,255,255,0.2)' }}>ver</span>
