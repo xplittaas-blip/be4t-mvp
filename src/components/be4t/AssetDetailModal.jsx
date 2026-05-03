@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { X, FileText, PieChart, ShieldCheck, Cpu, Music, TrendingUp, User } from 'lucide-react';
 import { BarChartMockup, DistributionChartMockup } from './ChartMockup';
@@ -33,6 +33,18 @@ const TABS = [
 
 const AssetDetailModal = ({ asset, onClose, onTokenizeClick }) => {
     const [activeTab, setActiveTab] = useState('royalties');
+    const calcRef = useRef(null); // scroll target for investment calculator
+
+    // Precise scroll to calculator heading (accounts for sticky nav ~62px)
+    const scrollToCalculator = useCallback(() => {
+        setActiveTab('invertir');
+        // Wait for tab render then scroll
+        setTimeout(() => {
+            if (calcRef.current) {
+                calcRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }, 80);
+    }, []);
 
     useEffect(() => {
         document.body.style.overflow = 'hidden';
@@ -233,7 +245,11 @@ const AssetDetailModal = ({ asset, onClose, onTokenizeClick }) => {
                 );
 
             case 'invertir':
-                return <InvestmentCalculator asset={asset} />;
+                return (
+                    <div ref={calcRef} style={{ scrollMarginTop: '80px' }}>
+                        <InvestmentCalculator asset={asset} />
+                    </div>
+                );
 
             default:
                 return null;
@@ -328,12 +344,30 @@ const AssetDetailModal = ({ asset, onClose, onTokenizeClick }) => {
                             <Cpu size={18} /> Generar Smart Contract
                         </button>
                     )}
-                    <button 
-                        className="primary-btn full-width" 
-                        style={{ background: 'var(--primary-color)' }}
-                        onClick={() => setActiveTab('invertir')}
+                    <button
+                        className="primary-btn full-width"
+                        style={{
+                            background: 'linear-gradient(135deg, #7c3aed 0%, #a855f7 50%, #06b6d4 100%)',
+                            backgroundSize: '200% auto',
+                            border: 'none',
+                            boxShadow: '0 4px 20px rgba(124,58,237,0.45)',
+                            transition: 'all 0.3s ease',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem',
+                            fontWeight: '800', fontSize: '0.95rem', letterSpacing: '-0.01em',
+                        }}
+                        onClick={scrollToCalculator}
+                        onMouseOver={e => {
+                            e.currentTarget.style.backgroundPosition = 'right center';
+                            e.currentTarget.style.boxShadow = '0 8px 32px rgba(124,58,237,0.65)';
+                            e.currentTarget.style.transform = 'translateY(-2px)';
+                        }}
+                        onMouseOut={e => {
+                            e.currentTarget.style.backgroundPosition = 'left center';
+                            e.currentTarget.style.boxShadow = '0 4px 20px rgba(124,58,237,0.45)';
+                            e.currentTarget.style.transform = 'translateY(0)';
+                        }}
                     >
-                        Invertir en este Activo
+                        💰 Invertir en este Activo
                     </button>
                     <p className="footer-disclaimer">La ejecución técnica y la infraestructura de liquidación es gestionada por BE4T.</p>
                 </div>

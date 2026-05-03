@@ -94,7 +94,7 @@ const MarketplaceHeader = ({
                 </div>
 
                 {/* Nav tabs */}
-                <nav style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', flex: 1, overflowX: 'auto', scrollbarWidth: 'none' }}>
+                <nav className="be4t-nav-tabs-scroll" style={{ flex: 1 }}>
                     {TABS.map(tab => (
                         <button
                             key={tab.id}

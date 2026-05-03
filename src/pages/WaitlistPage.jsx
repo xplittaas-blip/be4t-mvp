@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import useMailchimpSubscribe from '../hooks/useMailchimpSubscribe';
 
 const COUNTRIES = ['Colombia', 'México', 'Argentina', 'España', 'Chile', 'Perú', 'Venezuela', 'Estados Unidos', 'Puerto Rico', 'Ecuador', 'Bolivia', 'Uruguay', 'Paraguay', 'Guatemala', 'Costa Rica', 'Otro'];
 
@@ -33,15 +34,16 @@ const SuccessScreen = ({ mode }) => (
 const ArtistForm = ({ onNavigate }) => {
     const [form, setForm] = useState({ email: '', spotify_url: '', artist_name: '' });
     const [submitted, setSubmitted] = useState(false);
-    const [loading, setLoading] = useState(false);
+
+    const { subscribe, loading } = useMailchimpSubscribe();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setLoading(true);
-        // Simulate API call
-        await new Promise(r => setTimeout(r, 1200));
-        console.log('Artist lead:', form);
-        setLoading(false);
+        await subscribe({
+            email: form.email,
+            fname: form.artist_name,
+            tags: ['artista', 'artist-application'],
+        });
         setSubmitted(true);
     };
 
@@ -99,7 +101,7 @@ const ArtistForm = ({ onNavigate }) => {
                     transition: 'opacity 0.2s ease',
                 }}
             >
-                {loading ? 'Enviando...' : 'Aplicar como Artista →'}
+                {loading ? '⏳ Enviando...' : 'Aplicar como Artista →'}
             </button>
             <p style={{ textAlign: 'center', fontSize: '0.72rem', color: 'rgba(255,255,255,0.25)', margin: 0 }}>
                 Al enviar aceptas que BE4T procese tu información artística según nuestra política de privacidad.
@@ -108,18 +110,40 @@ const ArtistForm = ({ onNavigate }) => {
     );
 };
 
-// ── Fan Form ──────────────────────────────────────────────────────────────────
-const FanForm = ({ onNavigate }) => {
-    const [form, setForm] = useState({ email: '', country: '', fan_type: 'consolidated' });
+const MUSIC_GENRES = [
+    'Reggaetón', 'Pop Latino', 'Trap Latino', 'Salsa / Cumbia', 'Rock',
+    'Hip-Hop', 'R&B / Soul', 'Electrónica / Dance', 'Pop Internacional', 'Otro',
+];
+
+const INVESTMENT_RANGES = [
+    { value: '10-99',    label: '$10 – $99 USD',    icon: '🌱', desc: 'Explorador' },
+    { value: '100-499',  label: '$100 – $499 USD',  icon: '📈', desc: 'Inversor' },
+    { value: '500-1999', label: '$500 – $1,999 USD', icon: '🚀', desc: 'Avanzado' },
+    { value: '2000+',    label: '$2,000+ USD',       icon: '🏆', desc: 'Institucional' },
+];
+
+// ── Fan / Investor Form ───────────────────────────────────────────────────────
+const FanForm = ({ onNavigate, session }) => {
+    const [form, setForm] = useState({
+        email: session?.user?.email || '',
+        country: '',
+        music_genre: '',
+        investment_range: '',
+        fan_type: 'consolidated',
+    });
     const [submitted, setSubmitted] = useState(false);
-    const [loading, setLoading] = useState(false);
+    const { subscribe, loading } = useMailchimpSubscribe();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setLoading(true);
-        await new Promise(r => setTimeout(r, 1000));
-        console.log('Fan lead:', form);
-        setLoading(false);
+        await subscribe({
+            email: form.email,
+            country: form.country,
+            music_genre: form.music_genre,
+            investment_range: form.investment_range,
+            tags: [`fan_type-${form.fan_type}`],
+            supabaseUserId: session?.user?.id || null,
+        });
         setSubmitted(true);
     };
 
@@ -127,33 +151,37 @@ const FanForm = ({ onNavigate }) => {
 
     return (
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            {/* Fan type selector */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
-                {[
-                    { value: 'consolidated', icon: '🏆', label: 'Hits Consolidados', desc: 'Menor riesgo, flujo constante' },
-                    { value: 'emerging', icon: '🚀', label: 'Próximo Éxito', desc: 'Mayor riesgo, mayor retorno' },
-                ].map(opt => (
-                    <button
-                        key={opt.value}
-                        type="button"
-                        onClick={() => setForm(f => ({ ...f, fan_type: opt.value }))}
-                        style={{
-                            padding: '0.85rem',
-                            background: form.fan_type === opt.value ? 'rgba(139,92,246,0.2)' : 'rgba(255,255,255,0.04)',
-                            border: `1px solid ${form.fan_type === opt.value ? 'rgba(168,85,247,0.5)' : 'rgba(255,255,255,0.1)'}`,
-                            borderRadius: '12px', cursor: 'pointer', textAlign: 'left',
-                            transition: 'all 0.2s ease',
-                        }}
-                    >
-                        <div style={{ fontSize: '1.1rem', marginBottom: '0.3rem' }}>{opt.icon}</div>
-                        <div style={{ fontWeight: '700', fontSize: '0.82rem', color: 'white', marginBottom: '0.2rem' }}>{opt.label}</div>
-                        <div style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.4)' }}>{opt.desc}</div>
-                    </button>
-                ))}
+            {/* Fan type — investment style */}
+            <div>
+                <label style={{ fontSize: '0.78rem', color: 'rgba(255,255,255,0.5)', marginBottom: '0.5rem', display: 'block', letterSpacing: '0.08em' }}>PERFIL INVERSOR</label>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.6rem' }}>
+                    {[
+                        { value: 'consolidated', icon: '🏆', label: 'Hits Consolidados', desc: 'Menor riesgo' },
+                        { value: 'emerging',     icon: '🚀', label: 'Próximo Éxito',    desc: 'Mayor retorno' },
+                    ].map(opt => (
+                        <button
+                            key={opt.value}
+                            type="button"
+                            onClick={() => setForm(f => ({ ...f, fan_type: opt.value }))}
+                            style={{
+                                padding: '0.75rem',
+                                background: form.fan_type === opt.value ? 'rgba(139,92,246,0.2)' : 'rgba(255,255,255,0.04)',
+                                border: `1px solid ${form.fan_type === opt.value ? 'rgba(168,85,247,0.5)' : 'rgba(255,255,255,0.1)'}`,
+                                borderRadius: '10px', cursor: 'pointer', textAlign: 'left',
+                                transition: 'all 0.18s ease',
+                            }}
+                        >
+                            <div style={{ fontSize: '1rem', marginBottom: '0.2rem' }}>{opt.icon}</div>
+                            <div style={{ fontWeight: '700', fontSize: '0.78rem', color: 'white', marginBottom: '0.15rem' }}>{opt.label}</div>
+                            <div style={{ fontSize: '0.68rem', color: 'rgba(255,255,255,0.38)' }}>{opt.desc}</div>
+                        </button>
+                    ))}
+                </div>
             </div>
 
+            {/* Email — pre-filled from Thirdweb session if available */}
             <div>
-                <label style={{ fontSize: '0.78rem', color: 'rgba(255,255,255,0.5)', marginBottom: '0.4rem', display: 'block' }}>EMAIL</label>
+                <label style={{ fontSize: '0.78rem', color: 'rgba(255,255,255,0.5)', marginBottom: '0.4rem', display: 'block', letterSpacing: '0.08em' }}>EMAIL</label>
                 <input
                     type="email" required
                     placeholder="tu@email.com"
@@ -164,8 +192,10 @@ const FanForm = ({ onNavigate }) => {
                     onBlur={e => e.target.style.borderColor = 'rgba(255,255,255,0.12)'}
                 />
             </div>
+
+            {/* País */}
             <div>
-                <label style={{ fontSize: '0.78rem', color: 'rgba(255,255,255,0.5)', marginBottom: '0.4rem', display: 'block' }}>PAÍS</label>
+                <label style={{ fontSize: '0.78rem', color: 'rgba(255,255,255,0.5)', marginBottom: '0.4rem', display: 'block', letterSpacing: '0.08em' }}>PAÍS</label>
                 <select
                     required
                     value={form.country}
@@ -178,23 +208,81 @@ const FanForm = ({ onNavigate }) => {
                     {COUNTRIES.map(c => <option key={c} value={c}>{c}</option>)}
                 </select>
             </div>
+
+            {/* Género musical favorito */}
+            <div>
+                <label style={{ fontSize: '0.78rem', color: 'rgba(255,255,255,0.5)', marginBottom: '0.4rem', display: 'block', letterSpacing: '0.08em' }}>GÉNERO MUSICAL FAVORITO</label>
+                <select
+                    required
+                    value={form.music_genre}
+                    onChange={e => setForm(f => ({ ...f, music_genre: e.target.value }))}
+                    style={{ ...inputStyle, cursor: 'pointer' }}
+                    onFocus={e => e.target.style.borderColor = 'rgba(168,85,247,0.6)'}
+                    onBlur={e => e.target.style.borderColor = 'rgba(255,255,255,0.12)'}
+                >
+                    <option value="">Selecciona un género</option>
+                    {MUSIC_GENRES.map(g => <option key={g} value={g}>{g}</option>)}
+                </select>
+            </div>
+
+            {/* Rango de inversión */}
+            <div>
+                <label style={{ fontSize: '0.78rem', color: 'rgba(255,255,255,0.5)', marginBottom: '0.5rem', display: 'block', letterSpacing: '0.08em' }}>¿CUÁNTO PLANEAS INVERTIR?</label>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
+                    {INVESTMENT_RANGES.map(r => (
+                        <button
+                            key={r.value}
+                            type="button"
+                            onClick={() => setForm(f => ({ ...f, investment_range: r.value }))}
+                            style={{
+                                padding: '0.6rem 0.75rem',
+                                background: form.investment_range === r.value
+                                    ? 'rgba(16,185,129,0.18)'
+                                    : 'rgba(255,255,255,0.04)',
+                                border: `1px solid ${form.investment_range === r.value
+                                    ? 'rgba(16,185,129,0.45)'
+                                    : 'rgba(255,255,255,0.1)'}`,
+                                borderRadius: '10px', cursor: 'pointer',
+                                textAlign: 'left', transition: 'all 0.18s ease',
+                            }}
+                        >
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                                <span style={{ fontSize: '0.9rem' }}>{r.icon}</span>
+                                <div>
+                                    <div style={{ fontWeight: '700', fontSize: '0.72rem', color: form.investment_range === r.value ? '#4ade80' : 'white' }}>{r.label}</div>
+                                    <div style={{ fontSize: '0.66rem', color: 'rgba(255,255,255,0.35)' }}>{r.desc}</div>
+                                </div>
+                            </div>
+                        </button>
+                    ))}
+                </div>
+            </div>
+
+            {/* Submit */}
             <button
-                type="submit" disabled={loading}
+                type="submit"
+                disabled={loading || !form.investment_range}
                 style={{
-                    padding: '0.9rem', marginTop: '0.5rem',
-                    background: loading ? 'rgba(139,92,246,0.5)' : 'linear-gradient(135deg, #7c3aed, #a855f7)',
+                    padding: '0.9rem', marginTop: '0.25rem',
+                    background: loading
+                        ? 'rgba(139,92,246,0.5)'
+                        : !form.investment_range
+                        ? 'rgba(255,255,255,0.06)'
+                        : 'linear-gradient(135deg, #7c3aed, #a855f7)',
                     border: 'none', borderRadius: '12px',
-                    color: 'white', fontWeight: '800', fontSize: '0.95rem',
-                    cursor: loading ? 'wait' : 'pointer',
-                    transition: 'opacity 0.2s ease',
+                    color: !form.investment_range ? 'rgba(255,255,255,0.3)' : 'white',
+                    fontWeight: '800', fontSize: '0.95rem',
+                    cursor: loading || !form.investment_range ? 'not-allowed' : 'pointer',
+                    transition: 'all 0.2s ease',
                 }}
             >
-                {loading ? 'Uniéndome...' : 'Unirme como Inversor →'}
+                {loading ? '⏳ Registrando...' : 'Unirme como Inversor →'}
             </button>
+
             <button
                 type="button"
                 onClick={() => onNavigate('explore')}
-                style={{ background: 'none', border: 'none', color: 'rgba(139,92,246,0.7)', cursor: 'pointer', fontSize: '0.82rem' }}
+                style={{ background: 'none', border: 'none', color: 'rgba(139,92,246,0.6)', cursor: 'pointer', fontSize: '0.78rem', padding: '0.2rem' }}
             >
                 Explorar el mercado primero →
             </button>
@@ -203,7 +291,7 @@ const FanForm = ({ onNavigate }) => {
 };
 
 // ── Main Waitlist Page ────────────────────────────────────────────────────────
-const WaitlistPage = ({ onNavigate }) => {
+const WaitlistPage = ({ onNavigate, session }) => {
     const [activeMode, setActiveMode] = useState('fan');
 
     const modes = [
@@ -386,7 +474,7 @@ const WaitlistPage = ({ onNavigate }) => {
 
                     {activeMode === 'artista' || activeMode === 'disquera'
                         ? <ArtistForm onNavigate={onNavigate} />
-                        : <FanForm onNavigate={onNavigate} />
+                        : <FanForm onNavigate={onNavigate} session={session} />
                     }
                 </div>
             </div>

@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import HeroBanner from '../components/be4t/HeroBanner';
 import SongCard, { normalizeSong, SongCardSkeleton } from '../components/be4t/SongCard';
-import AssetDetailView from '../components/be4t/AssetDetailView';
 import TokenizationModal from '../components/be4t/TokenizationModal';
 import EarlyAccessModal from '../components/be4t/EarlyAccessModal';
+import { isShowcase } from '../core/env';
 import { fetchDemoSongs20 } from '../services/spotifyService';
 import './Marketplace.css';
 
@@ -51,14 +51,35 @@ const globalStyles = `
         margin: 0;
     }
 
-    /* ── Mobile (≤ 480px) ── */
+    /* ── Mobile (≤ 480px) — Swipe Carousel ── */
     @media (max-width: 480px) {
         .be4t-song-grid {
-            grid-template-columns: 1fr;
-            gap: 1rem;
+            display: flex !important;
+            flex-wrap: nowrap !important;
+            overflow-x: auto;
+            overflow-y: hidden;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            scroll-snap-type: x mandatory;
+            scroll-padding-left: 1.25rem;
+            gap: 0.75rem;
+            padding: 0.25rem 0 1.25rem 1.25rem;
+            touch-action: pan-x pan-y;
+        }
+        .be4t-song-grid::-webkit-scrollbar { display: none; }
+        .be4t-song-grid > * {
+            flex-shrink: 0;
+            width: 82vw;
+            max-width: 300px;
+            scroll-snap-align: start;   /* left-anchored snap = peek visible */
+            scroll-snap-stop: always;
+        }
+        /* Trailing spacer — keeps right edge from being clipped */
+        .be4t-song-grid::after {
+            content: ''; flex-shrink: 0; width: 0.75rem;
         }
         .be4t-grid-outer {
-            padding: 0 0.75rem;
+            padding: 0;
         }
         .be4t-filters {
             padding: 1rem 0.75rem 0.75rem;
@@ -250,8 +271,92 @@ const StickyWaitlistCTA = ({ onOpenModal }) => {
     );
 };
 
+// ── LiveActivity Ticker ────────────────────────────────────────────────────────
+const LiveActivityTicker = () => {
+    const [msg, setMsg] = useState('');
+    const [visible, setVisible] = useState(false);
+    
+    useEffect(() => {
+        const messages = [
+            'Nueva oferta en Mercado Secundario',
+            'Inversión reciente: 10 tokens de Feid',
+            'Inversión reciente: 50 tokens de Bad Bunny',
+            'Activo "LUNA" acaba de pagar yield',
+            'Inversión reciente: 25 tokens de Shakira',
+            'Nueva canción listada en Premium Assets',
+            'Recompra exitosa por Label (+10%)'
+        ];
+        
+        let TO;
+        const tick = () => {
+            const random = messages[Math.floor(Math.random() * messages.length)];
+            setMsg(random);
+            setVisible(true);
+            TO = setTimeout(() => {
+                setVisible(false);
+            }, 5000);
+        };
+        
+        const init = setTimeout(tick, 2000);
+        const interval = setInterval(tick, 16000);
+        return () => { clearTimeout(init); clearTimeout(TO); clearInterval(interval); };
+    }, []);
+
+    return (
+        <div className="live-ticker" style={{
+            position: 'fixed',
+            bottom: '2rem',
+            left: '2rem',
+            zIndex: 800,
+            transform: visible ? 'translateY(0) scale(1)' : 'translateY(20px) scale(0.95)',
+            opacity: visible ? 1 : 0,
+            transition: 'all 0.5s cubic-bezier(0.34,1.56,0.64,1)',
+            pointerEvents: 'none',
+        }}>
+            <div style={{
+                background: 'rgba(15,15,20,0.85)',
+                backdropFilter: 'blur(12px)',
+                WebkitBackdropFilter: 'blur(12px)',
+                border: '1px solid rgba(255,255,255,0.08)',
+                borderRadius: '8px',
+                padding: '0.6rem 1rem',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.6rem',
+                boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
+            }}>
+                <span style={{ fontSize: '0.9rem' }}>🔔</span>
+                <span style={{ fontSize: '0.75rem', fontWeight: '600', color: 'rgba(255,255,255,0.9)', letterSpacing: '0.5px' }}>
+                    {msg}
+                </span>
+            </div>
+            <style>{`
+                @media (max-width: 768px) {
+                    .live-ticker {
+                        left: 1rem !important;
+                        bottom: 6rem !important;
+                    }
+                }
+            `}</style>
+        </div>
+    );
+};
+
 // ── Sort functions ────────────────────────────────────────────────────────────
+const getScarcityScore = (song) => {
+    const availablePct = song.total_supply > 0 ? (song.tokens_available / song.total_supply) * 100 : 50;
+    if (availablePct < 15) return 100; // ÚLTIMAS UNIDADES
+    if (song.apy >= 15 || song.risk_tier === 'BLUE_CHIP') return 50; // TOP PERFORMER
+    return 0; // Regular
+};
+
 const SORT_FNS = {
+    hot:       (a, b) => {
+        const scoreA = getScarcityScore(a);
+        const scoreB = getScarcityScore(b);
+        if (scoreA !== scoreB) return scoreB - scoreA;
+        return (b.roi_est || 0) - (a.roi_est || 0); // Empate -> Mayor ROI
+    },
     roi:       (a, b) => (b.roi_est || 0)            - (a.roi_est || 0),
     streams:   (a, b) => (b.spotify_streams || 0)    - (a.spotify_streams || 0),
     price_asc: (a, b) => (a.price || 0)              - (b.price || 0),
@@ -267,10 +372,13 @@ const SELECT_STYLE = {
 };
 
 // ── Marketplace ───────────────────────────────────────────────────────────────
-const Marketplace = ({ session, onNavigate }) => {
+import { useDemoBalance } from '../hooks/useDemoBalance';
+
+const Marketplace = ({ session, walletAddress, onNavigate }) => {
+    const [activeTab, setActiveTab]       = useState('primary'); // 'primary' | 'secondary'
     const [userMode, setUserMode]         = useState('fan');
     const [searchQuery, setSearchQuery]   = useState('');
-    const [sortBy, setSortBy]             = useState('roi');
+    const [sortBy, setSortBy]             = useState('hot');
     const [genreFilter, setGenreFilter]   = useState('all'); // 'all' | 'reggaeton' | 'rock'
     const [rawAssets, setRawAssets]       = useState([]);
     const [isLoading, setIsLoading]       = useState(true);
@@ -280,6 +388,8 @@ const Marketplace = ({ session, onNavigate }) => {
     const [waitlistOpen, setWaitlistOpen] = useState(false);
 
     // ── Load 20 songs directly from Spotify (no Supabase for demo) ────────
+    const { portfolio: localPortfolio } = useDemoBalance(walletAddress);
+
     useEffect(() => {
         const load = async () => {
             setIsLoading(true);
@@ -291,6 +401,8 @@ const Marketplace = ({ session, onNavigate }) => {
                 console.log(`🎵 Demo loaded: ${tracks.length} songs (10 Reggaetón + 10 Rock)`);
             } catch (err) {
                 console.error('Demo load failed:', err);
+                // Fallback en caso de API limits (ya lo maneja el service, pero por seguridad)
+                setIsLoading(false);
                 setSpotifyStatus('error');
             } finally {
                 setIsLoading(false);
@@ -299,9 +411,29 @@ const Marketplace = ({ session, onNavigate }) => {
         load();
     }, []);
 
-    // ── Filter + Sort ────────────────────────────────────────────────────
+    // ── P2P Mocks ──
+    const p2pOfferings = useMemo(() => {
+        const userListed = localPortfolio.filter(h => h.isListed).map(h => ({
+            ...h,
+            isP2P: true,
+            seller: 'Tú',
+            p2pPrice: h.listPrice
+        }));
+
+        const othersListed = rawAssets.length >= 8 ? [
+            { ...rawAssets[1], isP2P: true, seller: '0x3F8...2aE', p2pPrice: (rawAssets[1].cost * 1.2 || 120), fractions: 5 },
+            { ...rawAssets[4], isP2P: true, seller: 'User429', p2pPrice: (rawAssets[4].cost * 0.95 || 95), fractions: 2 },
+            { ...rawAssets[7], isP2P: true, seller: 'DJ_Miami', p2pPrice: (rawAssets[7].cost * 1.5 || 150), fractions: 10 },
+        ].filter(Boolean) : [];
+
+        return [...userListed, ...othersListed];
+    }, [rawAssets, localPortfolio]);
+
+    // ── Filtering & Sorting ──
+    const displayAssets = activeTab === 'primary' ? rawAssets : p2pOfferings;
+
     const filteredSongs = useMemo(() => {
-        let list = [...rawAssets];
+        let list = [...displayAssets];
 
         if (searchQuery.trim()) {
             const q = searchQuery.toLowerCase();
@@ -324,36 +456,8 @@ const Marketplace = ({ session, onNavigate }) => {
         return list;
     }, [rawAssets, searchQuery, sortBy, genreFilter]);
 
-    // ── Detail View navigation ────────────────────────────────────────────
-    if (detailAsset) {
-        return (
-            <>
-                <style>{globalStyles}</style>
-                <AssetDetailView
-                    asset={detailAsset}
-                    allAssets={rawAssets.map(s => s._raw).filter(Boolean)}
-                    onBack={(newAsset) => {
-                        if (newAsset && newAsset.id !== detailAsset.id) {
-                            // Navigate to clicked related song
-                            setDetailAsset(newAsset);
-                        } else {
-                            setDetailAsset(null);
-                        }
-                    }}
-                />
-                {tokenizingAsset && (
-                    <TokenizationModal
-                        asset={tokenizingAsset}
-                        onClose={() => setTokenizingAsset(null)}
-                        onSuccess={(updated) => {
-                            setRawAssets(prev => prev.map(a => a.id === updated.id ? normalizeSong(updated) : a));
-                            setTokenizingAsset(null);
-                        }}
-                    />
-                )}
-            </>
-        );
-    }
+    // ── Detail View navigation ─ now uses full SongDetail page ──────────────
+    // No inline detail rendering — onNavigate('song-detail', id) handles this
 
     // ── Loading Skeleton Grid ─────────────────────────────────────────────
     const renderSkeletons = () => (
@@ -367,13 +471,8 @@ const Marketplace = ({ session, onNavigate }) => {
             <style>{globalStyles}</style>
 
             <main style={{ maxWidth: '1280px', margin: '0 auto', paddingBottom: '5rem' }}>
-                {/* ── Hero Banner ── */}
+                {/* ── Hero Banner (artist sliders) ── */}
                 <HeroBanner userMode={userMode} onNavigate={onNavigate} />
-
-                {/* ── Waitlist Banner (entre hero y catálogo) ── */}
-                {userMode !== 'disquera' && (
-                    <WaitlistBanner onOpenModal={() => setWaitlistOpen(true)} />
-                )}
 
                 {/* ── Spotify loading status ── */}
                 {spotifyStatus === 'loading' && (
@@ -404,7 +503,8 @@ const Marketplace = ({ session, onNavigate }) => {
                     </div>
                 )}
 
-                {/* ── Section title + filters ── */}
+
+
                 {userMode !== 'disquera' && (
                     <div className="be4t-filters">
                         <div>
@@ -420,6 +520,7 @@ const Marketplace = ({ session, onNavigate }) => {
                                 <option value="rock">🎸 Rock</option>
                             </select>
                             <select value={sortBy} onChange={e => setSortBy(e.target.value)} style={SELECT_STYLE}>
+                                <option value="hot">🔥 Destacados (Hot)</option>
                                 <option value="roi">Mayor ROI</option>
                                 <option value="growth">Mayor crecimiento</option>
                                 <option value="price_asc">Precio menor</option>
@@ -437,23 +538,47 @@ const Marketplace = ({ session, onNavigate }) => {
                         ) : filteredSongs.length === 0 ? (
                             <div style={{ textAlign: 'center', padding: '5rem 2rem', color: 'rgba(255,255,255,0.35)' }}>
                                 <p style={{ fontSize: '1rem' }}>
-                                    {searchQuery
-                                        ? `No se encontraron canciones para "${searchQuery}"`
-                                        : 'No hay activos disponibles.'}
+                                    {activeTab === 'secondary'
+                                        ? 'No hay activos listados en el mercado secundario en este momento.'
+                                        : (searchQuery ? `No se encontraron canciones para "${searchQuery}"` : 'No hay activos disponibles.')}
                                 </p>
                             </div>
                         ) : (
-                            <div className="be4t-song-grid">
+                            <>
+                                {/* Swipe hint — mobile only, fades out */}
+                                <style>{`
+                                    @keyframes be4t-fade-hint {
+                                        0%,70% { opacity: 1; }
+                                        100%    { opacity: 0; }
+                                    }
+                                    @media (min-width: 641px) { .be4t-swipe-hint { display: none !important; } }
+                                `}</style>
+                                <div className="be4t-swipe-hint" style={{
+                                    display: 'flex', alignItems: 'center', gap: '0.4rem',
+                                    paddingLeft: '1rem', marginBottom: '0.5rem',
+                                    fontSize: '0.73rem', color: 'rgba(255,255,255,0.35)',
+                                    animation: 'be4t-fade-hint 3s ease-out 1.5s forwards',
+                                    opacity: 1,
+                                }}>
+                                    <span style={{ fontSize: '0.9rem' }}>👆</span>
+                                    Desliza para explorar el catálogo
+                                </div>
+                                <div className="be4t-song-grid">
                                 {filteredSongs.map((song, i) => (
                                     <SongCard
                                         key={song.id}
                                         song={song}
                                         userMode={userMode}
                                         index={i}
-                                        onDetailClick={(raw) => setDetailAsset(raw)}
+                                        onDetailClick={(raw) => {
+                                            const songObj = raw?._raw || raw || {};
+                                            const songId  = songObj.id || raw?.id;
+                                            if (onNavigate) onNavigate('song-detail', songId, songObj);
+                                        }}
                                     />
                                 ))}
-                            </div>
+                                </div>
+                            </>
                         )}
                     </div>
                 )}
@@ -470,11 +595,14 @@ const Marketplace = ({ session, onNavigate }) => {
                 />
             )}
 
-            {/* ── Sticky mobile waitlist pill ── */}
-            <StickyWaitlistCTA onOpenModal={() => setWaitlistOpen(true)} />
+            {/* ── Sticky mobile waitlist pill ── Hide in showcase playground ── */}
+            {!isShowcase && <StickyWaitlistCTA onOpenModal={() => setWaitlistOpen(true)} />}
 
-            {/* ── Early Access Modal ── */}
-            <EarlyAccessModal isOpen={waitlistOpen} onClose={() => setWaitlistOpen(false)} />
+            {/* ── Live Activity Ticker ── Social Proof Sim ── */}
+            <LiveActivityTicker />
+
+            {/* ── Early Access Modal ── Hide in showcase playground ── */}
+            {!isShowcase && <EarlyAccessModal isOpen={waitlistOpen} onClose={() => setWaitlistOpen(false)} />}
         </div>
     );
 };

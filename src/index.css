@@ -132,3 +132,177 @@ button {
 ::-webkit-scrollbar-thumb:hover {
   background: var(--border-light);
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   BE4T — Mobile Touch / Swipe Utilities
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/**
+ * .be4t-scroll-x
+ * Base class for any horizontal scroll container.
+ * Adds momentum, hides scrollbar, prevents layout shift.
+ */
+.be4t-scroll-x {
+  display: flex;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch; /* iOS momentum */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  will-change: scroll-position;
+}
+.be4t-scroll-x::-webkit-scrollbar { display: none; }
+
+/**
+ * .be4t-snap-track
+ * Scroll-snap container — items lock to center after swipe.
+ * Use on the outer flex row.
+ */
+.be4t-snap-track {
+  scroll-snap-type: x mandatory;
+  scroll-padding: 0 1.5rem; /* respect peek offset */
+}
+
+/**
+ * .be4t-snap-item
+ * Apply to each direct child of a snap track.
+ */
+.be4t-snap-item {
+  scroll-snap-align: center;
+  scroll-snap-stop: always; /* no skipping cards */
+  flex-shrink: 0;
+}
+
+/**
+ * .be4t-no-select
+ * Prevent text selection during drag gestures.
+ */
+.be4t-no-select {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* ── Artist Stories Row — upgrade to snap ──────────────────────────────── */
+.artist-stories-row {
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+  touch-action: pan-x;
+}
+.artist-story-item {
+  scroll-snap-align: center;
+  scroll-snap-stop: always;
+}
+
+/* ── Nav tab bars — smooth touch scroll ───────────────────────────────── */
+.be4t-nav-tabs-scroll {
+  display: flex;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  scroll-snap-type: x proximity;
+  gap: 0.25rem;
+  padding-bottom: 2px; /* prevent focus ring clip */
+  touch-action: pan-x;
+}
+.be4t-nav-tabs-scroll::-webkit-scrollbar { display: none; }
+.be4t-nav-tabs-scroll button {
+  flex-shrink: 0;
+  scroll-snap-align: start;
+}
+
+/* ── Mobile: Song Grid → Horizontal Swipe Carousel ────────────────────── */
+@media (max-width: 640px) {
+  .be4t-song-grid {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    scroll-snap-type: x mandatory;
+    scroll-padding-left: 1.25rem;  /* aligns first card with peek */
+    gap: 1rem;
+    touch-action: pan-x pan-y; /* both axes: horizontal swipe drives carousel, vertical propagates to page scroll */
+    padding: 0.5rem 0 1rem 1.25rem; /* left peek indent */
+    /* Right padding is on last child via gap+card-width — see below */
+    cursor: grab;
+  }
+  .be4t-song-grid:active { cursor: grabbing; }
+  .be4t-song-grid::-webkit-scrollbar { display: none; }
+
+  /* Each song card becomes a snap item */
+  .be4t-song-grid > * {
+    flex-shrink: 0;
+    /*
+     * 82vw wide so ~18% of next card is always peeking,
+     * giving a clear visual affordance that there is more content.
+     */
+    width: 82vw;
+    max-width: 320px;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+  }
+
+  /* Spacer pseudo-element adds right padding after last card */
+  .be4t-song-grid::after {
+    content: '';
+    flex-shrink: 0;
+    width: 1rem;
+  }
+
+  /* Grid outer — remove horizontal padding to allow full bleed */
+  .be4t-grid-outer {
+    padding: 0;
+  }
+}
+
+/* ── Tablet: Show 2 cards at once ─────────────────────────────────────── */
+@media (min-width: 641px) and (max-width: 900px) {
+  .be4t-song-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+}
+
+/* ── Mobile Modal Sheet ─────────────────────────────────────────────────── */
+/*
+ * On small screens, modals become bottom sheets with internal scroll.
+ * Max-height = 90dvh so it never overlaps the status bar.
+ * overscroll-behavior: contain stops the page from scrolling while
+ * the user scrolls inside the modal.
+ */
+@media (max-width: 600px) {
+  .be4t-modal-inner {
+    max-height: 90dvh !important;     /* dynamic viewport height — safe area aware */
+    border-radius: 24px 24px 0 0 !important;
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-y: auto !important;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Overlay background fills full screen on mobile */
+  .be4t-modal-overlay {
+    align-items: flex-end !important;
+    padding: 0 !important;
+  }
+
+  /* Drag handle pill */
+  .be4t-modal-inner::before {
+    content: '';
+    display: block;
+    width: 36px;
+    height: 4px;
+    border-radius: 2px;
+    background: rgba(255,255,255,0.15);
+    margin: 0.6rem auto 0;
+  }
+}

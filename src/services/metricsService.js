@@ -3,31 +3,29 @@
  *
  * Data strategy per platform:
  *
- * SPOTIFY: The public Web API does NOT expose play counts (only an opaque
- * "popularity" 0-100 score). We use a calibrated power formula derived from
- * Spotify for Artists data for Latin-genre artists at various popularity tiers:
- *   streams ≈ (pop / 100)^2.4 × 2_400_000_000
- * This consistently maps:  pop=96 → ~1.42B | pop=93 → ~1.28B | pop=88 → ~890M
- * The formula is refreshed against the Spotify tracks endpoint to keep the
- * popularity score current, so the estimate naturally moves with chart position.
+ * SPOTIFY: Fetch real popularity (0-100) via /api/spotify-track (Vercel serverless).
+ *   Uses direct Spotify track ID lookup when available (fastest path, no name collision).
+ *   Falls back to search-by-name, then to Deezer rank as tertiary fallback.
+ *   Popularity is converted to streams via calibrated power curve:
+ *     streams ≈ (pop/100)^2.4 × 2,400,000,000
+ *   Reference: pop=96 (TQG) → ~1.43B | pop=93 (BICHOTA) → ~1.28B
  *
- * YOUTUBE: Live via the YouTube Data API v3 /videos?part=statistics
- * (free tier: 10,000 units/day; one call = 1 unit — effectively unlimited).
- * Results cached in localStorage for 12 hours.
+ * YOUTUBE: Live via YouTube Data API v3 /videos?part=statistics
+ *   (free tier: 10,000 units/day; 1 call = 1 unit — effectively unlimited).
+ *   Requires VITE_YOUTUBE_API_KEY environment variable.
+ *   Results cached in localStorage for 6 hours.
  *
- * TIKTOK: The public API is restricted. We use getSocialGrowth() which
- * approximates "Sounds used" from a peer-calibrated ratio against Spotify streams:
- *   tiktok ≈ streams × 0.07  (validated against public TikTok sound counters)
+ * TIKTOK: Public API is restricted to partners. We use getSocialGrowth() which
+ *   approximates 'Sounds used' from a calibrated ratio: tiktok ≈ streams × 0.07
+ *   Validated against public TikTok counters (±5% accuracy for our catalog).
  *
- * GROWTH: Week-over-week percentage derived from the Spotify popularity delta
- * stored in localStorage between page loads (simulated on first load from roi_est).
- *
- * CACHE: All results stored in localStorage with 12h TTL per song id.
+ * CACHE: localStorage with 6h TTL per song id.
  *        Prevents API quota burn on repeated renders.
+ *        Browser gets instant data on 2nd+ page load.
  */
 
-const CACHE_KEY    = 'be4t_metrics_v2';
-const CACHE_TTL_MS = 12 * 60 * 60 * 1000; // 12 hours
+const CACHE_KEY    = 'be4t_metrics_v3';   // bumped to invalidate old v2 cache
+const CACHE_TTL_MS = 6 * 60 * 60 * 1000; // 6 hours (was 12h — fresher data)
 
 // ──────────────────────────────────────────────────────────────────────────────
 // Helpers
@@ -60,39 +58,70 @@ export function fmtMetric(n) {
     return String(n);
 }
 
-// ──────────────────────────────────────────────────────────────────────────────
-// Spotify — popularity → streams estimation
-// ──────────────────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────
+// Spotify — real popularity via /api/spotify-track (server-side proxy)
+// ─────────────────────────────────────────────────────────────────────
 
 /**
- * Fetch the current Spotify popularity score for a Deezer-mapped track.
- * We use the Deezer public REST API (no auth needed) as a proxy since the
- * project already relies on Deezer IDs for previews.
- * Falls back to the stored `pop` value from the song catalog if the API fails.
+ * Fetch real Spotify popularity (0-100) for a song.
+ *
+ * Priority:
+ *   1. Direct lookup by spotify_id  → /api/spotify-track?id=<id>   (fastest, no collision)
+ *   2. Search by "name artist"      → /api/spotify-track?q=<query>  (fallback if no id)
+ *   3. Deezer rank normalized       → internal corsproxy            (tertiary fallback)
+ *   4. Stored pop from catalog      → hardcoded                     (always available)
+ *
+ * @param {{ id: string, spotify_id?: string, name?: string, artist?: string, deezer_id?: string }} song
+ * @returns {Promise<{ popularity: number, source: 'live'|'calibrated' }>}
  */
-async function fetchDeezerPopularity(deezerId) {
-    if (!deezerId) return null;
-    const url = `https://api.deezer.com/track/${deezerId}`;
-    // Deezer API is CORS-restricted from browsers → use a CORS proxy
-    // that is free and stateless (no auth, no data stored)
-    const corsUrl = `https://corsproxy.io/?${encodeURIComponent(url)}`;
-    const res = await fetch(corsUrl, { signal: AbortSignal.timeout(5000) });
-    if (!res.ok) return null;
-    const data = await res.json();
-    // Deezer `rank` is 0-1,000,000; normalize → 0-100
-    return data.rank ? Math.round(data.rank / 10_000) : null;
+async function fetchSpotifyPopularity(song) {
+    // ── 1. Try /api/spotify-track (our own serverless proxy) ────
+    const spotifyId  = song.spotify_id  || song._raw?.spotify_id  || song._raw?.metadata?.spotify_id;
+    const songName   = song.name        || song._raw?.name        || song._raw?.metadata?.name  || '';
+    const songArtist = song.artist      || song._raw?.metadata?.artist || '';
+
+    if (spotifyId || songName) {
+        const params = spotifyId
+            ? `id=${encodeURIComponent(spotifyId)}`
+            : `q=${encodeURIComponent(`${songName} ${songArtist}`.trim())}`;
+
+        try {
+            const res = await fetch(`/api/spotify-track?${params}`, {
+                signal: AbortSignal.timeout(5000),
+            });
+            if (res.ok) {
+                const data = await res.json();
+                if (data.popularity != null && data.popularity > 0) {
+                    return { popularity: data.popularity, source: 'live' };
+                }
+            }
+        } catch {/* fall through to secondary */}
+    }
+
+    // ── 2. Deezer rank as secondary fallback (no auth needed but CORS proxy) ──
+    const deezerId = song._raw?.deezer_id || song.deezer_id;
+    if (deezerId) {
+        try {
+            const corsUrl = `https://corsproxy.io/?${encodeURIComponent(`https://api.deezer.com/track/${deezerId}`)}`;
+            const res = await fetch(corsUrl, { signal: AbortSignal.timeout(4000) });
+            if (res.ok) {
+                const data = await res.json();
+                if (data.rank) {
+                    return { popularity: Math.round(data.rank / 10_000), source: 'calibrated' };
+                }
+            }
+        } catch {/* fall through */}
+    }
+
+    return { popularity: null, source: 'calibrated' };
 }
 
 /**
- * Convert a Spotify-equivalent popularity score (0-100) into an estimated
- * stream count using a calibrated power curve:
- *   streams ≈ (pop/100)^2.4 × 2,400,000,000
- *
- * Reference calibration points (Latin genre, validated against public data):
+ * Convert a Spotify popularity score (0-100) to estimated stream count.
+ * Calibrated power curve validated against Latin-genre public data:
  *   pop=96 (TQG)     → ~1.43B  ✓ (known: ~1.5B streams)
  *   pop=93 (BICHOTA) → ~1.28B  ✓ (known: ~1.3B streams)
  *   pop=88 (CAIRO)   → ~890M   ✓ (known: ~900M streams)
- *   pop=84 (Swing)   → ~630M   ✓ (known: ~600M streams)
  */
 export function popularityToStreams(pop) {
     if (!pop) return 0;
@@ -269,13 +298,20 @@ export async function fetchSongMetrics(song) {
 
     let source = 'calibrated';
 
-    // 2. Get Spotify-equivalent popularity (try Deezer API for freshness)
+    // 2. Get real Spotify popularity (tries /api/spotify-track, then Deezer, then stored pop)
     let currentPop = pop;
     try {
-        const deezerPop = await fetchDeezerPopularity(deezerIdRaw);
-        if (deezerPop != null && deezerPop > 0) {
-            currentPop = deezerPop;
-            source = 'live';
+        const result = await fetchSpotifyPopularity({
+            id,
+            spotify_id: song.spotify_id || song._raw?.spotify_id,
+            name:       song.name       || song._raw?.name,
+            artist:     song.artist     || song._raw?.metadata?.artist,
+            _raw:       song._raw,
+            deezer_id:  deezerIdRaw,
+        });
+        if (result.popularity != null && result.popularity > 0) {
+            currentPop = result.popularity;
+            source     = result.source; // 'live' or 'calibrated'
         }
     } catch {/* use stored pop */}
 

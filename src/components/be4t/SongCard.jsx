@@ -3,7 +3,6 @@ import { audioManager } from '../../services/audioManager';
 import { fetchPreviewUrl } from '../../services/previewService';
 import { fetchSongMetrics } from '../../services/metricsService';
 import { isProduction } from '../../core/env';
-import AcquisitionModal from './AcquisitionModal';
 
 // ── Format helpers ─────────────────────────────────────────────────────────────
 const fmt = (n) => {
@@ -63,11 +62,11 @@ export const normalizeSong = (raw) => {
         asset_type:       raw.asset_type === 'music' ? 'MUSIC' : 'RWA',
         tag:              raw.tag || (raw.asset_type === 'music' ? 'MUSIC' : 'RWA'),
         spotify_streams:  proxyStreams,
+        monthly_streams:  Math.round(proxyStreams / 12),   // avg monthly streams
         youtube_views:    meta.youtube_views || raw.youtube_views || Math.floor(totalVal * 8.2 + seed * 500),
         tiktok_creations: meta.tiktok_creations || raw.tiktok_creations || Math.floor(totalVal * 0.9 + seed * 100),
         growth:           `+${roi.toFixed(1)}%`,
         growth_positive:  roi >= 0,
-        market_cap:       marketCap,
         tokens_available: tokensAvailable,
         total_supply:     totalSupply,
         risk_tier:        riskTier,
@@ -105,13 +104,15 @@ export const SongCardSkeleton = () => (
 
 // ── Tokens Availability Bar ────────────────────────────────────────────────────
 const TokenBar = ({ available, total }) => {
-    const pct        = total > 0 ? (available / total) * 100 : 0;
-    const isLow      = pct < 20;
-    const isMid      = pct >= 20 && pct < 50;
-    const barColor   = isLow  ? '#f97316'  // orange — scarcity
-                     : isMid  ? '#eab308'  // yellow — limited
-                     :          '#10b981'; // green — available
-    const textColor  = isLow  ? '#fb923c' : isMid ? '#fbbf24' : 'rgba(255,255,255,0.45)';
+    const pct        = Math.max(0, Math.min(100, total > 0 ? (available / total) * 100 : 0));
+    const isScarce   = pct < 15;
+    const isLow      = pct >= 15 && pct < 30;
+    const isMid      = pct >= 30 && pct < 50;
+    const barColor   = isScarce ? '#ff4500'  // neon orange — scarcity
+                     : isLow    ? '#f97316'  // orange
+                     : isMid    ? '#eab308'  // yellow
+                     :          '#10b981';   // green
+    const textColor  = isScarce ? '#ff4500' : isLow ? '#fb923c' : isMid ? '#fbbf24' : 'rgba(255,255,255,0.45)';
 
     return (
         <div>
@@ -119,10 +120,12 @@ const TokenBar = ({ available, total }) => {
                 <span style={{ fontSize: '0.58rem', color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.9px', fontWeight: '600' }}>
                     Tokens Disponibles
                 </span>
-                <span style={{ fontSize: '0.72rem', fontWeight: '800', color: textColor, letterSpacing: '-0.02em' }}>
+                <span style={{ fontSize: '0.72rem', fontWeight: '800', color: textColor, letterSpacing: '-0.02em', display: 'flex', alignItems: 'center' }}>
                     {fmt(available)}
-                    <span style={{ color: 'rgba(255,255,255,0.2)', fontWeight: '400', fontSize: '0.62rem' }}> / {fmt(total)}</span>
-                    {isLow && <span style={{ marginLeft: '4px', fontSize: '0.55rem', color: '#f97316', fontWeight: '800', letterSpacing: '0.5px' }}>CASI AGOTADO</span>}
+                    <span style={{ color: 'rgba(255,255,255,0.2)', fontWeight: '400', fontSize: '0.62rem', margin: '0 4px' }}>/ {fmt(total)}</span>
+                    {isScarce && (
+                        <span style={{ background: 'rgba(255,69,0,0.1)', padding: '1px 4px', borderRadius: '4px', fontSize: '0.55rem', color: '#ff4500', fontWeight: '900', letterSpacing: '0.5px', textShadow: '0 0 8px rgba(255,69,0,0.5)', animation: 'be4t-scarcity-flash 1s infinite' }}>ÚLTIMAS UNIDADES</span>
+                    )}
                 </span>
             </div>
             {/* Progress bar */}
@@ -133,7 +136,7 @@ const TokenBar = ({ available, total }) => {
                     background: barColor,
                     borderRadius: '100px',
                     transition: 'width 0.6s ease',
-                    boxShadow: `0 0 6px ${barColor}88`,
+                    boxShadow: isScarce ? `0 0 12px ${barColor}` : `0 0 6px ${barColor}88`,
                 }} />
             </div>
         </div>
@@ -142,12 +145,15 @@ const TokenBar = ({ available, total }) => {
 
 // ── Main SongCard ──────────────────────────────────────────────────────────────
 const SongCard = ({ song, userMode, index = 0, onDetailClick }) => {
-    const [hovered, setHovered]                         = useState(false);
-    const [isPlaying, setIsPlaying]                     = useState(false);
-    const [isLoading, setIsLoading]                     = useState(false);
-    const [showAcquisitionModal, setShowAcquisitionModal] = useState(false);
+    const [hovered, setHovered]   = useState(false);
+    const [isPlaying, setIsPlaying] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
     const audioRef   = useRef(null);
     const previewRef = useRef(song.preview_url || null);
+
+    const handleDetailClick = useCallback(() => {
+        if (onDetailClick) onDetailClick(song._raw || song);
+    }, [onDetailClick, song]);
 
     // ── Live metrics from Deezer/Spotify API ────────────────────────────────
     const [metrics, setMetrics] = useState(null);
@@ -224,6 +230,9 @@ const SongCard = ({ song, userMode, index = 0, onDetailClick }) => {
     const availablePct = song.total_supply > 0 ? (song.tokens_available / song.total_supply) * 100 : 50;
     const isLowSupply  = availablePct < 20;
 
+    // Premium Asset Logic
+    const isPremiumAsset = song.apy >= 15 || song.risk_tier === 'BLUE_CHIP';
+
     return (
         <>
             <style>{`
@@ -237,17 +246,26 @@ const SongCard = ({ song, userMode, index = 0, onDetailClick }) => {
                 @keyframes be4t-scarcity-flash {
                     0%,100% { opacity: 1; } 50% { opacity: 0.6; }
                 }
+                @keyframes top-performer-glow {
+                    0%   { border-color: rgba(139,92,246,0.3); box-shadow: 0 0 15px rgba(139,92,246,0.1); }
+                    50%  { border-color: rgba(6,182,212,0.5);  box-shadow: 0 0 25px rgba(6,182,212,0.25); }
+                    100% { border-color: rgba(139,92,246,0.3); box-shadow: 0 0 15px rgba(139,92,246,0.1); }
+                }
+                .is-premium {
+                    animation: top-performer-glow 4s ease-in-out infinite alternate;
+                }
             `}</style>
 
             <div
                 id={`song-card-${song.id}`}
+                className={isPremiumAsset ? 'is-premium' : ''}
                 onMouseEnter={() => setHovered(true)}
                 onMouseLeave={() => setHovered(false)}
                 style={{
                     background: 'rgba(12,12,22,0.92)',
                     border: `1px solid ${hovered
                         ? (isLowSupply ? 'rgba(249,115,22,0.55)' : 'rgba(139,92,246,0.45)')
-                        : 'rgba(255,255,255,0.07)'}`,
+                        : (isPremiumAsset ? 'transparent' : 'rgba(255,255,255,0.07)')}`,
                     borderRadius: '20px',
                     overflow: 'hidden',
                     display: 'flex',
@@ -279,14 +297,35 @@ const SongCard = ({ song, userMode, index = 0, onDetailClick }) => {
                     <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '55%',
                         background: 'linear-gradient(to top, rgba(8,4,20,0.97) 0%, transparent 100%)', zIndex: 2 }} />
 
-                    {/* MUSIC / RWA badge */}
+                    {/* MUSIC / RWA badge + PERKS */}
                     <div style={{
-                        position: 'absolute', top: '10px', left: '10px',
-                        background: badgeColor.bg, border: `1px solid ${badgeColor.border}`,
-                        borderRadius: '100px', padding: '3px 9px',
-                        fontSize: '0.62rem', fontWeight: '700', color: badgeColor.text,
-                        letterSpacing: '1px', textTransform: 'uppercase', zIndex: 5,
-                    }}>{song.tag || song.asset_type}</div>
+                        position: 'absolute', top: '10px', left: '10px', display: 'flex', gap: '6px', zIndex: 5
+                    }}>
+                        <div style={{
+                            background: badgeColor.bg, border: `1px solid ${badgeColor.border}`,
+                            borderRadius: '100px', padding: '3px 9px',
+                            fontSize: '0.62rem', fontWeight: '700', color: badgeColor.text,
+                            letterSpacing: '1px', textTransform: 'uppercase',
+                        }}>{song.tag || song.asset_type}</div>
+                        
+                        <div style={{
+                            background: 'rgba(0, 255, 204, 0.15)', border: '1px solid rgba(0, 255, 204, 0.4)',
+                            borderRadius: '100px', padding: '3px 9px',
+                            fontSize: '0.58rem', fontWeight: '800', color: '#00FFCC',
+                            letterSpacing: '0.5px', textTransform: 'uppercase',
+                            boxShadow: '0 0 10px rgba(0, 255, 204, 0.2)'
+                        }}>PERKS DISPONIBLES</div>
+                    </div>
+
+                    {song.isP2P && (
+                        <div style={{
+                            position: 'absolute', top: '35px', left: '10px',
+                            background: 'rgba(6,182,212,0.9)', border: '1px solid rgba(6,182,212,0.4)',
+                            borderRadius: '100px', padding: '3px 9px',
+                            fontSize: '0.58rem', fontWeight: '800', color: '#111',
+                            letterSpacing: '1px', zIndex: 5, boxShadow: '0 2px 10px rgba(6,182,212,0.4)'
+                        }}>Vendido por {song.seller}</div>
+                    )}
 
                     {/* Risk Tier + HOT */}
                     <div style={{ position: 'absolute', top: '10px', right: '10px', display: 'flex',
@@ -298,11 +337,19 @@ const SongCard = ({ song, userMode, index = 0, onDetailClick }) => {
                                 BLUE CHIP
                             </span>
                         ) : (
-                            <span style={{ background: 'rgba(234,179,8,0.15)', border: '1px solid rgba(234,179,8,0.5)',
-                                borderRadius: '100px', padding: '3px 9px', fontSize: '0.58rem', fontWeight: '800',
-                                color: '#fbbf24', letterSpacing: '0.8px', fontFamily: "'Courier New', monospace" }}>
-                                EMERGING
-                            </span>
+                            isPremiumAsset ? (
+                                <span style={{ background: 'linear-gradient(90deg, rgba(139,92,246,0.8), rgba(6,182,212,0.8))', border: '1px solid rgba(255,255,255,0.3)',
+                                    borderRadius: '100px', padding: '3px 9px', fontSize: '0.58rem', fontWeight: '800',
+                                    color: 'white', letterSpacing: '0.8px', boxShadow: '0 0 10px rgba(139,92,246,0.5)' }}>
+                                    TOP PERFORMER
+                                </span>
+                            ) : (
+                                <span style={{ background: 'rgba(234,179,8,0.15)', border: '1px solid rgba(234,179,8,0.5)',
+                                    borderRadius: '100px', padding: '3px 9px', fontSize: '0.58rem', fontWeight: '800',
+                                    color: '#fbbf24', letterSpacing: '0.8px', fontFamily: "'Courier New', monospace" }}>
+                                    EMERGING
+                                </span>
+                            )
                         )}
                         {song.is_trending && (
                             <span style={{ background: 'rgba(239,68,68,0.9)', borderRadius: '100px', padding: '3px 9px',
@@ -386,30 +433,66 @@ const SongCard = ({ song, userMode, index = 0, onDetailClick }) => {
                                 </span>
                             )}
                         </p>
+                        <p style={{ color: '#00FFCC', fontSize: '0.68rem', margin: '0.4rem 0 0', fontWeight: '600', letterSpacing: '0.3px', textShadow: '0 0 8px rgba(0,255,204,0.3)' }}>
+                            🎁 Desbloquea: Preventa VIP + Merch Exclusivo
+                        </p>
                     </div>
 
                     {/* Platform metrics — 3-col grid */}
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.42rem' }}>
-                        {[
-                            { Icon: SpotifyIcon, color: '#1DB954', label: 'STREAMS', value: fmt(displayStreams),  sub: 'Spotify'  },
-                            { Icon: YouTubeIcon, color: '#FF0000', label: 'VIEWS',   value: fmt(displayViews),    sub: 'YouTube'  },
-                            { Icon: TikTokIcon,  color: '#2DD4BF', label: 'CREAT.',  value: fmt(displayTikTok),   sub: 'TikTok'   },
-                        ].map(({ Icon, color, label, value, sub }) => (
-                            <div key={label} style={{
-                                background: 'rgba(255,255,255,0.028)',
-                                border: '1px solid rgba(255,255,255,0.055)',
-                                borderRadius: '8px', padding: '0.38rem 0.45rem',
-                                display: 'flex', flexDirection: 'column', gap: '0.12rem',
-                            }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
-                                    <Icon size={9} />
-                                    <span style={{ fontSize: '0.5rem', color: 'rgba(255,255,255,0.3)',
-                                        textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: '700' }}>{label}</span>
+                    <div>
+                        {/* Header row: label + LIVE indicator */}
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.35rem' }}>
+                            <span style={{ fontSize: '0.5rem', color: 'rgba(255,255,255,0.2)', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: '700' }}>Plataformas</span>
+                            {metrics ? (
+                                isLiveMetrics ? (
+                                    <span style={{
+                                        display: 'inline-flex', alignItems: 'center', gap: '3px',
+                                        background: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.3)',
+                                        borderRadius: '100px', padding: '1px 7px', fontSize: '0.48rem',
+                                        color: '#4ade80', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.8px',
+                                    }}>
+                                        <span style={{ width: '4px', height: '4px', borderRadius: '50%', background: '#22c55e',
+                                            display: 'inline-block', animation: 'be4t-dot-pulse 1.8s ease-in-out infinite' }} />
+                                        LIVE
+                                    </span>
+                                ) : (
+                                    <span style={{
+                                        display: 'inline-flex', alignItems: 'center', gap: '3px',
+                                        background: 'rgba(234,179,8,0.08)', border: '1px solid rgba(234,179,8,0.25)',
+                                        borderRadius: '100px', padding: '1px 7px', fontSize: '0.48rem',
+                                        color: '#fbbf24', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.8px',
+                                    }}>
+                                        <span style={{ width: '4px', height: '4px', borderRadius: '50%', background: '#f59e0b',
+                                            display: 'inline-block' }} />
+                                        Est.
+                                    </span>
+                                )
+                            ) : (
+                                <span style={{ fontSize: '0.44rem', color: 'rgba(255,255,255,0.18)', fontStyle: 'italic' }}>cargando…</span>
+                            )}
+                        </div>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.42rem' }}>
+                            {[
+                                { Icon: SpotifyIcon, color: '#1DB954', label: 'STREAMS', value: fmt(displayStreams),  sub: 'Spotify'  },
+                                { Icon: YouTubeIcon, color: '#FF0000', label: 'VIEWS',   value: fmt(displayViews),    sub: 'YouTube'  },
+                                { Icon: TikTokIcon,  color: '#2DD4BF', label: 'CREAT.',  value: fmt(displayTikTok),   sub: 'TikTok'   },
+                            ].map(({ Icon, color, label, value, sub }) => (
+                                <div key={label} style={{
+                                    background: 'rgba(255,255,255,0.028)',
+                                    border: '1px solid rgba(255,255,255,0.055)',
+                                    borderRadius: '8px', padding: '0.38rem 0.45rem',
+                                    display: 'flex', flexDirection: 'column', gap: '0.12rem',
+                                }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
+                                        <Icon size={9} />
+                                        <span style={{ fontSize: '0.5rem', color: 'rgba(255,255,255,0.3)',
+                                            textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: '700' }}>{label}</span>
+                                    </div>
+                                    <span style={{ fontSize: '0.88rem', fontWeight: '800', color: 'white', letterSpacing: '-0.02em' }}>{value}</span>
+                                    <span style={{ fontSize: '0.48rem', color: 'rgba(255,255,255,0.2)' }}>{sub}</span>
                                 </div>
-                                <span style={{ fontSize: '0.88rem', fontWeight: '800', color: 'white', letterSpacing: '-0.02em' }}>{value}</span>
-                                <span style={{ fontSize: '0.48rem', color: 'rgba(255,255,255,0.2)' }}>{sub}</span>
-                            </div>
-                        ))}
+                            ))}
+                        </div>
                     </div>
 
                     {/* Growth sparkline row */}
@@ -432,12 +515,12 @@ const SongCard = ({ song, userMode, index = 0, onDetailClick }) => {
                         border: '1px solid rgba(255,255,255,0.065)',
                         borderRadius: '12px', overflow: 'hidden',
                     }}>
-                        {/* Row 1: Market Cap | Precio/Token */}
+                        {/* Row 1: Streams/Mes | Precio/Token */}
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr',
                             borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
                             {[
-                                { label: 'Market Cap',    value: fmtUSD(song.market_cap) },
-                                { label: 'Precio / Token', value: fmtUSD(song.price) },
+                                { label: 'Streams / Mes', value: fmt(song.monthly_streams ?? Math.round((song.spotify_streams ?? 0) / 12)) },
+                                { label: song.isP2P ? 'Precio Secundario' : 'Precio / Token', value: fmtUSD(song.isP2P ? song.p2pPrice : song.price) },
                             ].map(({ label, value }, i) => (
                                 <div key={label} style={{
                                     padding: '0.62rem 0.8rem',
@@ -480,54 +563,71 @@ const SongCard = ({ song, userMode, index = 0, onDetailClick }) => {
                             </div>
                         </div>
 
-                        {/* Row 3: Tokens disponibles bar */}
+                        {/* Row 3: Tokens disponibles bar (solo emisiones primarias o info P2P) */}
                         <div style={{ padding: '0.65rem 0.8rem' }}>
-                            <TokenBar available={song.tokens_available} total={song.total_supply} />
+                            {song.isP2P ? (
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '5px' }}>
+                                    <span style={{ fontSize: '0.58rem', color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.9px', fontWeight: '600' }}>
+                                        Lote en Venta
+                                    </span>
+                                    <span style={{ fontSize: '0.72rem', fontWeight: '800', color: '#22d3ee', letterSpacing: '-0.02em' }}>
+                                        {song.fractions} tokens
+                                    </span>
+                                </div>
+                            ) : (
+                                <TokenBar available={song.tokens_available} total={song.total_supply} />
+                            )}
                         </div>
                     </div>
 
-                    {/* ── CTA ── */}
+                    {/* ── PRIMARY CTA — navigates to SongDetail page ── */}
                     <button
                         id={`acquire-btn-${song.id}`}
-                        onClick={(e) => { e.stopPropagation(); setShowAcquisitionModal(true); }}
+                        onClick={(e) => { e.stopPropagation(); handleDetailClick(); }}
                         style={{
-                            width: '100%', padding: '0.88rem 0.6rem',
-                            background: 'linear-gradient(135deg, #065f46 0%, #10b981 100%)',
+                            width: '100%', padding: '0.92rem 0.6rem',
+                            background: 'linear-gradient(135deg, #7c3aed 0%, #a855f7 50%, #06b6d4 100%)',
+                            backgroundSize: '200% auto',
                             border: 'none', borderRadius: '12px',
                             color: 'white', fontWeight: '800', fontSize: '0.88rem',
                             cursor: 'pointer', transition: 'all 0.3s ease',
                             lineHeight: 1.25, letterSpacing: '-0.01em',
-                            boxShadow: '0 3px 14px rgba(16,185,129,0.3)',
+                            boxShadow: '0 4px 20px rgba(124,58,237,0.45)',
                             marginTop: 'auto',
+                            position: 'relative', overflow: 'hidden',
                         }}
                         onMouseOver={e => {
-                            e.currentTarget.style.filter = 'brightness(1.12)';
-                            e.currentTarget.style.boxShadow = '0 6px 24px rgba(16,185,129,0.55)';
-                            e.currentTarget.style.transform = 'translateY(-1px)';
+                            e.currentTarget.style.backgroundPosition = 'right center';
+                            e.currentTarget.style.boxShadow = '0 8px 32px rgba(124,58,237,0.65)';
+                            e.currentTarget.style.transform = 'translateY(-2px) scale(1.01)';
                         }}
                         onMouseOut={e => {
-                            e.currentTarget.style.filter = 'brightness(1)';
-                            e.currentTarget.style.boxShadow = '0 3px 14px rgba(16,185,129,0.3)';
-                            e.currentTarget.style.transform = 'translateY(0)';
+                            e.currentTarget.style.backgroundPosition = 'left center';
+                            e.currentTarget.style.boxShadow = '0 4px 20px rgba(124,58,237,0.45)';
+                            e.currentTarget.style.transform = 'translateY(0) scale(1)';
                         }}
                     >
-                        Adquirir participación de regalías
-                        {isProduction && (
-                            <span style={{ display: 'block', fontSize: '0.58rem', fontWeight: '600',
-                                color: 'rgba(255,255,255,0.65)', marginTop: '2px', letterSpacing: '0.3px' }}>
-                                Conectar wallet · Firmar en Base Sepolia
-                            </span>
-                        )}
+                        💰 Adquirir participación
+                        <span style={{ display: 'block', fontSize: '0.58rem', fontWeight: '600',
+                            color: 'rgba(255,255,255,0.7)', marginTop: '2px', letterSpacing: '0.3px' }}>
+                            {isProduction ? 'Fondear · Calcular retorno' : 'Simular con crédito demo'}
+                        </span>
+                    </button>
+
+                    {/* Secondary link */}
+                    <button
+                        id={`detail-link-${song.id}`}
+                        onClick={(e) => { e.stopPropagation(); handleDetailClick(); }}
+                        style={{ width: '100%', background: 'none', border: 'none', padding: '0.3rem 0',
+                            color: 'rgba(255,255,255,0.28)', fontSize: '0.65rem', cursor: 'pointer',
+                            textDecoration: 'underline', textDecorationColor: 'rgba(255,255,255,0.15)',
+                            textUnderlineOffset: '2px', transition: 'color 0.2s', }}
+                        onMouseOver={e => e.currentTarget.style.color = 'rgba(255,255,255,0.55)'}
+                        onMouseOut={e => e.currentTarget.style.color = 'rgba(255,255,255,0.28)'}
+                    >
+                        Ver análisis completo y métricas
                     </button>
                 </div>
-
-                {/* Acquisition Modal */}
-                {showAcquisitionModal && (
-                    <AcquisitionModal
-                        asset={song}
-                        onClose={() => setShowAcquisitionModal(false)}
-                    />
-                )}
             </div>
         </>
     );

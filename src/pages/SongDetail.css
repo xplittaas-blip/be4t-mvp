@@ -1,3 +1,9 @@
+/* ── Live data badge animations ──────────────────────────────────────────── */
+@keyframes sd-live-pulse {
+    0%, 100% { opacity: 1; box-shadow: 0 0 6px #22c55e; }
+    50%       { opacity: 0.4; box-shadow: 0 0 2px #22c55e; }
+}
+
 /* Custom Resets & Utilities */
 .mb-2 {
     margin-bottom: 0.5rem;
@@ -109,7 +115,7 @@
     display: grid;
     grid-template-columns: 1.5fr 1fr;
     gap: 3rem;
-    align-items: start;
+    align-items: start; /* critical for sticky to work */
 }
 
 .detail-left-column {
@@ -118,9 +124,10 @@
     gap: 2rem;
 }
 
+/* aside sticky is now set inline — just strip the sticky from .calculator-section */
 .calculator-section {
-    position: sticky;
-    top: 100px;
+    position: static !important;
+    top: auto !important;
 }
 
 @media (max-width: 992px) {
@@ -574,4 +581,168 @@
     .artist-stats {
         justify-content: center;
     }
+}
+
+/* ── Mobile-First Fintech UX ────────────────────────────────────────────────── */
+
+/* Thumb-safe CTAs — minimum 52px tall so they're easy to tap */
+@media (max-width: 480px) {
+    .detail-section {
+        padding: 1.25rem 1rem;
+        border-radius: 16px;
+    }
+
+    .section-title {
+        font-size: 1.35rem;
+        letter-spacing: -0.3px;
+    }
+
+    .hero-title {
+        font-size: clamp(1.8rem, 8vw, 2.4rem);
+        letter-spacing: -1px;
+    }
+
+    .hero-artist {
+        font-size: 1.1rem;
+    }
+
+    .hero-hook {
+        font-size: 1rem;
+    }
+
+    /* Invest CTA — thumb-friendly, full-width pill */
+    .sd-invest-btn {
+        min-height: 56px !important;
+        font-size: 1.05rem !important;
+        padding: 1rem 1.5rem !important;
+        border-radius: 16px !important;
+        letter-spacing: -0.02em !important;
+        -webkit-tap-highlight-color: transparent;
+        touch-action: manipulation;
+    }
+
+    /* Balance tag below button */
+    .sd-balance-tag {
+        font-size: 0.68rem !important;
+        margin-top: 0.4rem;
+    }
+}
+
+/* ── Universal Sticky Invest Bar (Chases user on all screens) ───────────── */
+.sd-sticky-invest-bar {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    z-index: 900;
+    padding: 1rem 1.5rem calc(1rem + env(safe-area-inset-bottom));
+    background: linear-gradient(to top, rgba(8,8,18,0.98) 0%, rgba(8,8,18,0.85) 100%);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-top: 1px solid rgba(255,255,255,0.06);
+    box-shadow: 0 -10px 40px rgba(0,0,0,0.5);
+    display: flex;
+    justify-content: center;
+    animation: slideUpBar 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slideUpBar {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+}
+
+.sd-sticky-content {
+    max-width: 1200px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+/* Hide the old inline button completely */
+.sd-inline-invest {
+    display: none !important;
+}
+
+/* Add padding to page so sticky bar doesn't cover content */
+.song-detail-page {
+    padding-bottom: 7rem;
+}
+
+@media (max-width: 768px) {
+    .sd-sticky-invest-bar {
+        padding: 0.75rem 1rem calc(0.75rem + env(safe-area-inset-bottom));
+    }
+    .sd-sticky-content {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    .sd-sticky-info {
+        display: none; /* Hide label on mobile to save space */
+    }
+    .sd-sticky-content > div {
+        width: 100%;
+        flex-direction: column-reverse;
+        gap: 0.4rem;
+    }
+    .sd-invest-btn {
+        width: 100%;
+    }
+    .sd-balance-tag {
+        text-align: center !important;
+    }
+}
+
+/* ── Reference Match: BICHOTA Optimized Dashboard ─────────────────────────── */
+
+.neon-border-glow {
+    position: relative;
+    border: 2px solid transparent !important;
+    background: linear-gradient(rgba(10,8,25,0.95), rgba(10,8,25,0.95)) padding-box, 
+                linear-gradient(135deg, #00f0ff 0%, #7c3aed 100%) border-box !important;
+    box-shadow: 0 0 30px rgba(0, 240, 255, 0.15), inset 0 0 15px rgba(124, 58, 237, 0.1) !important;
+    border-radius: 20px !important;
+    transition: all 0.3s ease;
+}
+
+.compact-metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.75rem;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 16px;
+    padding: 1rem;
+}
+
+.metric-item {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 12px;
+    padding: 0.75rem;
+    text-align: center;
+}
+
+.text-cyan { color: #00f0ff !important; }
+.text-violet { color: #c4b5fd !important; }
+.text-purple { color: #7c3aed !important; }
+
+.vault-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.75rem;
+    margin-top: 1rem;
+}
+
+.perk-badge-coin {
+    width: 65px;
+    height: 65px;
+    border-radius: 50%;
+    border: 2px solid rgba(255,255,255,0.1);
+    box-shadow: 0 0 20px rgba(0,0,0,0.5);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    object-fit: cover;
+}
+
+.perk-badge-coin:hover {
+    transform: scale(1.1) rotate(5deg);
+    box-shadow: 0 0 25px currentColor;
 }

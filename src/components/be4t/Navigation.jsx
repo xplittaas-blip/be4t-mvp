@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import WalletFundingModal from './WalletFundingModal';
-import ConnectWalletButton from './ConnectWalletButton';
+import NavCTA from './NavCTA';
 import { isProduction } from '../../core/env';
 
 // ── BE4T Brand Logo (uses /public/be4t-logo.svg) ────────────────────────────
@@ -52,9 +51,8 @@ const HamburgerIcon = ({ open }) => (
     </svg>
 );
 
-const Navigation = ({ currentPage, setCurrentPage, session, onLoginClick }) => {
+const Navigation = ({ currentPage, setCurrentPage, session, onLoginClick, isAdmin = false, userRole = 'investor' }) => {
     const [mobileOpen, setMobileOpen] = useState(false);
-    const [walletOpen, setWalletOpen] = useState(false);
 
     // Close menu on page change or resize to desktop
     useEffect(() => {
@@ -70,10 +68,11 @@ const Navigation = ({ currentPage, setCurrentPage, session, onLoginClick }) => {
     }, [mobileOpen]);
 
     const navItems = [
-        { id: 'explore',       label: '↗ Explorar',       emoji: '🎵', description: 'Top 20 Artistas' },
-        { id: 'mis-canciones', label: '♫ Mis Canciones',  emoji: '🎶', description: 'Tu portafolio' },
-        { id: 'disqueras',     label: '⊞ Para Disqueras', emoji: '🏢', description: 'B2B Institucional' },
-        { id: 'como-funciona', label: '❓ Cómo Funciona', emoji: '💡', description: 'Aprende más' },
+        { id: 'explore',          label: 'Explorar',          description: 'Top 20 Artistas' },
+        { id: 'mis-canciones',    label: 'Mis Canciones',     description: 'Tu portafolio' },
+        { id: 'label-dashboard',  label: 'Business Dashboard',description: 'Business Metrics' },
+        { id: 'secondary-market', label: 'Premium Assets',    description: 'Trading P2P', badge: 'P2P' },
+        { id: 'como-funciona',    label: 'Cómo Funciona',     description: 'Aprende más' },
     ];
 
     const navigate = (id) => { setCurrentPage(id); setMobileOpen(false); };
@@ -161,26 +160,28 @@ const Navigation = ({ currentPage, setCurrentPage, session, onLoginClick }) => {
                     {/* Desktop nav links */}
                     <div className="be4t-nav-links" style={{
                         flex: 1, display: 'flex', alignItems: 'center',
-                        gap: '0.25rem', paddingLeft: '1rem',
-                        overflowX: 'auto', scrollbarWidth: 'none',
+                        gap: '0.1rem', paddingLeft: '0.5rem',
+                        whiteSpace: 'nowrap',
                     }}>
                         {navItems.map(item => {
                             const isActive = currentPage === item.id;
                             return (
                                 <button key={item.id} onClick={() => navigate(item.id)} title={item.description}
                                     style={{
-                                        padding: '0.4rem 0.85rem',
+                                        padding: '0.4rem 0.6rem',
                                         borderRadius: '8px', border: 'none',
                                         background: isActive ? 'rgba(139,92,246,0.2)' : 'transparent',
                                         color: isActive ? '#c4b5fd' : 'rgba(255,255,255,0.55)',
                                         fontWeight: isActive ? '700' : '400',
-                                        fontSize: '0.82rem', cursor: 'pointer', whiteSpace: 'nowrap',
+                                        fontSize: '0.75rem', cursor: 'pointer', whiteSpace: 'nowrap',
                                         borderBottom: isActive ? '2px solid #a855f7' : '2px solid transparent',
                                         transition: 'all 0.2s ease',
                                     }}
                                     onMouseOver={e => { if (!isActive) { e.currentTarget.style.color = 'rgba(255,255,255,0.85)'; e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; }}}
                                     onMouseOut={e => { if (!isActive) { e.currentTarget.style.color = 'rgba(255,255,255,0.55)'; e.currentTarget.style.background = 'transparent'; }}}
-                                >{item.label}</button>
+                                >{item.label}{item.badge && (
+                                    <span style={{ marginLeft: '5px', fontSize: '0.52rem', fontWeight: '900', background: '#06b6d4', color: '#000', borderRadius: '4px', padding: '1px 5px', verticalAlign: 'middle', letterSpacing: '0.5px' }}>{item.badge}</span>
+                                )}</button>
                             );
                         })}
                     </div>
@@ -188,25 +189,20 @@ const Navigation = ({ currentPage, setCurrentPage, session, onLoginClick }) => {
                     {/* Spacer on mobile */}
                     <div style={{ flex: 1 }} />
 
-                    {/* Right actions */}
+                    {/* Right actions — single NavCTA + admin + hamburger */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexShrink: 0 }}>
-                        {/* Web3 Wallet Connect (production only) */}
-                        {isProduction && <ConnectWalletButton />}
 
-                        {/* Mode Badge: LIVE vs DEMO — always visible */}
+                        {/* Mode badge — always visible */}
                         <div style={{
-                            display: 'inline-flex', alignItems: 'center', gap: '0.35rem',
-                            padding: '0.38rem 0.75rem',
-                            background: isProduction
-                                ? 'rgba(16,185,129,0.1)'
-                                : 'rgba(245,158,11,0.08)',
-                            border: `1px solid ${isProduction ? 'rgba(16,185,129,0.35)' : 'rgba(245,158,11,0.3)'}`,
+                            display: 'inline-flex', alignItems: 'center', gap: '0.3rem',
+                            padding: '0.28rem 0.6rem',
+                            background: isProduction ? 'rgba(16,185,129,0.08)' : 'rgba(245,158,11,0.08)',
+                            border: `1px solid ${isProduction ? 'rgba(16,185,129,0.25)' : 'rgba(245,158,11,0.25)'}`,
                             borderRadius: '100px',
-                            fontSize: '0.65rem', fontWeight: '800',
+                            fontSize: '0.6rem', fontWeight: '800',
                             letterSpacing: '0.8px', textTransform: 'uppercase',
                             color: isProduction ? '#10b981' : '#f59e0b',
-                            whiteSpace: 'nowrap',
-                            flexShrink: 0,
+                            whiteSpace: 'nowrap', flexShrink: 0,
                         }}>
                             <span style={{
                                 width: '5px', height: '5px', borderRadius: '50%',
@@ -214,73 +210,77 @@ const Navigation = ({ currentPage, setCurrentPage, session, onLoginClick }) => {
                                 display: 'inline-block',
                                 animation: isProduction ? 'be4t-nav-pulse 1.8s ease infinite' : 'none',
                             }} />
-                            {isProduction ? 'LIVE' : 'DEMO'}
+                            {isProduction ? 'REAL' : 'DEMO'}
                         </div>
 
-                        {/* BE4T Funding Modal (Supabase auth) */}
-                        <button
-                            onClick={() => setWalletOpen(true)}
-                            title="Fondear cuenta"
-                            style={{
-                                display: 'flex', alignItems: 'center', gap: '0.45rem',
-                                padding: '0.5rem 0.9rem',
-                                background: 'rgba(124,58,237,0.1)',
-                                border: '1px solid rgba(139,92,246,0.3)',
-                                borderRadius: '100px',
-                                color: '#c4b5fd', fontSize: '0.78rem', fontWeight: '600',
-                                cursor: 'pointer', whiteSpace: 'nowrap',
-                                transition: 'all 0.2s ease',
-                                minHeight: '44px', minWidth: '44px',
-                            }}
-                            onMouseOver={e => { e.currentTarget.style.background = 'rgba(124,58,237,0.22)'; }}
-                            onMouseOut={e => { e.currentTarget.style.background = 'rgba(124,58,237,0.1)'; }}
-                        >
-                            <WalletIcon />
-                            <span className="be4t-wallet-label">Fondear</span>
-                        </button>
-
-                        {/* Profile / Login */}
-                        {session ? (
-                            <button onClick={() => navigate('perfil')} title="Mi Perfil"
+                        {/* Admin button (if admin logged in via Supabase) */}
+                        {isAdmin && session && (
+                            <button
+                                onClick={() => isProduction
+                                    ? (window.history.pushState({}, '', '/admin'), window.dispatchEvent(new PopStateEvent('popstate')))
+                                    : navigate('label-dashboard')}
+                                title="Panel de Control"
                                 style={{
-                                    width: '44px', height: '44px', borderRadius: '50%',
-                                    background: 'linear-gradient(135deg, #7c3aed, #a855f7)',
-                                    border: '2px solid rgba(168,85,247,0.4)',
-                                    color: 'white', fontWeight: '800', fontSize: '0.85rem',
-                                    cursor: 'pointer', flexShrink: 0,
-                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                }}>
-                                {(session.user?.email?.[0] || 'U').toUpperCase()}
-                            </button>
-                        ) : (
-                            <button onClick={onLoginClick}
-                                style={{
-                                    padding: '0.5rem 1.1rem', minHeight: '44px',
-                                    background: 'linear-gradient(135deg, #7c3aed, #a855f7, #06b6d4)',
-                                    backgroundSize: '200% auto',
-                                    border: 'none', borderRadius: '100px',
-                                    color: 'white', fontWeight: '800', fontSize: '0.78rem',
-                                    cursor: 'pointer', whiteSpace: 'nowrap', letterSpacing: '-0.01em',
-                                    boxShadow: '0 2px 14px rgba(124,58,237,0.4)',
+                                    display: 'flex', alignItems: 'center', gap: '5px',
+                                    padding: '0.4rem 0.8rem',
+                                    background: 'rgba(139,92,246,0.15)',
+                                    border: '1px solid rgba(139,92,246,0.4)',
+                                    borderRadius: '100px',
+                                    color: '#c4b5fd', fontSize: '0.7rem', fontWeight: '800',
+                                    cursor: 'pointer', whiteSpace: 'nowrap',
+                                    transition: 'all 0.2s ease',
                                 }}
                             >
-                                Acceso Anticipado
+                                🛡️ Admin
                             </button>
                         )}
 
-                        {/* ── Hamburger (mobile only) ── */}
+                        {/* THE unified CTA — handles all auth states */}
+                        <NavCTA
+                            session={session}
+                            onNavigate={navigate}
+                            onLoginClick={onLoginClick}
+                        />
+
+                        {/* Avatar (shown when Supabase session exists — quick profile nav) */}
+                        {session && (
+                            <button onClick={() => navigate('perfil')} title="Mi Perfil"
+                                style={{
+                                    width: '34px', height: '34px', borderRadius: '50%',
+                                    background: isAdmin
+                                        ? 'linear-gradient(135deg, #4c1d95, #8B5CF6)'
+                                        : 'linear-gradient(135deg, #7c3aed, #a855f7)',
+                                    border: isAdmin
+                                        ? '2px solid rgba(196,181,253,0.5)'
+                                        : '2px solid rgba(168,85,247,0.35)',
+                                    color: 'white', fontWeight: '800', fontSize: '0.78rem',
+                                    cursor: 'pointer', flexShrink: 0,
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                    position: 'relative',
+                                }}>
+                                {(session.user?.email?.[0] || 'U').toUpperCase()}
+                                {isAdmin && (
+                                    <span style={{
+                                        position: 'absolute', bottom: '0', right: '0',
+                                        width: '8px', height: '8px', borderRadius: '50%',
+                                        background: '#c4b5fd', border: '2px solid #0f1117',
+                                    }} />
+                                )}
+                            </button>
+                        )}
+
+                        {/* Hamburger (mobile only) */}
                         <button
                             className="be4t-hamburger"
                             onClick={() => setMobileOpen(o => !o)}
                             aria-label="Abrir menú"
                             style={{
-                                display: 'none', // overridden by CSS @media
+                                display: 'none',
                                 alignItems: 'center', justifyContent: 'center',
-                                width: '44px', height: '44px',
+                                width: '40px', height: '40px',
                                 background: mobileOpen ? 'rgba(139,92,246,0.2)' : 'rgba(255,255,255,0.06)',
                                 border: `1px solid ${mobileOpen ? 'rgba(139,92,246,0.5)' : 'rgba(255,255,255,0.1)'}`,
-                                borderRadius: '10px',
-                                color: 'white', cursor: 'pointer',
+                                borderRadius: '10px', color: 'white', cursor: 'pointer',
                                 transition: 'all 0.2s ease', flexShrink: 0,
                             }}>
                             <HamburgerIcon open={mobileOpen} />
@@ -345,31 +345,27 @@ const Navigation = ({ currentPage, setCurrentPage, session, onLoginClick }) => {
 
                 {/* Bottom actions */}
                 <div style={{ marginTop: 'auto', padding: '1rem 1rem 2rem', borderTop: '1px solid rgba(255,255,255,0.06)', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                    <button
-                        onClick={() => { setWalletOpen(true); setMobileOpen(false); }}
-                        style={{
-                            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.6rem',
-                            padding: '0.85rem', minHeight: '52px',
-                            background: 'linear-gradient(135deg, rgba(124,58,237,0.2), rgba(6,182,212,0.15))',
-                            border: '1px solid rgba(139,92,246,0.4)', borderRadius: '12px',
-                            color: '#c4b5fd', fontWeight: '700', fontSize: '0.9rem', cursor: 'pointer',
-                        }}>
-                        <WalletIcon /> Conectar Wallet
-                    </button>
-                    {!session && (
-                        <button onClick={() => { onLoginClick?.(); setMobileOpen(false); }}
+                    {/* NavCTA in mobile sidebar */}
+                    <div style={{ display: 'flex', justifyContent: 'center' }}>
+                        <NavCTA session={session} onNavigate={(page) => { navigate(page); setMobileOpen(false); }} onLoginClick={() => { onLoginClick?.(); setMobileOpen(false); }} />
+                    </div>
+                    {/* Admin: Panel de Control (mobile) */}
+                    {isAdmin && session && (
+                        <button
+                            onClick={() => { navigate('label-dashboard'); setMobileOpen(false); }}
                             style={{
+                                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.6rem',
                                 padding: '0.85rem', minHeight: '52px',
-                                background: 'linear-gradient(135deg, #7c3aed, #a855f7)',
-                                border: 'none', borderRadius: '12px',
-                                color: 'white', fontWeight: '700', fontSize: '0.9rem', cursor: 'pointer',
-                            }}>
-                            Obtener Acceso Anticipado
+                                background: 'linear-gradient(135deg, rgba(139,92,246,0.25), rgba(124,58,237,0.15))',
+                                border: '1px solid rgba(139,92,246,0.5)', borderRadius: '12px',
+                                color: '#c4b5fd', fontWeight: '800', fontSize: '0.9rem', cursor: 'pointer',
+                            }}
+                        >
+                            🛡️ Panel de Control
                         </button>
                     )}
                 </div>
             </div>
-            <WalletFundingModal isOpen={walletOpen} onClose={() => setWalletOpen(false)} />
         </>
     );
 };

@@ -1,6 +1,6 @@
 import fallbackData from '../../data/fallbackSongs.json';
 
-const CACHE_KEY = 'xplit_marketplace_cache';
+const CACHE_KEY = 'xplit_marketplace_cache_v2';
 const CACHE_EXPIRY_MS = 24 * 60 * 60 * 1000; // 24 hours
 
 export const getMarketplaceData = async () => {
