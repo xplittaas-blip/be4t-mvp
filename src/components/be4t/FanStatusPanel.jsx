@@ -355,7 +355,7 @@ export default function FanStatusPanel({
                             {isFullyUnlocked ? '¡Nivel máximo alcanzado!' : `Estás a solo ${nextLockedPerk?.min_tokens - totalTokens} tokens del nivel ${nextLockedPerk?.label}`}
                         </p>
                     </div>
-                </div>
+                )}
 
                 {/* Tier cards horizontal grid */}
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px' }}>
