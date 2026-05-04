@@ -410,6 +410,11 @@ function App() {
             setSession(session);
             if (session) setShowAuthModal(false);
         });
+
+        // Auto-navigate if URL specifies a page
+        const initialPage = getUrlPage();
+        if (initialPage) setCurrentPage(initialPage);
+
         return () => subscription.unsubscribe();
     }, []);
 
@@ -520,11 +525,6 @@ function App() {
                     <HowItWorks onNavigate={navigate} />
                 )}
 
-                {/* Pitch Deck: Presentation Mode */}
-                {(currentPage === 'pitch' || urlPage === 'pitch') && (
-                    <PitchDeck onExit={() => navigate('explore')} />
-                )}
-
                 {/* Legacy routes */}
                 {currentPage === 'artist-invite' && (
                     isShowcase
@@ -554,6 +554,16 @@ function App() {
                     isOpen={showAuthModal}
                     onClose={() => setShowAuthModal(false)}
                 />
+            )}
+
+            {/* Pitch Deck: Presentation Mode (Fixed on top of everything) */}
+            {(currentPage === 'pitch' || urlPage === 'pitch') && (
+                <PitchDeck onExit={() => {
+                    if (window.location.pathname === '/pitch') {
+                        window.history.pushState({}, '', '/');
+                    }
+                    navigate('explore');
+                }} />
             )}
         </div>
     );
