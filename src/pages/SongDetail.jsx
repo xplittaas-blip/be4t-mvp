@@ -808,7 +808,7 @@ const SongDetail = ({ onBack, songId, songData, onRequireAuth, isAuthenticated, 
                         <button
                             className="sd-invest-btn"
                             disabled={txState === 'processing'}
-                            onClick={() => executeInvestment()}
+                            onClick={handleParticipate}
                             style={{
                                 width: '100%',
                                 padding: '1.2rem',
