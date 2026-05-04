@@ -8,6 +8,7 @@ import Marketplace from './pages/Marketplace';
 import Portfolio from './pages/Portfolio';
 import WaitlistPage from './pages/WaitlistPage';
 import SongDetail from './pages/SongDetail';
+import PitchDeck from './pages/PitchDeck';
 import HowItWorks from './components/be4t/HowItWorks';
 import AdminPanel from './pages/AdminPanel';
 import LabelDashboard from './pages/LabelDashboard';
@@ -420,7 +421,12 @@ function App() {
     }, []);
 
     // ── URL-based /admin routing (─────────────────────────────────────────────────
-    const getUrlPage = () => window.location.pathname === '/admin' ? 'admin' : null;
+    const getUrlPage = () => {
+        const path = window.location.pathname;
+        if (path === '/admin') return 'admin';
+        if (path === '/pitch') return 'pitch';
+        return null;
+    };
     const [urlPage, setUrlPage] = useState(getUrlPage);
 
     useEffect(() => {
@@ -512,6 +518,11 @@ function App() {
                 {/* Cómo Funciona: HowItWorks full page */}
                 {currentPage === 'como-funciona' && (
                     <HowItWorks onNavigate={navigate} />
+                )}
+
+                {/* Pitch Deck: Presentation Mode */}
+                {(currentPage === 'pitch' || urlPage === 'pitch') && (
+                    <PitchDeck onExit={() => navigate('explore')} />
                 )}
 
                 {/* Legacy routes */}

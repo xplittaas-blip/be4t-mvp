@@ -204,6 +204,7 @@ const Footer = () => {
                             <ColHead>Company</ColHead>
                             <FooterLink label="About BE4T"   onClick={() => navTo('como-funciona')} />
                             <FooterLink label="Artistas"     onClick={() => navTo('artist-invite')} />
+                            <FooterLink label="Pitch Deck 2026" onClick={() => navTo('pitch')} />
                             <FooterLink label="Términos"     onClick={() => {}} />
                             <FooterLink label="Privacidad"   onClick={() => {}} />
                         </div>
