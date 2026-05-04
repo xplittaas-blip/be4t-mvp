@@ -101,19 +101,30 @@ export function useDemoBalance(walletAddress = null) {
         setAcquiredMap(loadJSON(ak, {}));
         setHistory(loadJSON(hk, []));
 
-        // 2. Try Supabase (authoritative source) — overrides localStorage if more data
+        // 2. Try Supabase (authoritative source) — overrides localStorage if MORE data
         supabaseLoad(walletAddress).then(remote => {
             if (!remote) { setIsPersisted(false); return; }
             const remoteHistory  = remote.history  || [];
             const remotePortfolio = remote.portfolio || {};
-            // Only override if Supabase has MORE history (prevents regression)
-            if (remoteHistory.length > 0) {
+
+            // Atomically load current local state again to compare (since it might have changed since line 101/102)
+            const localHistory = loadJSON(hk, []);
+            
+            // Only override if Supabase has MORE history (prevents regression where stale remote data wipes fresh local purchases)
+            if (remoteHistory.length > localHistory.length) {
                 setHistory(remoteHistory);
                 saveJSON(hk, remoteHistory);
-            }
-            if (Object.keys(remotePortfolio).length > 0) {
-                setAcquiredMap(remotePortfolio);
-                saveJSON(ak, remotePortfolio);
+                
+                if (Object.keys(remotePortfolio).length > 0) {
+                    setAcquiredMap(remotePortfolio);
+                    saveJSON(ak, remotePortfolio);
+                }
+            } else if (remoteHistory.length === localHistory.length) {
+                // If they are equal, we are already in sync
+            } else {
+                // Local is ahead of remote — don't override. 
+                // The debounced sync in the other useEffect will eventually push local to remote.
+                console.log('[BE4T] Local storage is ahead of remote. Skipping remote sync to avoid regression.');
             }
             setIsPersisted(true);
         });
