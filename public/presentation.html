@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BE4T Pitch Deck 2026</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #08080f;
+            color: white;
+            margin: 0;
+            overflow: hidden;
+        }
+        .slide {
+            display: none;
+            height: 100vh;
+            width: 100vw;
+            padding: 2rem;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+        .slide.active {
+            display: flex;
+        }
+        .accent-gradient {
+            background: linear-gradient(90deg, #00f0ff, #a855f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .glow-circle {
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(0,240,255,0.1) 0%, transparent 70%);
+            border-radius: 50%;
+            z-index: -1;
+            animation: pulse 4s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(0.9); opacity: 0.3; }
+            50% { transform: scale(1.1); opacity: 0.6; }
+            100% { transform: scale(0.9); opacity: 0.3; }
+        }
+        .nav-btn {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .nav-btn:hover {
+            background: rgba(255,255,255,0.1);
+            transform: translateY(-2px);
+        }
+        .nav-btn:disabled {
+            opacity: 0.2;
+            cursor: not-allowed;
+        }
+        .card {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 24px;
+            padding: 2rem;
+            transition: all 0.3s;
+        }
+        .card:hover {
+            border-color: #00f0ff;
+            background: rgba(0,240,255,0.03);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Slide 1: Cover -->
+    <div class="slide active" id="slide-1">
+        <div class="glow-circle"></div>
+        <div class="text-center">
+            <div class="inline-flex items-center gap-2 bg-cyan-500/10 border border-cyan-500/30 rounded-full px-5 py-2 mb-8">
+                <span class="text-[10px] font-black tracking-[3px] text-cyan-400 uppercase">The Future of Music IP</span>
+            </div>
+            <h1 class="text-8xl md:text-9xl font-black tracking-tighter leading-[0.85] mb-6">
+                BE<span class="text-cyan-400">4</span>T
+            </h1>
+            <p class="text-xl md:text-3xl font-light text-white/80">
+                Transformando fans en <span class="font-bold accent-gradient">socios</span>.
+            </p>
+        </div>
+    </div>
+
+    <!-- Slide 2: The Gap -->
+    <div class="slide" id="slide-2">
+        <div class="max-w-5xl w-full grid md:grid-cols-2 gap-12 items-center">
+            <div>
+                <h3 class="text-cyan-400 text-xs font-black tracking-widest uppercase mb-4">El Abismo de la Lealtad</h3>
+                <h2 class="text-5xl md:text-6xl font-black leading-tight mb-8">El streaming está <span class="text-red-500">fallándole</span> al artista.</h2>
+                <div class="space-y-8">
+                    <div class="flex gap-4">
+                        <div class="text-cyan-400">●</div>
+                        <div>
+                            <h4 class="font-bold text-lg">Desconexión Total</h4>
+                            <p class="text-white/40 text-sm">El artista no conoce a su 1% más leal. La data pertenece a la plataforma.</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-4">
+                        <div class="text-cyan-400">●</div>
+                        <div>
+                            <h4 class="font-bold text-lg">Crecimiento Lineal</h4>
+                            <p class="text-white/40 text-sm">El revenue depende de clics, no de compromiso emocional.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card text-center py-16">
+                <div class="text-[120px] font-black text-cyan-400 leading-none">+400%</div>
+                <div class="text-white/30 text-xs uppercase tracking-widest mt-4">LTV Comunitario Proyectado</div>
+                <div class="mt-8 text-white/60 text-sm italic">"Monetizamos la emoción, no solo el audio."</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 3: The Solution -->
+    <div class="slide" id="slide-3">
+        <div class="max-w-6xl w-full">
+            <div class="text-center mb-16">
+                <h3 class="text-cyan-400 text-xs font-black tracking-widest uppercase">Nuestro Modelo</h3>
+                <h2 class="text-5xl md:text-6xl font-black mt-2">Propiedad Intelectual Participativa</h2>
+            </div>
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="card border-cyan-500/20 bg-cyan-500/5">
+                    <h4 class="text-2xl font-black mb-4">Para Majors & Sellos</h4>
+                    <ul class="space-y-4 text-white/70">
+                        <li><span class="text-cyan-400 font-bold">✓</span> <strong>Data de Super-Fans:</strong> Identifica al 1% real.</li>
+                        <li><span class="text-cyan-400 font-bold">✓</span> <strong>Community LTV:</strong> Monetización pre-lanzamiento.</li>
+                        <li><span class="text-cyan-400 font-bold">✓</span> <strong>Asset Liquidity:</strong> Capitaliza catálogo pasivo.</li>
+                    </ul>
+                </div>
+                <div class="card border-purple-500/20 bg-purple-500/5">
+                    <h4 class="text-2xl font-black mb-4">Para el Artista</h4>
+                    <ul class="space-y-4 text-white/70">
+                        <li><span class="text-purple-400 font-bold">✓</span> <strong>Independencia:</strong> Adelantos financiados por fans.</li>
+                        <li><span class="text-purple-400 font-bold">✓</span> <strong>Comunidad:</strong> Fans convertidos en embajadores.</li>
+                        <li><span class="text-purple-400 font-bold">✓</span> <strong>Exclusividad:</strong> Gamificación total del hit.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 4: The Vault -->
+    <div class="slide" id="slide-4">
+        <div class="max-w-5xl w-full text-center">
+            <h3 class="text-cyan-400 text-xs font-black tracking-widest uppercase mb-4">Gamificación</h3>
+            <h2 class="text-5xl md:text-6xl font-black mb-16">La Bóveda de Exclusividad</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="card border-cyan-500/30">
+                    <div class="text-cyan-400 font-black mb-2 tracking-widest">FAN</div>
+                    <p class="text-white/50 text-sm">Badge Exclusivo + Chat</p>
+                </div>
+                <div class="card border-purple-500/30">
+                    <div class="text-purple-400 font-black mb-2 tracking-widest">SOCIO</div>
+                    <p class="text-white/50 text-sm">Merch + Meet & Greet</p>
+                </div>
+                <div class="card border-yellow-500/30">
+                    <div class="text-yellow-500 font-black mb-2 tracking-widest">VIP</div>
+                    <p class="text-white/50 text-sm">Nombre en Créditos + Backstage</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 5: CTA -->
+    <div class="slide" id="slide-5">
+        <div class="text-center">
+            <h2 class="text-6xl md:text-8xl font-black tracking-tighter leading-[0.9] mb-12">
+                Validemos el próximo <br><span class="accent-gradient">hit</span> juntos.
+            </h2>
+            <button class="bg-gradient-to-r from-cyan-400 to-purple-500 px-12 py-5 rounded-2xl font-black text-xl hover:scale-105 transition-transform shadow-[0_10px_50px_rgba(0,240,255,0.3)]">
+                Agendar Demo Estratégica
+            </button>
+            <div class="mt-20 flex justify-center gap-12 text-white/30 text-[10px] font-bold uppercase tracking-widest">
+                <div>Growth & Product</div>
+                <div>Legal Framework</div>
+                <div>Tokens as a Service</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer Controls -->
+    <div class="fixed bottom-0 left-0 w-full p-8 flex justify-between items-center z-50">
+        <div class="text-white/20 font-bold text-sm tracking-widest" id="slide-number">1 / 5</div>
+        <div class="flex gap-4">
+            <button class="nav-btn" id="prev-btn" disabled>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+            </button>
+            <button class="nav-btn bg-cyan-400 text-black border-none" id="next-btn">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        let currentSlide = 1;
+        const totalSlides = 5;
+
+        function updateSlides() {
+            document.querySelectorAll('.slide').forEach(s => s.classList.remove('active'));
+            document.getElementById(`slide-${currentSlide}`).classList.add('active');
+            document.getElementById('slide-number').innerText = `${currentSlide} / ${totalSlides}`;
+            document.getElementById('prev-btn').disabled = currentSlide === 1;
+            document.getElementById('next-btn').disabled = currentSlide === totalSlides;
+            
+            // Background color for next button
+            if (currentSlide === totalSlides) {
+                document.getElementById('next-btn').classList.add('opacity-20');
+            } else {
+                document.getElementById('next-btn').classList.remove('opacity-20');
+            }
+        }
+
+        document.getElementById('next-btn').addEventListener('click', () => {
+            if (currentSlide < totalSlides) {
+                currentSlide++;
+                updateSlides();
+            }
+        });
+
+        document.getElementById('prev-btn').addEventListener('click', () => {
+            if (currentSlide > 1) {
+                currentSlide--;
+                updateSlides();
+            }
+        });
+
+        // Keyboard support
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') {
+                if (currentSlide < totalSlides) { currentSlide++; updateSlides(); }
+            } else if (e.key === 'ArrowLeft') {
+                if (currentSlide > 1) { currentSlide--; updateSlides(); }
+            }
+        });
+    </script>
+</body>
+</html>
