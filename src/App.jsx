@@ -412,8 +412,12 @@ function App() {
         });
 
         // Auto-navigate if URL specifies a page
-        const initialPage = getUrlPage();
-        if (initialPage) setCurrentPage(initialPage);
+        const path = window.location.pathname.toLowerCase().replace(/\/$/, '');
+        if (path === '/pitch' || path === '/admin') {
+            const initialPage = path === '/pitch' ? 'pitch' : 'admin';
+            console.log('[BE4T] Auto-navigating to:', initialPage);
+            setCurrentPage(initialPage);
+        }
 
         return () => subscription.unsubscribe();
     }, []);
@@ -427,7 +431,7 @@ function App() {
 
     // ── URL-based /admin routing (─────────────────────────────────────────────────
     const getUrlPage = () => {
-        const path = window.location.pathname;
+        const path = window.location.pathname.toLowerCase().replace(/\/$/, '');
         if (path === '/admin') return 'admin';
         if (path === '/pitch') return 'pitch';
         return null;
