@@ -3,10 +3,12 @@
   "buildCommand": "vite build --mode production",
   "outputDirectory": "dist",
   "framework": "vite",
+  "redirects": [
+    { "source": "/presentation", "destination": "/industry-pitch.html", "permanent": true }
+  ],
   "rewrites": [
-    { "source": "/presentation", "destination": "/presentation.html" },
-    { "source": "/presentation.html", "destination": "/presentation.html" },
-    { "source": "/((?!api/|presentation).*)", "destination": "/index.html" }
+    { "source": "/industry-pitch.html", "destination": "/industry-pitch.html" },
+    { "source": "/((?!api/|industry-pitch).*)", "destination": "/index.html" }
   ],
   "headers": [
     {
