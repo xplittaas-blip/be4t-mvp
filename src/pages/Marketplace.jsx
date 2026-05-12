@@ -3,6 +3,7 @@ import HeroBanner from '../components/be4t/HeroBanner';
 import SongCard, { normalizeSong, SongCardSkeleton } from '../components/be4t/SongCard';
 import TokenizationModal from '../components/be4t/TokenizationModal';
 import EarlyAccessModal from '../components/be4t/EarlyAccessModal';
+import AuthGateModal from '../components/be4t/AuthGateModal';
 import { isShowcase } from '../core/env';
 import { fetchDemoSongs20 } from '../services/spotifyService';
 import './Marketplace.css';
@@ -386,6 +387,9 @@ const Marketplace = ({ session, walletAddress, onNavigate }) => {
     const [detailAsset, setDetailAsset]   = useState(null);
     const [tokenizingAsset, setTokenizingAsset] = useState(null);
     const [waitlistOpen, setWaitlistOpen] = useState(false);
+    const [authGate, setAuthGate]         = useState({ open: false, songName: null });
+    const [showAuthToast, setShowAuthToast] = useState(false);
+    const [authModalOpen, setAuthModalOpen] = useState(false);
 
     // ── Load 20 songs directly from Spotify (no Supabase for demo) ────────
     const { portfolio: localPortfolio } = useDemoBalance(walletAddress);
@@ -571,6 +575,15 @@ const Marketplace = ({ session, walletAddress, onNavigate }) => {
                                         userMode={userMode}
                                         index={i}
                                         onDetailClick={(raw) => {
+                                            // ── Auth gate: intercept guests ──
+                                            if (!session) {
+                                                const name = raw?.title || raw?._raw?.name || null;
+                                                setAuthGate({ open: true, songName: name });
+                                                // Also fire the VIP auth toast
+                                                setShowAuthToast(true);
+                                                setTimeout(() => setShowAuthToast(false), 5500);
+                                                return;
+                                            }
                                             const songObj = raw?._raw || raw || {};
                                             const songId  = songObj.id || raw?.id;
                                             if (onNavigate) onNavigate('song-detail', songId, songObj);
@@ -594,6 +607,42 @@ const Marketplace = ({ session, walletAddress, onNavigate }) => {
                     }}
                 />
             )}
+
+            {/* ── Auth Gate Modal ─────────────────────────────────────────── */}
+            <AuthGateModal
+                isOpen={authGate.open}
+                songName={authGate.songName}
+                onClose={() => setAuthGate({ open: false, songName: null })}
+                onLogin={() => setWaitlistOpen(true)}
+            />
+
+            {/* ── VIP Auth Toast ──────────────────────────────────────────── */}
+            <style>{`
+                @keyframes be4t-toast-vip-in  { from { transform:translateY(16px) scale(0.96); opacity:0; } to { transform:translateY(0) scale(1); opacity:1; } }
+                @keyframes be4t-toast-vip-out { from { opacity:1; } to { opacity:0; transform:translateY(8px); } }
+            `}</style>
+            <div style={{
+                position: 'fixed', bottom: '2rem', left: '2rem', zIndex: 1000,
+                display: 'flex', alignItems: 'center', gap: '0.6rem',
+                background: 'linear-gradient(135deg, rgba(8,6,20,0.95) 0%, rgba(14,8,28,0.95) 100%)',
+                backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)',
+                border: '1px solid rgba(0,242,255,0.2)',
+                borderRadius: '12px',
+                padding: '0.65rem 1.1rem',
+                boxShadow: '0 0 0 1px rgba(139,92,246,0.12), 0 8px 32px rgba(0,0,0,0.5)',
+                pointerEvents: 'none',
+                opacity: showAuthToast ? 1 : 0,
+                transform: showAuthToast ? 'translateY(0) scale(1)' : 'translateY(16px) scale(0.96)',
+                transition: 'all 0.4s cubic-bezier(0.34,1.2,0.64,1)',
+            }}>
+                <span style={{
+                    display: 'inline-block', width: '8px', height: '8px', borderRadius: '50%',
+                    background: '#00F2FF', boxShadow: '0 0 8px #00F2FF', flexShrink: 0,
+                }} />
+                <span style={{ fontSize: '0.78rem', fontWeight: '700', color: 'rgba(255,255,255,0.9)', letterSpacing: '0.3px' }}>
+                    🔐 Identifícate para sincronizar tus regalías
+                </span>
+            </div>
 
             {/* ── Sticky mobile waitlist pill ── Hide in showcase playground ── */}
             {!isShowcase && <StickyWaitlistCTA onOpenModal={() => setWaitlistOpen(true)} />}
