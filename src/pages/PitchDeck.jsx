@@ -99,15 +99,15 @@ const PitchDeck = ({ onExit }) => {
                     <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '24px', padding: '2rem' }}>
                         <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.4)', marginBottom: '1.5rem', textTransform: 'uppercase' }}>Valor Actual del Fan vs Potencial BE4T</div>
                         <div style={{ height: '300px', width: '100%' }}>
-                            <ResponsiveContainer width=\"100%\" height=\"100%\">
+                            <ResponsiveContainer width="100%" height="100%">
                                 <AreaChart data={communityGrowth}>
                                     <defs>
-                                        <linearGradient id=\"colorValue\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\">
-                                            <stop offset=\"5%\" stopColor={PITCH_COLORS.accent} stopOpacity={0.3}/>
-                                            <stop offset=\"95%\" stopColor={PITCH_COLORS.accent} stopOpacity={0}/>
+                                        <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
+                                            <stop offset="5%" stopColor={PITCH_COLORS.accent} stopOpacity={0.3}/>
+                                            <stop offset="95%" stopColor={PITCH_COLORS.accent} stopOpacity={0}/>
                                         </linearGradient>
                                     </defs>
-                                    <Area type=\"monotone\" dataKey=\"ltv\" stroke={PITCH_COLORS.accent} fillOpacity={1} fill=\"url(#colorValue)\" strokeWidth={3} />
+                                    <Area type="monotone" dataKey="ltv" stroke={PITCH_COLORS.accent} fillOpacity={1} fill="url(#colorValue)" strokeWidth={3} />
                                 </AreaChart>
                             </ResponsiveContainer>
                         </div>
