@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BE4T — Strategic Label Presentation</title>
+    <link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Urbanist', sans-serif;
+            background: #F0F4F8;
+            color: #1A1A1A;
+            padding: 40px 20px;
+        }
+        .slide {
+            width: 1280px;
+            min-height: 720px;
+            padding: 72px 80px 60px;
+            margin: 24px auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.07);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        .accent-bar {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 6px;
+            background: linear-gradient(90deg, #00F2FF 0%, #8B5CF6 100%);
+        }
+        .slide-number {
+            position: absolute;
+            top: 28px; right: 40px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #CBD5E1;
+            letter-spacing: 0.08em;
+        }
+        h1 { font-size: 88px; font-weight: 800; letter-spacing: -0.04em; color: #0F172A; }
+        h2 {
+            font-size: 44px;
+            font-weight: 700;
+            color: #0F172A;
+            border-left: 7px solid #00F2FF;
+            padding-left: 22px;
+            line-height: 1.15;
+            margin-bottom: 44px;
+            letter-spacing: -0.02em;
+        }
+        .content { font-size: 22px; line-height: 1.65; color: #475569; flex-grow: 1; }
+        .tile {
+            background: #F8FAFC;
+            padding: 32px;
+            border-radius: 14px;
+            border: 1px solid #E2E8F0;
+        }
+        .tile-label {
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: #94A3B8;
+            margin-bottom: 14px;
+        }
+        .highlight { color: #00C9D4; font-weight: 700; }
+        .tag {
+            display: inline-block;
+            background: #ECFEFF;
+            border: 1px solid #A5F3FC;
+            color: #0891B2;
+            border-radius: 100px;
+            padding: 6px 16px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .footer {
+            margin-top: 40px;
+            font-size: 14px;
+            color: #CBD5E1;
+            border-top: 1px solid #F1F5F9;
+            padding-top: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .footer-logo {
+            font-weight: 800;
+            font-size: 18px;
+            background: linear-gradient(90deg, #00F2FF, #8B5CF6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .step-circle {
+            width: 52px; height: 52px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 800; font-size: 20px;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        @media (max-width: 1320px) {
+            .slide { width: 100%; min-height: auto; padding: 48px 40px 40px; }
+            h1 { font-size: 56px; }
+            h2 { font-size: 30px; }
+            .content { font-size: 18px; }
+        }
+        @media print {
+            body { padding: 0; background: white; }
+            .slide { box-shadow: none; margin: 0; border-radius: 0; page-break-after: always; min-height: 100vh; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- SLIDE 1: Cover -->
+    <div class="slide">
+        <div class="accent-bar"></div>
+        <span class="slide-number">01 / 05</span>
+        <div style="display:flex; flex-direction:column; justify-content:center; align-items:center; flex-grow:1; text-align:center; gap: 24px;">
+            <div style="display:inline-flex; align-items:center; gap:12px; background:#F0FDFE; border:1px solid #A5F3FC; border-radius:100px; padding:8px 22px; margin-bottom:8px;">
+                <span style="width:8px;height:8px;border-radius:50%;background:#00C9D4;display:inline-block;"></span>
+                <span style="font-size:14px; font-weight:700; color:#0891B2; letter-spacing:0.1em; text-transform:uppercase;">Confidential · Strategic Presentation 2026</span>
+            </div>
+            <h1>BE4T</h1>
+            <p style="font-size:28px; color:#64748B; font-weight:400; max-width:720px; line-height:1.4;">
+                Infraestructura de Fidelización y Data<br>para la Industria Musical del Siglo XXI
+            </p>
+            <div style="width:64px; height:4px; border-radius:100px; background:linear-gradient(90deg,#00F2FF,#8B5CF6); margin-top:8px;"></div>
+        </div>
+        <div class="footer">
+            <span class="footer-logo">BE4T</span>
+            <span>be4t.io · Base Sepolia · 2026</span>
+        </div>
+    </div>
+
+    <!-- SLIDE 2: The Problem -->
+    <div class="slide">
+        <div class="accent-bar"></div>
+        <span class="slide-number">02 / 05</span>
+        <h2>El Diagnóstico:<br>La Brecha del Streaming</h2>
+        <div class="content" style="display:grid; grid-template-columns:1fr 1fr; gap:24px; align-items:stretch;">
+            <div class="tile">
+                <div class="tile-label">⚠️ El Problema</div>
+                <p>Las disqueras acumulan <strong>billones de reproducciones</strong>, pero tienen <span class="highlight">cero identidad verificable</span> de sus consumidores más leales.</p>
+            </div>
+            <div class="tile">
+                <div class="tile-label">📊 La Realidad</div>
+                <p>Dependencia total de los algoritmos de Spotify y YouTube. El fan es anónimo, y su lealtad es efímera e inaprovechable.</p>
+            </div>
+            <div class="tile" style="grid-column: 1 / -1; background:#FFF7ED; border-color:#FED7AA;">
+                <div class="tile-label" style="color:#EA580C;">💡 La oportunidad no capturada</div>
+                <p style="color:#9A3412;">Los <strong>Super-Fans</strong> representan el 1% del streaming pero generan más del <strong>40% del gasto en merchandising</strong> y experiencias. Hoy son invisibles para el sello.</p>
+            </div>
+        </div>
+        <div class="footer">
+            <span class="footer-logo">BE4T</span>
+            <span>BE4T Strategic Consulting · 2026</span>
+        </div>
+    </div>
+
+    <!-- SLIDE 3: The Solution -->
+    <div class="slide">
+        <div class="accent-bar"></div>
+        <span class="slide-number">03 / 05</span>
+        <h2>La Solución:<br>Propiedad Participativa</h2>
+        <div class="content" style="display:flex; flex-direction:column; gap:28px;">
+            <p><span class="highlight">Mecánica:</span> BE4T permite tokenizar fracciones de regalías de una canción. El fan no dona ni hace streaming — <span class="highlight">invierte</span> y se convierte en co-propietario del activo.</p>
+
+            <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px;">
+                <div class="tile" style="text-align:center;">
+                    <div style="font-size:36px; margin-bottom:12px;">🎵</div>
+                    <div style="font-weight:700; color:#0F172A; margin-bottom:6px;">Artista tokeniza</div>
+                    <div style="font-size:17px;">Fracciona el 10–20% de sus regalías en tokens ERC-1155</div>
+                </div>
+                <div class="tile" style="text-align:center;">
+                    <div style="font-size:36px; margin-bottom:12px;">💰</div>
+                    <div style="font-weight:700; color:#0F172A; margin-bottom:6px;">Fan invierte</div>
+                    <div style="font-size:17px;">Recibe rendimiento proporcional al streaming real (15% TEA)</div>
+                </div>
+                <div class="tile" style="text-align:center;">
+                    <div style="font-size:36px; margin-bottom:12px;">✨</div>
+                    <div style="font-weight:700; color:#0F172A; margin-bottom:6px;">Sello se beneficia</div>
+                    <div style="font-size:17px;">Obtiene capital inmediato y un ejército de promotores orgánicos</div>
+                </div>
+            </div>
+
+            <div style="padding:24px 28px; background:#ECFEFF; border-radius:14px; border:1px solid #A5F3FC; color:#0E7490; font-size:20px; font-weight:600; text-align:center; line-height:1.5;">
+                "Cuando el fan es dueño, se convierte en el departamento de marketing más apasionado y rentable del sello."
+            </div>
+        </div>
+        <div class="footer">
+            <span class="footer-logo">BE4T</span>
+            <span>BE4T Strategic Consulting · 2026</span>
+        </div>
+    </div>
+
+    <!-- SLIDE 4: B2B Value -->
+    <div class="slide">
+        <div class="accent-bar"></div>
+        <span class="slide-number">04 / 05</span>
+        <h2>Valor Estratégico B2B:<br>Data, LTV & Nuevos Ingresos</h2>
+        <div class="content" style="display:flex; flex-direction:column; gap:28px;">
+            <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:20px; text-align:center;">
+                <div class="tile">
+                    <div style="font-size:52px; font-weight:800; color:#00C9D4; margin-bottom:8px; letter-spacing:-0.03em;">1%</div>
+                    <div style="font-weight:700; color:#0F172A; margin-bottom:6px;">First-Party Data</div>
+                    <div style="font-size:17px;">Identificación real de Super-Fans con historial de inversión verificable</div>
+                </div>
+                <div class="tile">
+                    <div style="font-size:52px; font-weight:800; color:#8B5CF6; margin-bottom:8px; letter-spacing:-0.03em;">4x</div>
+                    <div style="font-weight:700; color:#0F172A; margin-bottom:6px;">LTV Comunitario</div>
+                    <div style="font-size:17px;">Incremento de ingresos por fan activado en modelo de Perks + regalías</div>
+                </div>
+                <div class="tile">
+                    <div style="font-size:52px; font-weight:800; color:#22C55E; margin-bottom:8px; letter-spacing:-0.03em;">0 riesgo</div>
+                    <div style="font-weight:700; color:#0F172A; margin-bottom:6px;">Validación pre-lanzamiento</div>
+                    <div style="font-size:17px;">La demanda de tokens valida el hit antes de gastar en marketing masivo</div>
+                </div>
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+                <div class="tile" style="background:#F5F3FF; border-color:#DDD6FE;">
+                    <div class="tile-label" style="color:#7C3AED;">🔐 Para el Sello</div>
+                    <p style="font-size:19px;">Vende el 10% de un hit para financiar marketing de 5 artistas nuevos, <strong>sin ceder IP permanente</strong>. Capital inmediato, control total.</p>
+                </div>
+                <div class="tile" style="background:#F0FDF4; border-color:#BBF7D0;">
+                    <div class="tile-label" style="color:#15803D;">📈 Para el Artista</div>
+                    <p style="font-size:19px;">Mantiene el control de su base de fans vía <strong>FanStatus on-chain</strong>. Sus fans más leales son co-dueños — ninguna major puede replicar eso.</p>
+                </div>
+            </div>
+        </div>
+        <div class="footer">
+            <span class="footer-logo">BE4T</span>
+            <span>BE4T Strategic Consulting · 2026</span>
+        </div>
+    </div>
+
+    <!-- SLIDE 5: Roadmap + CTA -->
+    <div class="slide">
+        <div class="accent-bar"></div>
+        <span class="slide-number">05 / 05</span>
+        <h2>Hoja de Ruta:<br>El Futuro que Construimos Juntos</h2>
+        <div class="content" style="display:flex; flex-direction:column; gap:24px; flex-grow:1;">
+            <div style="display:flex; flex-direction:column; gap:18px;">
+                <div style="display:flex; align-items:center; gap:22px;">
+                    <div class="step-circle" style="background:linear-gradient(135deg,#00F2FF,#0891B2);">1</div>
+                    <div>
+                        <div style="font-weight:700; color:#0F172A; font-size:20px;">Fase Piloto — Genesis Drop</div>
+                        <div style="color:#64748B; font-size:18px;">Tokenización de un hit global con la base de fans núcleo. Prueba de concepto, datos reales.</div>
+                    </div>
+                </div>
+                <div style="display:flex; align-items:center; gap:22px;">
+                    <div class="step-circle" style="background:linear-gradient(135deg,#8B5CF6,#6D28D9);">2</div>
+                    <div>
+                        <div style="font-weight:700; color:#0F172A; font-size:20px;">Activación — The Vault (Perks)</div>
+                        <div style="color:#64748B; font-size:18px;">Despliegue completo de la Bóveda de Beneficios. Retención y upsell automatizados por contrato inteligente.</div>
+                    </div>
+                </div>
+                <div style="display:flex; align-items:center; gap:22px;">
+                    <div class="step-circle" style="background:linear-gradient(135deg,#475569,#1E293B);">3</div>
+                    <div>
+                        <div style="font-weight:700; color:#0F172A; font-size:20px;">Escala — Catálogo Completo</div>
+                        <div style="color:#64748B; font-size:18px;">Análisis de first-party data, expansión a múltiples artistas y mercados (US, EU, LatAm).</div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-top:auto; padding:28px 32px; background:linear-gradient(135deg, #F0FDFE 0%, #F5F3FF 100%); border-radius:14px; border:1px solid #C7D2FE; text-align:center;">
+                <p style="font-size:22px; font-style:italic; color:#334155; line-height:1.5; margin-bottom:16px;">
+                    "No estamos cambiando la música. Estamos cambiando la forma en que el mundo <strong>pertenece</strong> a ella."
+                </p>
+                <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
+                    <span class="tag">🌐 be4t.io</span>
+                    <span class="tag">⛓️ Base Sepolia</span>
+                    <span class="tag">📩 hola@be4t.io</span>
+                </div>
+            </div>
+        </div>
+        <div class="footer">
+            <span class="footer-logo">BE4T</span>
+            <span>BE4T Strategic Consulting · Confidential · 2026</span>
+        </div>
+    </div>
+
+</body>
+</html>
