@@ -8,9 +8,7 @@
     { "source": "/labels", "destination": "/labels.html", "permanent": false }
   ],
   "rewrites": [
-    { "source": "/industry-pitch.html", "destination": "/industry-pitch.html" },
-    { "source": "/labels.html", "destination": "/labels.html" },
-    { "source": "/((?!api/|industry-pitch|labels).*)", "destination": "/index.html" }
+    { "source": "/((?!api/)(?!.*\\.html$).*)", "destination": "/index.html" }
   ],
   "headers": [
     {
