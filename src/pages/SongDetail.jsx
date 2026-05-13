@@ -410,8 +410,10 @@ const SongDetail = ({ onBack, songId, songData, onRequireAuth, isAuthenticated, 
     };
 
     const handleParticipate = () => {
-        if (!isAuthenticated) { onRequireAuth(); return; }
-        if (isAuthenticated && !walletAddress && !account) {
+        // Showcase/demo mode: always allow — $50k demo credit, no real auth needed
+        // Production mode: require session OR wallet
+        if (!isShowcase && !isAuthenticated) { onRequireAuth(); return; }
+        if (!isShowcase && isAuthenticated && !walletAddress && !account) {
             onRequireAuth();
             return;
         }

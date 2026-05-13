@@ -21,6 +21,8 @@ import { supabase } from '../core/xplit/supabaseClient';
 
 const INITIAL_BALANCE = 50_000;
 const GLOBAL_LABEL_LEDGER = 'be4t_demo_label_ledger';
+// Stable key for showcase users who haven't connected a wallet yet
+const DEMO_GUEST_KEY = 'demo-guest-default';
 
 // ── Storage key derivation ────────────────────────────────────────────────────
 // Normalize key: strip '0x' prefix, lowercase for consistency
@@ -79,7 +81,10 @@ async function supabaseSave(walletAddr, portfolio, history) {
 
 // ── Main Hook ─────────────────────────────────────────────────────────────────
 export function useDemoBalance(walletAddress = null) {
-    const { acquiredKey, historyKey } = getKeys(walletAddress);
+    // In showcase mode, fall back to a stable guest key so the demo always works
+    // even when no wallet is connected.
+    const effectiveAddress = walletAddress || (isShowcase ? DEMO_GUEST_KEY : null);
+    const { acquiredKey, historyKey } = getKeys(effectiveAddress);
     const syncTimerRef = useRef(null);
     const [isPersisted, setIsPersisted] = useState(false);
 
@@ -90,66 +95,50 @@ export function useDemoBalance(walletAddress = null) {
 
     // ── Re-sync when wallet changes (localStorage first, then Supabase) ─────────
     useEffect(() => {
-        if (!walletAddress) {
+        // Re-sync when effectiveAddress changes
+        if (!effectiveAddress) {
             setAcquiredMap({});
             setHistory([]);
             setIsPersisted(false);
             return;
         }
-        // 1. Instant load from localStorage (fast)
-        const { acquiredKey: ak, historyKey: hk } = getKeys(walletAddress);
+        const { acquiredKey: ak, historyKey: hk } = getKeys(effectiveAddress);
         setAcquiredMap(loadJSON(ak, {}));
         setHistory(loadJSON(hk, []));
 
-        // 2. Try Supabase (authoritative source) — overrides localStorage if MORE data
-        supabaseLoad(walletAddress).then(remote => {
+        // 2. Try Supabase (authoritative source) — skip for guest key
+        if (effectiveAddress === DEMO_GUEST_KEY) { setIsPersisted(false); return; }
+        supabaseLoad(effectiveAddress).then(remote => {
             if (!remote) { setIsPersisted(false); return; }
             const remoteHistory  = remote.history  || [];
             const remotePortfolio = remote.portfolio || {};
 
-            // Atomically load current local state again to compare (since it might have changed since line 101/102)
-            const localHistory = loadJSON(hk, []);
-            
-            // Only override if Supabase has MORE history (prevents regression where stale remote data wipes fresh local purchases)
-            if (remoteHistory.length > localHistory.length) {
-                setHistory(remoteHistory);
-                saveJSON(hk, remoteHistory);
-                
-                if (Object.keys(remotePortfolio).length > 0) {
-                    setAcquiredMap(remotePortfolio);
-                    saveJSON(ak, remotePortfolio);
-                }
-            } else if (remoteHistory.length === localHistory.length) {
-                // If they are equal, we are already in sync
-            } else {
-                // Local is ahead of remote — don't override. 
-                // The debounced sync in the other useEffect will eventually push local to remote.
-                console.log('[BE4T] Local storage is ahead of remote. Skipping remote sync to avoid regression.');
-            }
+            setAcquiredMap(curr => (Object.keys(remotePortfolio).length >= Object.keys(curr).length ? remotePortfolio : curr));
+            setHistory(curr => (remoteHistory.length >= curr.length ? remoteHistory : curr));
             setIsPersisted(true);
         });
-    }, [walletAddress]);
+    }, [effectiveAddress]);
 
     // ── Persist: localStorage (sync) + Supabase (debounced 1.5s) ────────────────
     useEffect(() => { saveJSON(acquiredKey, acquiredMap); }, [acquiredKey, acquiredMap]);
     useEffect(() => { saveJSON(historyKey,  history); },     [historyKey,  history]);
     useEffect(() => { saveJSON(GLOBAL_LABEL_LEDGER, labelLedger); }, [labelLedger]);
 
-    // Debounced Supabase sync — fires 1.5s after last change
+    // Debounced Supabase sync — fires 1.5s after last change (skip for guest key)
     useEffect(() => {
-        if (!walletAddress) return;
+        if (!effectiveAddress || effectiveAddress === DEMO_GUEST_KEY) return;
         if (syncTimerRef.current) clearTimeout(syncTimerRef.current);
         syncTimerRef.current = setTimeout(() => {
-            supabaseSave(walletAddress, acquiredMap, history)
+            supabaseSave(effectiveAddress, acquiredMap, history)
                 .then(() => setIsPersisted(true))
                 .catch(() => {});
         }, 1500);
         return () => { if (syncTimerRef.current) clearTimeout(syncTimerRef.current); };
-    }, [walletAddress, acquiredMap, history]);
+    }, [effectiveAddress, acquiredMap, history]);
 
     // ── Atomic balance calculation (the Ledger) ───────────────────────────────
     const balance = useMemo(() => {
-        if (!walletAddress) return 0; // No wallet = no balance shown
+        if (!effectiveAddress) return 0; // No wallet = no balance shown
         let bal = INITIAL_BALANCE;
         for (const tx of history) {
             if (tx.type === 'COMPRA')                             bal -= tx.amount;
@@ -160,10 +149,10 @@ export function useDemoBalance(walletAddress = null) {
 
     // ── acquire ───────────────────────────────────────────────────────────────
     const acquire = useCallback((songId, cost, fractions = 1, songMeta = {}) => {
-        if (!isShowcase)      return { ok: false, reason: 'not-showcase' };
-        if (!walletAddress)   return { ok: false, reason: 'no-wallet' };
-        if (cost <= 0)        return { ok: false, reason: 'invalid-cost' };
-        if (balance < cost)   return { ok: false, reason: 'insufficient', balance, needed: cost };
+        if (!isShowcase)         return { ok: false, reason: 'not-showcase' };
+        if (!effectiveAddress)   return { ok: false, reason: 'no-wallet' };
+        if (cost <= 0)           return { ok: false, reason: 'invalid-cost' };
+        if (balance < cost)      return { ok: false, reason: 'insufficient', balance, needed: cost };
 
         const costFloat = parseFloat(cost.toFixed(2));
 
@@ -221,10 +210,10 @@ export function useDemoBalance(walletAddress = null) {
 
     // ── reset ─────────────────────────────────────────────────────────────────
     const reset = useCallback(() => {
-        if (!walletAddress) return;
+        if (!effectiveAddress) return;
         setHistory([]);
         setAcquiredMap({});
-    }, [walletAddress]);
+    }, [effectiveAddress]);
 
     // ── instantExit ───────────────────────────────────────────────────────────
     const instantExit = useCallback((songId) => {
@@ -297,10 +286,10 @@ export function useDemoBalance(walletAddress = null) {
         hasBalance: (cost) => balance >= cost,
         isDemo: isShowcase,
         // Identity
-        walletAddress,
-        isWalletConnected: !!walletAddress,
+        walletAddress: effectiveAddress,
+        isWalletConnected: !!walletAddress, // true only when a REAL wallet is connected
         // Persistence state
-        isPersisted,          // true = data is saved in Supabase, not just localStorage
+        isPersisted,
     };
 }
 

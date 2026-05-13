@@ -575,11 +575,13 @@ const Marketplace = ({ session, walletAddress, onNavigate }) => {
                                         userMode={userMode}
                                         index={i}
                                         onDetailClick={(raw) => {
-                                            // ── Auth gate: intercept guests ──
-                                            if (!session) {
+                                            // ── Auth gate ──────────────────────────────────────────
+                                            // Showcase mode: always allow (demo has $50k credit, no login needed)
+                                            // Production mode: block if no session AND no walletAddress
+                                            const isGuest = !isShowcase && !session && !walletAddress;
+                                            if (isGuest) {
                                                 const name = raw?.title || raw?._raw?.name || null;
                                                 setAuthGate({ open: true, songName: name });
-                                                // Also fire the VIP auth toast
                                                 setShowAuthToast(true);
                                                 setTimeout(() => setShowAuthToast(false), 5500);
                                                 return;
