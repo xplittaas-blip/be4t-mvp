@@ -204,6 +204,52 @@ export function DemoBalanceProvider({ children, userId, walletAddress }) {
         return { ok: true, newBalance: parseFloat((balance - costFloat).toFixed(2)) };
     }, [balance, persistNow]);
 
+    const instantExit = useCallback((songId) => {
+        setAcquiredMap(prevA => {
+            if (!prevA[songId]) return prevA;
+            const nextA = { ...prevA };
+            const refundAmount = prevA[songId].cost || 0;
+            delete nextA[songId];
+            
+            setHistory(prevH => {
+                const nextH = [...prevH, { 
+                    type: 'REFUND', 
+                    amount: refundAmount, 
+                    assetId: songId, 
+                    assetName: prevA[songId].name || 'Canción',
+                    date: Date.now() 
+                }];
+                persistNow(nextA, nextH);
+                return nextH;
+            });
+            return nextA;
+        });
+    }, [persistNow]);
+
+    const listOnMarket = useCallback((songId, price) => {
+        setAcquiredMap(prevA => {
+            if (!prevA[songId]) return prevA;
+            const nextA = { 
+                ...prevA, 
+                [songId]: { ...prevA[songId], listingPrice: price, listed: true } 
+            };
+            persistNow(nextA, stateRef.current.history);
+            return nextA;
+        });
+    }, [persistNow]);
+
+    const unlistFromMarket = useCallback((songId) => {
+        setAcquiredMap(prevA => {
+            if (!prevA[songId]) return prevA;
+            const nextA = { 
+                ...prevA, 
+                [songId]: { ...prevA[songId], listed: false } 
+            };
+            persistNow(nextA, stateRef.current.history);
+            return nextA;
+        });
+    }, [persistNow]);
+
     const portfolio = useMemo(() => Object.entries(acquiredMap).map(([id, data]) => {
         const secondsSince = (Date.now() - (data.acquiredAt || Date.now())) / 1000;
         const earned = (data.cost * (data.apy / 100) / 31536000) * secondsSince;
@@ -219,6 +265,9 @@ export function DemoBalanceProvider({ children, userId, walletAddress }) {
         portfolio,
         history,
         acquire,
+        instantExit,
+        listOnMarket,
+        unlistFromMarket,
         isLoading,
         isPersisted,
         reset: () => {
@@ -227,7 +276,8 @@ export function DemoBalanceProvider({ children, userId, walletAddress }) {
             if (userId) dbSave(userId, walletAddress, {}, []);
         },
         acquired: (songId) => acquiredMap[songId] ? { acquired: true, ...acquiredMap[songId] } : false,
-        hasBalance: (amount) => balance >= amount
+        hasBalance: (amount) => balance >= amount,
+        labelLedger
     };
 
     return <DemoBalanceContext.Provider value={value}>{children}</DemoBalanceContext.Provider>;
