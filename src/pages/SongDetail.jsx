@@ -282,7 +282,8 @@ const SongDetail = ({ onBack, songId, songData, onRequireAuth, isAuthenticated, 
     const [txResult, setTxResult] = useState(null);
     const [calcAmount, setCalcAmount] = useState(250);
 
-    const { balance, acquire, acquired: isAcquired, hasBalance } = useDemoBalance(walletAddress);
+    const { balance, acquire, acquired: isAcquired, hasBalance, isLoading: isBalanceLoading } = useDemoBalance();
+
     const account = useActiveAccount();
     const { mutateAsync: sendTx } = useSendTransaction();
 

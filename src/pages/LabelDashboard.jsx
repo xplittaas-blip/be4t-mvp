@@ -204,7 +204,8 @@ const AccessDenied = ({ onBack }) => (
 
 // ── Main Dashboard ─────────────────────────────────────────────────────────────
 const LabelDashboard = ({ session, walletAddress, onNavigate }) => {
-    const { portfolio, labelLedger } = useDemoBalance(walletAddress);
+    const { portfolio, labelLedger } = useDemoBalance();
+
     const [tick, setTick] = useState(0);
 
     // Live ticker: re-render every 4s to update earned-to-date

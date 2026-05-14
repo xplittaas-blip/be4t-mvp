@@ -63,7 +63,7 @@ function NavCTAInner({ session, onNavigate, onLoginClick }) {
     
     // Get effectiveId (0x ?? UUID) exactly like App.jsx does
     const { effectiveId } = useWalletSync(session);
-    const { balance: demoBalance } = useDemoBalance(effectiveId);
+    const { balance: demoBalance } = useDemoBalance();
     const [showPay, setShowPay] = useState(false);
     const [walletMenuOpen, setWalletMenuOpen] = useState(false);
 

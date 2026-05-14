@@ -392,7 +392,7 @@ const Marketplace = ({ session, walletAddress, onNavigate }) => {
     const [authModalOpen, setAuthModalOpen] = useState(false);
 
     // ── Load 20 songs directly from Spotify (no Supabase for demo) ────────
-    const { portfolio: localPortfolio } = useDemoBalance(walletAddress);
+    const { portfolio: localPortfolio } = useDemoBalance();
 
     useEffect(() => {
         const load = async () => {

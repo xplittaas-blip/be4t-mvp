@@ -17,6 +17,7 @@ import { supabase } from './core/xplit/supabaseClient';
 import { useUserRole } from './hooks/useUserRole';
 import { useWalletSync } from './hooks/useWalletSync';
 import { isShowcase } from './core/env';
+import { DemoBalanceProvider } from './context/DemoBalanceContext';
 
 // ── Lazy pages ────────────────────────────────────────────────────────────────
 // Profile page (simple placeholder if no dedicated page)
@@ -456,121 +457,124 @@ function App() {
     };
 
     return (
-        <div style={{ background: '#0F1117', minHeight: '100vh', color: 'white' }}>
-            {/* ── Global font import hoisted here ── */}
-            <style>{`
-                @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
-                *, *::before, *::after { box-sizing: border-box; font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
-                body { background: #0F1117; color: white; margin: 0; padding: 0; }
-                ::-webkit-scrollbar { width: 4px; }
-                ::-webkit-scrollbar-track { background: rgba(255,255,255,0.03); }
-                ::-webkit-scrollbar-thumb { background: rgba(139,92,246,0.4); border-radius: 2px; }
-                input, select, textarea { font-family: inherit; }
-                button { font-family: inherit; }
-            `}</style>
+        <DemoBalanceProvider userId={session?.user?.id} walletAddress={effectiveId}>
+            <div style={{ background: '#0F1117', minHeight: '100vh', color: 'white' }}>
+                {/* ── Global font import hoisted here ── */}
+                <style>{`
+                    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+                    *, *::before, *::after { box-sizing: border-box; font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+                    body { background: #0F1117; color: white; margin: 0; padding: 0; }
+                    ::-webkit-scrollbar { width: 4px; }
+                    ::-webkit-scrollbar-track { background: rgba(255,255,255,0.03); }
+                    ::-webkit-scrollbar-thumb { background: rgba(139,92,246,0.4); border-radius: 2px; }
+                    input, select, textarea { font-family: inherit; }
+                    button { font-family: inherit; }
+                `}</style>
 
-            <Navigation
-                currentPage={currentPage}
-                setCurrentPage={navigate}
-                session={session}
-                onLoginClick={() => setShowAuthModal(true)}
-                isAdmin={isAdmin}
-                userRole={userRole}
-            />
+                <Navigation
+                    currentPage={currentPage}
+                    setCurrentPage={navigate}
+                    session={session}
+                    onLoginClick={() => setShowAuthModal(true)}
+                    isAdmin={isAdmin}
+                    userRole={userRole}
+                />
 
-            <main>
-                {/* Explorar: Marketplace with Spotify Top 20 */}
-                {currentPage === 'explore' && (
-                    <Marketplace session={session} walletAddress={effectiveId} onNavigate={navigate} />
-                )}
+                <main>
+                    {/* Explorar: Marketplace with Spotify Top 20 */}
+                    {currentPage === 'explore' && (
+                        <Marketplace session={session} walletAddress={effectiveId} onNavigate={navigate} />
+                    )}
 
-                {/* Song Detail: Full-page view */}
-                {currentPage === 'song-detail' && (
-                    <SongDetail
-                        songId={activeSongId}
-                        songData={activeSong}
-                        isAuthenticated={isAuthenticated}
-                        session={session}
-                        walletAddress={effectiveId}
-                        onBack={() => navigate('explore')}
-                        onRequireAuth={() => setShowAuthModal(true)}
+                    {/* Song Detail: Full-page view */}
+                    {currentPage === 'song-detail' && (
+                        <SongDetail
+                            songId={activeSongId}
+                            songData={activeSong}
+                            isAuthenticated={isAuthenticated}
+                            session={session}
+                            walletAddress={effectiveId}
+                            onBack={() => navigate('explore')}
+                            onRequireAuth={() => setShowAuthModal(true)}
+                        />
+                    )}
+
+                    {/* Mis Canciones: Portfolio / Dashboard */}
+                    {currentPage === 'mis-canciones' && (
+                        <Portfolio session={session} walletAddress={effectiveId} onNavigate={setCurrentPage} />
+                    )}
+
+                    {/* Business Dashboard: B2B metrics */}
+                    {currentPage === 'label-dashboard' && (
+                        <LabelDashboard session={session} walletAddress={effectiveId} onNavigate={setCurrentPage} />
+                    )}
+
+                    {/* Secondary Market: P2P token trading */}
+                    {currentPage === 'secondary-market' && (
+                        <SecondaryMarket session={session} walletAddress={effectiveId} onNavigate={setCurrentPage} onRequireAuth={() => setShowAuthModal(true)} />
+                    )}
+
+                    {/* Perfil: User settings */}
+                    {currentPage === 'perfil' && session && (
+                        <ProfilePage session={session} onLogout={() => setCurrentPage('explore')} isAdmin={isAdmin} />
+                    )}
+
+                    {/* Waitlist — redirect to explore in showcase playground */}
+                    {currentPage === 'waitlist' && (
+                        isShowcase
+                            ? <Marketplace session={session} onNavigate={navigate} />
+                            : <WaitlistPage onNavigate={navigate} session={session} />
+                    )}
+
+                    {/* Cómo Funciona: HowItWorks full page */}
+                    {currentPage === 'como-funciona' && (
+                        <HowItWorks onNavigate={navigate} />
+                    )}
+
+                    {/* Legacy routes */}
+                    {currentPage === 'artist-invite' && (
+                        isShowcase
+                            ? <Marketplace session={session} onNavigate={navigate} />
+                            : <WaitlistPage onNavigate={navigate} session={session} />
+                    )}
+                    {currentPage === 'investor-waitlist' && (
+                        isShowcase
+                            ? <Marketplace session={session} onNavigate={navigate} />
+                            : <WaitlistPage onNavigate={navigate} session={session} />
+                    )}
+
+                    {/* Admin Panel: /admin route — protected, production only */}
+                    {(urlPage === 'admin' || currentPage === 'admin') && (
+                        <AdminPanel session={session} isAdmin={isAdmin} />
+                    )}
+
+                    {/* Home: redirect to explore */}
+                    {!urlPage && currentPage === 'home' && <Marketplace session={session} />}
+                </main>
+
+                <MiniPlayer />
+                <Footer />
+                {/* EarlyAccessModal — hidden in showcase playground (no lead capture) */}
+                {!isShowcase && (
+                    <EarlyAccessModal
+                        isOpen={showAuthModal}
+                        onClose={() => setShowAuthModal(false)}
                     />
                 )}
 
-                {/* Mis Canciones: Portfolio / Dashboard */}
-                {currentPage === 'mis-canciones' && (
-                    <Portfolio session={session} walletAddress={effectiveId} onNavigate={setCurrentPage} />
+                {/* Pitch Deck: Presentation Mode (Fixed on top of everything) */}
+                {(currentPage === 'pitch' || urlPage === 'pitch') && (
+                    <PitchDeck onExit={() => {
+                        if (window.location.pathname === '/pitch') {
+                            window.history.pushState({}, '', '/');
+                        }
+                        navigate('explore');
+                    }} />
                 )}
-
-                {/* Business Dashboard: B2B metrics */}
-                {currentPage === 'label-dashboard' && (
-                    <LabelDashboard session={session} walletAddress={effectiveId} onNavigate={setCurrentPage} />
-                )}
-
-                {/* Secondary Market: P2P token trading */}
-                {currentPage === 'secondary-market' && (
-                    <SecondaryMarket session={session} walletAddress={effectiveId} onNavigate={setCurrentPage} onRequireAuth={() => setShowAuthModal(true)} />
-                )}
-
-                {/* Perfil: User settings */}
-                {currentPage === 'perfil' && session && (
-                    <ProfilePage session={session} onLogout={() => setCurrentPage('explore')} isAdmin={isAdmin} />
-                )}
-
-                {/* Waitlist — redirect to explore in showcase playground */}
-                {currentPage === 'waitlist' && (
-                    isShowcase
-                        ? <Marketplace session={session} onNavigate={navigate} />
-                        : <WaitlistPage onNavigate={navigate} session={session} />
-                )}
-
-                {/* Cómo Funciona: HowItWorks full page */}
-                {currentPage === 'como-funciona' && (
-                    <HowItWorks onNavigate={navigate} />
-                )}
-
-                {/* Legacy routes */}
-                {currentPage === 'artist-invite' && (
-                    isShowcase
-                        ? <Marketplace session={session} onNavigate={navigate} />
-                        : <WaitlistPage onNavigate={navigate} session={session} />
-                )}
-                {currentPage === 'investor-waitlist' && (
-                    isShowcase
-                        ? <Marketplace session={session} onNavigate={navigate} />
-                        : <WaitlistPage onNavigate={navigate} session={session} />
-                )}
-
-                {/* Admin Panel: /admin route — protected, production only */}
-                {(urlPage === 'admin' || currentPage === 'admin') && (
-                    <AdminPanel session={session} isAdmin={isAdmin} />
-                )}
-
-                {/* Home: redirect to explore */}
-                {!urlPage && currentPage === 'home' && <Marketplace session={session} />}
-            </main>
-
-            <MiniPlayer />
-            <Footer />
-            {/* EarlyAccessModal — hidden in showcase playground (no lead capture) */}
-            {!isShowcase && (
-                <EarlyAccessModal
-                    isOpen={showAuthModal}
-                    onClose={() => setShowAuthModal(false)}
-                />
-            )}
-
-            {/* Pitch Deck: Presentation Mode (Fixed on top of everything) */}
-            {(currentPage === 'pitch' || urlPage === 'pitch') && (
-                <PitchDeck onExit={() => {
-                    if (window.location.pathname === '/pitch') {
-                        window.history.pushState({}, '', '/');
-                    }
-                    navigate('explore');
-                }} />
-            )}
-        </div>
+            </div>
+        </DemoBalanceProvider>
     );
+
 }
 
 export default App;

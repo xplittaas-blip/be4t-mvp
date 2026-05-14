@@ -388,7 +388,8 @@ function MarketStat({ label, value, color = 'white' }) {
 
 // ── Main Page ─────────────────────────────────────────────────────────────────
 const SecondaryMarket = ({ session, walletAddress, onNavigate, onRequireAuth }) => {
-    const { balance, portfolio, acquire } = useDemoBalance(walletAddress);
+    const { balance, portfolio, acquire } = useDemoBalance();
+
     const [buyTarget, setBuyTarget]       = useState(null);
     const [successMsg, setSuccessMsg]     = useState('');
     const [sortBy, setSortBy]             = useState('premium');
