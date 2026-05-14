@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { 
     ChevronLeft, ChevronRight, Briefcase, Users, 
     TrendingUp, Shield, Lock, Star, Zap, BarChart3, 
-    ArrowRight, Music 
+    ArrowRight, Music, FileText, Cpu, UserCheck, Coins 
 } from 'lucide-react';
 import { 
     LineChart, Line, XAxis, YAxis, CartesianGrid, 
@@ -155,7 +155,46 @@ const PitchDeck = ({ onExit }) => {
             )
         },
 
-        // SLIDE 4: THE VAULT (Gamification)
+        // SLIDE 4: THE PROTOCOL FLOW (Detailed Operational Model)
+        {
+            id: 'protocol-flow',
+            content: (
+                <div style={{ width: '100%', maxWidth: '1100px' }}>
+                    <div style={{ textAlign: 'center', marginBottom: '3.5rem' }}>
+                        <h3 style={{ fontSize: '0.8rem', fontWeight: '800', color: PITCH_COLORS.accent, letterSpacing: '2px', textTransform: 'uppercase' }}>
+                            INFRAESTRUCTURA OPERATIVA
+                        </h3>
+                        <h2 style={{ fontSize: '3.2rem', fontWeight: '900', marginTop: '0.5rem' }}>El Ciclo de Valor BE4T</h2>
+                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '1rem', position: 'relative' }}>
+                        {[
+                            { step: '01', title: 'Originación', desc: 'Acuerdo Legal SPV', icon: <FileText size={20} /> },
+                            { step: '02', title: 'Emisión', desc: 'Minting Base L2', icon: <Cpu size={20} /> },
+                            { step: '03', title: 'Inversión', desc: 'Venta Directa', icon: <UserCheck size={20} /> },
+                            { step: '04', title: 'Recaudo', desc: 'Spotify/Apple IP', icon: <BarChart3 size={20} /> },
+                            { step: '05', title: 'Yield', desc: 'Dispersión Auto', icon: <Coins size={20} /> }
+                        ].map((s, i) => (
+                            <div key={i} style={{ 
+                                background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)', 
+                                borderRadius: '20px', padding: '1.5rem', textAlign: 'center', position: 'relative' 
+                            }}>
+                                <div style={{ fontSize: '0.65rem', color: PITCH_COLORS.accent, fontWeight: '800', marginBottom: '1rem' }}>{s.step}</div>
+                                <div style={{ color: 'white', marginBottom: '1rem', display: 'flex', justifyContent: 'center' }}>{s.icon}</div>
+                                <h4 style={{ fontSize: '1rem', fontWeight: '800', marginBottom: '0.5rem' }}>{s.title}</h4>
+                                <p style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.4)', lineHeight: 1.4 }}>{s.desc}</p>
+                            </div>
+                        ))}
+                    </div>
+                    <div style={{ marginTop: '3rem', padding: '1.5rem', background: 'rgba(0,240,255,0.05)', borderRadius: '16px', border: '1px solid rgba(0,240,255,0.1)', textAlign: 'center' }}>
+                        <p style={{ fontSize: '0.9rem', color: PITCH_COLORS.accent, fontWeight: '600', margin: 0 }}>
+                            \"Un ecosistema donde el Smart Contract es el auditor y el fan es el beneficiario directo.\"
+                        </p>
+                    </div>
+                </div>
+            )
+        },
+
+        // SLIDE 5: THE VAULT (Gamification)
         {
             id: 'vault',
             content: (

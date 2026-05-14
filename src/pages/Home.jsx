@@ -1,6 +1,7 @@
 import React from 'react';
 import { ArrowRight, PlayCircle, TrendingUp, Users } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import ProtocolFlow from '../components/be4t/ProtocolFlow';
 import './Home.css';
 
 const Home = () => {
@@ -63,6 +64,9 @@ const Home = () => {
                     </div>
                 </div>
             </section>
+            
+            {/* Protocol Flow Visualization */}
+            <ProtocolFlow />
         </div>
     );
 };
