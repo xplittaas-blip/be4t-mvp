@@ -226,7 +226,8 @@ export function DemoBalanceProvider({ children, userId, walletAddress }) {
             setHistory([]);
             if (userId) dbSave(userId, walletAddress, {}, []);
         },
-        acquired: (songId) => acquiredMap[songId] ? { acquired: true, ...acquiredMap[songId] } : false
+        acquired: (songId) => acquiredMap[songId] ? { acquired: true, ...acquiredMap[songId] } : false,
+        hasBalance: (amount) => balance >= amount
     };
 
     return <DemoBalanceContext.Provider value={value}>{children}</DemoBalanceContext.Provider>;
