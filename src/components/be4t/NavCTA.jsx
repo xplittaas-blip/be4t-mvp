@@ -40,6 +40,8 @@ const ThirdwebPayModal = isProduction
     ? lazy(() => import('./ThirdwebPayModal'))
     : null;
 
+const GlobalVaultModal = lazy(() => import('./GlobalVaultModal'));
+
 const formatUSD = (n) =>
     new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n);
 
@@ -65,6 +67,7 @@ function NavCTAInner({ session, onNavigate, onLoginClick }) {
     const { effectiveId } = useWalletSync(session);
     const { balance: demoBalance } = useDemoBalance();
     const [showPay, setShowPay] = useState(false);
+    const [showVault, setShowVault] = useState(false);
     const [walletMenuOpen, setWalletMenuOpen] = useState(false);
 
     // Real ETH balance on Base Sepolia (production only)
@@ -119,45 +122,7 @@ function NavCTAInner({ session, onNavigate, onLoginClick }) {
         );
     }
 
-    // ── STATE B: Connected + onboarding pending ───────────────────────────────
-    if (!onboardingDone) {
-        // — SHOWCASE: zero friction — auto-complete onboarding, go straight to gallery —
-        if (isShowcase) {
-            localStorage.setItem('be4t_demo_onboarded', 'true');
-            // Trigger navigate on next tick so the component finishes rendering
-            setTimeout(() => onNavigate('explore'), 0);
-            // Render a brief "welcome" pill while navigating
-            return (
-                <div style={{
-                    ...CTABase,
-                    background: 'linear-gradient(135deg, rgba(16,185,129,0.12), rgba(6,182,212,0.08))',
-                    border: '1px solid rgba(16,185,129,0.3)',
-                    color: '#4ade80', boxShadow: 'none', cursor: 'default',
-                }}>
-                    <span style={{ width:'6px', height:'6px', borderRadius:'50%', background:'#4ade80', boxShadow:'0 0 6px #4ade80', animation:'be4t-cta-pulse 1.4s ease infinite' }} />
-                    ¡Bienvenido! $50,000 listos
-                </div>
-            );
-        }
-        // — PRODUCTION: show onboarding CTA —
-        return (
-            <button
-                onClick={() => onNavigate('waitlist')}
-                style={{
-                    ...CTABase,
-                    background: 'linear-gradient(135deg, #7c3aed, #a855f7)',
-                    color: 'white',
-                    boxShadow: '0 2px 14px rgba(124,58,237,0.4)',
-                }}
-                onMouseOver={e => { e.currentTarget.style.opacity = '0.88'; }}
-                onMouseOut={e => { e.currentTarget.style.opacity = '1'; }}
-            >
-                🔐 Activar Bóveda
-            </button>
-        );
-    }
-
-    // ── STATE C: Connected + onboarded → Show balance ─────────────────────────
+    // ── STATE C: Connected → Show balance + Vault ─────────────────────────
     const showcaseLabel = `${formatUSD(demoBalance)}`;
     const prodLabel     = ethBalance
         ? `${parseFloat(ethBalance.displayValue).toFixed(4)} ${ethBalance.symbol}`
@@ -169,7 +134,21 @@ function NavCTAInner({ session, onNavigate, onLoginClick }) {
 
     return (
         <>
-            <div style={{ position: 'relative' }}>
+            <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', position: 'relative' }}>
+                <button
+                    onClick={() => setShowVault(true)}
+                    style={{
+                        ...CTABase,
+                        background: 'linear-gradient(135deg, #7c3aed, #a855f7)',
+                        color: 'white',
+                        boxShadow: '0 2px 14px rgba(124,58,237,0.4)',
+                    }}
+                    onMouseOver={e => { e.currentTarget.style.opacity = '0.88'; }}
+                    onMouseOut={e => { e.currentTarget.style.opacity = '1'; }}
+                >
+                    🔐 Bóveda de Perks
+                </button>
+                
                 <button
                     onClick={() => {
                         if (isProduction) setShowPay(true);
@@ -255,6 +234,12 @@ function NavCTAInner({ session, onNavigate, onLoginClick }) {
                         songName="tu cartera"
                         amountUSD={20}
                     />
+                </Suspense>
+            )}
+
+            {showVault && (
+                <Suspense fallback={null}>
+                    <GlobalVaultModal onClose={() => setShowVault(false)} />
                 </Suspense>
             )}
 

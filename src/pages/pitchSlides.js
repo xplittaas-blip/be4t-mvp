@@ -1,0 +1,131 @@
+export const SLIDES = [
+  {
+    id: 'cover', label: 'BE4T',
+    eyebrow: 'THE FUTURE OF MUSIC IP',
+    title: 'BE<accent>4</accent>T',
+    subtitle: 'Transformando fans en socios capitalistas del ecosistema musical.',
+    type: 'cover',
+  },
+  {
+    id: 'problem', label: 'Problema',
+    eyebrow: 'EL PROBLEMA',
+    title: 'El streaming les está fallando a todos',
+    type: 'two-col',
+    left: {
+      heading: 'Para el Artista',
+      color: '#ff4d6d',
+      points: [
+        ['Ingresos miserables', 'Solo $0.003–$0.005 por stream. Un hit de 10M streams = $30K—antes de comisiones.'],
+        ['Sin acceso a capital', 'Adelantos bancarios imposibles. El artista independiente queda atrapado.'],
+        ['Data secuestrada', 'Spotify/Apple son dueños del fan. El artista no sabe quién es su 1% más valioso.'],
+      ],
+    },
+    right: {
+      heading: 'Para el Fan',
+      color: '#f97316',
+      points: [
+        ['Lealtad sin recompensa', 'El fan más devoto tiene exactamente los mismos derechos que quien escuchó una vez.'],
+        ['Cero participación', 'Ningunos beneficios económicos cuando el artista crece.'],
+        ['Experiencias genéricas', 'Acceso masificado, sin exclusividad real.'],
+      ],
+    },
+  },
+  {
+    id: 'solution', label: 'Solución',
+    eyebrow: 'NUESTRA SOLUCIÓN',
+    title: 'Propiedad Intelectual Participativa',
+    subtitle: 'BE4T tokeniza las regalías musicales futuras, convirtiendo fans en co-propietarios y financiando artistas sin deuda bancaria.',
+    type: 'three-cards',
+    cards: [
+      { icon: '🎵', color: '#00f0ff', title: 'Para el Artista', desc: 'Recibe capital inmediato vendiendo una fracción de sus regalías futuras a su comunidad.' },
+      { icon: '👥', color: '#a855f7', title: 'Para el Fan', desc: 'Invierte desde $10, recibe regalías proporcionales y accede a perks exclusivos crecientes.' },
+      { icon: '🏷️', color: '#facc15', title: 'Para el Sello', desc: 'Monetiza catálogo pasivo, identifica super-fans e incrementa el LTV comunitario.' },
+    ],
+  },
+  {
+    id: 'market', label: 'Mercado',
+    eyebrow: 'TAMAÑO DEL MERCADO',
+    title: 'Un mercado masivo y mal servido',
+    type: 'market',
+    stats: [
+      { label: 'TAM — Mercado Global de Música', value: '$26.2B', sub: 'Ingresos globales de la industria musical 2024 (IFPI)', color: '#00f0ff' },
+      { label: 'SAM — Música Tokenizable LATAM + España', value: '$3.4B', sub: 'Regalías anuales generadas en mercados hispanos', color: '#a855f7' },
+      { label: 'SOM — Objetivo Año 3 BE4T', value: '$48M', sub: 'Capturable con 500 tracks activos y 25K inversores', color: '#4ade80' },
+    ],
+    insight: 'El mercado de música en streaming creció 10.4% YoY. La tokenización de activos reales (RWA) alcanzó $5B en 2024 y proyecta $16T para 2030 (BCG).',
+  },
+  {
+    id: 'revenue', label: 'Revenue',
+    eyebrow: 'MODELO DE NEGOCIO',
+    title: 'Ingresos desde múltiples ángulos',
+    type: 'revenue',
+    streams: [
+      { icon: '💸', name: 'Comisión de Emisión', pct: '5%', desc: 'Sobre el monto total tokenizado por cada activo musical.' },
+      { icon: '📈', name: 'Protocolo de Regalías', pct: '2%', desc: 'Fee sobre cada distribución de rendimientos a inversores.' },
+      { icon: '🛒', name: 'Marketplace Secundario', pct: '1.5%', desc: 'Comisión sobre compraventa P2P de tokens entre inversores.' },
+      { icon: '🏢', name: 'Licencia B2B White-Label', pct: 'SaaS', desc: 'Distribuidoras e independientes que despliegan BE4T bajo su marca.' },
+    ],
+    unit: { label: 'Track Promedio: $25,000 tokenizados', rev: '$1,250 upfront + $500/año en protocol fees' },
+  },
+  {
+    id: 'features', label: 'Funcionalidades',
+    eyebrow: 'PRODUCTO ACTUAL',
+    title: 'Funcionalidades Principales',
+    type: 'features',
+    list: [
+      { icon: '🎧', title: 'Marketplace de Activos', desc: 'Catálogo de canciones tokenizadas con métricas en tiempo real (Spotify, YouTube, TikTok).' },
+      { icon: '💼', title: 'Portfolio de Inversión', desc: 'Dashboard personalizado con ROI acumulado, regalías recibidas y valor del portafolio.' },
+      { icon: '🔐', title: 'Bóveda de Perks (Gamification)', desc: 'Sistema de niveles FAN → SOCIO → VIP. Más tokens = más exclusividad y beneficios.' },
+      { icon: '📱', title: 'Compra sin fricción', desc: 'Acceso con Google/Email. Sin wallet previa. Pago con USDC via Thirdweb Pay.' },
+      { icon: '🔗', title: 'Smart Contracts Auditados', desc: 'ERC-1155 en Base L2. Bajo costo de gas, alta velocidad, auditados por firma independiente.' },
+      { icon: '📊', title: 'Métricas Live de Artistas', desc: 'Integración directa con APIs de Spotify, YouTube y TikTok para valoración dinámica.' },
+    ],
+  },
+  {
+    id: 'infra-now', label: 'Infra Actual',
+    eyebrow: 'INFRAESTRUCTURA ACTUAL',
+    title: 'Stack de Producción Hoy',
+    type: 'infra',
+    layers: [
+      { name: 'Frontend', color: '#00f0ff', items: ['React + Vite (SPA)', 'Vercel Edge Network', 'TailwindCSS / Vanilla CSS', 'i18n (ES/EN)'] },
+      { name: 'Auth & Wallet', color: '#a855f7', items: ['Thirdweb — Social Login', 'Google + Email (OTP)', 'ERC-4337 Smart Wallets', 'Supabase Auth'] },
+      { name: 'Blockchain', color: '#facc15', items: ['Base L2 (Sepolia + Mainnet)', 'ERC-1155 Vault Contract', 'USDC como moneda de inversión', 'On-chain yield distribution'] },
+      { name: 'Backend / Data', color: '#4ade80', items: ['Supabase (PostgreSQL)', 'user_investments table', 'Spotify API + YouTube API', 'Vercel Serverless Functions'] },
+    ],
+  },
+  {
+    id: 'infra-future', label: 'Roadmap',
+    eyebrow: 'INFRAESTRUCTURA FUTURA',
+    title: 'Roadmap de Escalabilidad',
+    type: 'roadmap',
+    phases: [
+      {
+        phase: 'Q3 2026', name: 'Producto Completo',
+        color: '#00f0ff',
+        items: ['Mercado Secundario P2P en vivo', 'Distribución automática de regalías on-chain', 'KYC/AML integrado (Sumsub)', 'App móvil iOS + Android'],
+      },
+      {
+        phase: 'Q4 2026', name: 'Escala LATAM',
+        color: '#a855f7',
+        items: ['100 tracks activos / 3 sellos firmados', 'White-label para distribuidoras', 'Integración con Boomplay y DistroKid', 'Cumplimiento MiCA (Europa)'],
+      },
+      {
+        phase: '2027', name: 'Liderazgo Global',
+        color: '#facc15',
+        items: ['500+ tracks / $10M tokenizados', 'DAO de Gobernanza con token BE4T', 'Integración con majors (Universal, Sony)', 'Expansión Brasil, México, España'],
+      },
+    ],
+  },
+  {
+    id: 'cta', label: 'Contacto',
+    eyebrow: 'ÚNETE AL MOVIMIENTO',
+    title: 'Validemos el próximo hit juntos.',
+    subtitle: 'Buscamos $500K Seed para cerrar el producto, firmar los primeros 10 artistas y lanzar en Q3 2026.',
+    type: 'cta',
+    contacts: [
+      { label: 'Email', val: 'hola@be4t.com' },
+      { label: 'Demo Live', val: 'charged-satellite-three.vercel.app' },
+      { label: 'LinkedIn', val: '/company/be4t' },
+    ],
+  },
+];

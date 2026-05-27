@@ -14,7 +14,7 @@ import { THIRDWEB_CLIENT_ID, isProduction } from './env';
 
 // ── Thirdweb Client ───────────────────────────────────────────────────────────
 export const client = createThirdwebClient({
-    clientId: THIRDWEB_CLIENT_ID || 'e96be70a9e07ba78c44a7eb82ae58d59',
+    clientId: THIRDWEB_CLIENT_ID,
 });
 
 // ── Chain: Locked to Base Sepolia for MVP Phase 1 (Testnet) ─────────────────

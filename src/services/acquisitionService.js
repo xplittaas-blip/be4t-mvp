@@ -26,35 +26,61 @@ async function simulateAcquisition(asset) {
     };
 }
 
-// ── Production: real ERC-1155 claim ──────────────────────────────────────────
-async function claimToken({ asset, account, quantity = 1 }) {
+// ── Production: real USDC approve + Vault invest ──────────────────────────
+async function claimToken({ asset, account, quantity = 1, totalPrice = null }) {
     const web3 = await getThirdwebClient();
     if (!web3) throw new Error('Web3 client not initialised');
-    if (!asset.contract_address) throw new Error('No contract address for this asset');
     if (!account) throw new Error('Wallet not connected');
+
+    const VAULT_ADDRESS = import.meta.env.VITE_VAULT_ADDRESS;
+    const USDC_ADDRESS  = import.meta.env.VITE_USDC_ADDRESS;
+    
+    if (!VAULT_ADDRESS || !USDC_ADDRESS) {
+        throw new Error("Faltan variables de entorno para los contratos de producción");
+    }
 
     const { getContract, prepareContractCall, sendTransaction } = await import('thirdweb');
 
-    const contract = getContract({
+    const usdcContract = getContract({
         client:  web3.client,
         chain:   web3.chain,
-        address: asset.contract_address,
+        address: USDC_ADDRESS,
+    });
+    
+    const vaultContract = getContract({
+        client:  web3.client,
+        chain:   web3.chain,
+        address: VAULT_ADDRESS,
     });
 
-    const tx = prepareContractCall({
-        contract,
-        method: 'function claim(address _receiver, uint256 _tokenId, uint256 _quantity) external',
-        params: [account.address, BigInt(0), BigInt(quantity)],
-    });
+    // Estimate total price based on token price if not provided
+    const fallbackPrice = asset.price || asset.token_price_usd || 10;
+    const finalTotal = totalPrice ?? (quantity * fallbackPrice);
+    
+    const totalUSDC = BigInt(Math.floor(finalTotal * 1000000));
 
-    const receipt = await sendTransaction({ transaction: tx, account });
+    // 1. Approve USDC
+    const approveTx = prepareContractCall({
+        contract: usdcContract,
+        method: "function approve(address spender, uint256 amount) returns (bool)",
+        params: [VAULT_ADDRESS, totalUSDC]
+    });
+    await sendTransaction({ transaction: approveTx, account });
+
+    // 2. Invest in Vault
+    const investTx = prepareContractCall({
+        contract: vaultContract,
+        method: "function invest(uint256 id, uint256 quantity)",
+        params: [BigInt(asset.id || 1), BigInt(quantity)]
+    });
+    const receipt = await sendTransaction({ transaction: investTx, account });
 
     return {
         success:    true,
         txHash:     receipt.transactionHash,
-        tokenId:    0,
+        tokenId:    asset.id || 1,
         qty:        quantity,
-        asset:      asset.name,
+        asset:      asset.name || asset.title || 'asset',
         mode:       'production',
         explorerUrl: `https://sepolia.basescan.org/tx/${receipt.transactionHash}`,
     };
@@ -65,9 +91,9 @@ async function claimToken({ asset, account, quantity = 1 }) {
  * acquireToken({ asset, account, quantity })
  * Unified entry point — automatically routes to simulation or blockchain.
  */
-export async function acquireToken({ asset, account, quantity = 1 }) {
+export async function acquireToken({ asset, account, quantity = 1, totalPrice = null }) {
     if (!isProduction) {
         return simulateAcquisition(asset);
     }
-    return claimToken({ asset, account, quantity });
+    return claimToken({ asset, account, quantity, totalPrice });
 }

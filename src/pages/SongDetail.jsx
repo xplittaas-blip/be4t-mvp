@@ -25,7 +25,7 @@ import { getContract, prepareContractCall } from 'thirdweb';
 import { client, activeChain } from '../core/thirdwebClient';
 import { isProduction, isShowcase } from '../core/env';
 import { useDemoBalance } from '../hooks/useDemoBalance';
-
+import { recordInvestment } from '../services/investmentService';
 // be4t components
 import FanStatusPanel from '../components/be4t/FanStatusPanel';
 import ConfettiBlast from '../components/be4t/ConfettiBlast';
@@ -437,9 +437,13 @@ const SongDetail = ({ onBack, songId, songData, onRequireAuth, isAuthenticated, 
             };
 
             try {
-                if (account) {
-                    const VAULT_ADDRESS = import.meta.env.VITE_VAULT_ADDRESS || "0x51EaE61B3fF980560b4570144f808796E2E10972"; 
-                    const USDC_ADDRESS  = import.meta.env.VITE_USDC_ADDRESS  || "0xA87C1f7dcfc7A3102377484B6c8A9bb02447d2fE";
+                if (isProduction) {
+                    if (!account) throw new Error("Wallet not connected");
+                    const VAULT_ADDRESS = import.meta.env.VITE_VAULT_ADDRESS;
+                    const USDC_ADDRESS  = import.meta.env.VITE_USDC_ADDRESS;
+                    if (!VAULT_ADDRESS || !USDC_ADDRESS) {
+                        throw new Error("Faltan variables de entorno para los contratos de producción");
+                    }
 
                     const usdcContract = getContract({ client, chain: activeChain, address: USDC_ADDRESS });
                     const vaultContract = getContract({ client, chain: activeChain, address: VAULT_ADDRESS });
@@ -458,38 +462,46 @@ const SongDetail = ({ onBack, songId, songData, onRequireAuth, isAuthenticated, 
                     });
 
                     await sendTx(approveTx);
-                    await sendTx(investTx);
-                } else if (!isShowcase) {
-                    throw new Error("Wallet not connected");
-                }
+                    const investReceipt = await sendTx(investTx);
+                    
+                    const effectiveUserId = session?.user?.id || walletAddress || account.address;
+                    
+                    // Escribir en base de datos productiva
+                    await recordInvestment({
+                        userId: effectiveUserId,
+                        trackId: song.id,
+                        tokensPurchased: fractions,
+                        purchasePrice: total,
+                        apyAtPurchase: songMeta.apy,
+                        tokenPriceAtBuy: tokenPrice,
+                        txHash: investReceipt.transactionHash,
+                        chainId: activeChain.id
+                    });
 
-                const result = acquire(song.id, total, fractions, songMeta);
-                if (result.ok) {
                     setTxResult({ cost: total, fractions, songName: song.title, artistName: song.artist });
                     setTxState('success');
                     setTimeout(() => {
                         document.dispatchEvent(new CustomEvent('navigate', { detail: 'mis-canciones' }));
                     }, 3500);
+
                 } else {
-                    setTxState('error');
-                    setTimeout(() => setTxState('idle'), 2500);
-                }
-            } catch (error) {
-                console.error("[Web3 Error]", error);
-                if (isShowcase) {
+                    // Modo Demo (Showcase)
                     const result = acquire(song.id, total, fractions, songMeta);
                     if (result.ok) {
                         setTxResult({ cost: total, fractions, songName: song.title, artistName: song.artist });
                         setTxState('success');
-                        setTimeout(() => document.dispatchEvent(new CustomEvent('navigate', { detail: 'mis-canciones' })), 3500);
+                        setTimeout(() => {
+                            document.dispatchEvent(new CustomEvent('navigate', { detail: 'mis-canciones' }));
+                        }, 3500);
                     } else {
                         setTxState('error');
                         setTimeout(() => setTxState('idle'), 2500);
                     }
-                } else {
-                    setTxState('error');
-                    setTimeout(() => setTxState('idle'), 2500);
                 }
+            } catch (error) {
+                console.error("[Web3 Error]", error);
+                setTxState('error');
+                setTimeout(() => setTxState('idle'), 2500);
             }
         };
 

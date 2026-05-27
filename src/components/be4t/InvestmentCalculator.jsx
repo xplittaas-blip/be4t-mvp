@@ -3,6 +3,8 @@ import { TrendingUp, DollarSign, Music, ChevronRight, Zap, CreditCard, CheckCirc
 import { createPortal } from 'react-dom';
 import { isShowcase, isProduction } from '../../core/env';
 import { useDemoBalance } from '../../hooks/useDemoBalance';
+import { useAcquisition } from '../../hooks/useAcquisition';
+import { useActiveAccount } from 'thirdweb/react';
 import ConfettiBlast from './ConfettiBlast';
 
 // Lazy-load PayModal only in production to keep showcase bundle lean
@@ -31,6 +33,11 @@ const InvestmentCalculator = ({ asset, session }) => {
 
     // ── Ghost Balance (Showcase only) ────────────────────────────────────────
     const { balance, acquire, acquired: isAcquired, hasBalance } = useDemoBalance();
+    
+    // ── Production Acquisition ────────────────────────────────────────────────
+    const { acquire: prodAcquire } = useAcquisition();
+    const account = useActiveAccount();
+    
     const songAcquired = isAcquired(asset?.id || asset?.track_id || 'unknown');
     const songName     = asset?.name || asset?.title || 'esta canción';
     const artistName   = asset?.metadata?.artist || asset?.artist || 'este artista';
@@ -122,9 +129,22 @@ const InvestmentCalculator = ({ asset, session }) => {
         setShowPay(true);
     };
 
-    const handlePaySuccess = () => {
+    const handlePaySuccess = async () => {
         setShowPay(false);
-        setTxState('success');
+        setTxState('processing');
+        try {
+            await prodAcquire({ 
+                asset, 
+                account,
+                quantity: fractions,
+                totalPrice: investmentCost
+            });
+            setTxState('success');
+        } catch (e) {
+            console.error("Failed to acquire token after pay success", e);
+            setTxState('error');
+            setTimeout(() => setTxState('idle'), 2500);
+        }
     };
 
     const handleClick = isShowcase ? handleShowcaseAcquire : handleProductionInvest;

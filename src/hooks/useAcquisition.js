@@ -13,6 +13,7 @@
  */
 import { useState, useCallback } from 'react';
 import { acquireToken } from '../services/acquisitionService';
+import { recordInvestment } from '../services/investmentService';
 
 export const ACQUISITION_STATUS = {
     IDLE:    'idle',
@@ -74,6 +75,7 @@ export function useAcquisition() {
             // Post-TX: notify backend to sync tokens_available in Supabase
             if (res.mode === 'production' && res.txHash) {
                 try {
+                    // Update supply
                     await fetch('/api/update-token-supply', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -83,9 +85,22 @@ export function useAcquisition() {
                             txHash:  res.txHash,
                         }),
                     });
+                    
+                    // Escribir en base de datos productiva
+                    const tokenPrice = asset.price || asset.token_price_usd || 10;
+                    await recordInvestment({
+                        userId: account?.address || 'unknown',
+                        trackId: asset.id,
+                        tokensPurchased: quantity,
+                        purchasePrice: quantity * tokenPrice,
+                        apyAtPurchase: asset.roi_est || asset.apy || 14,
+                        tokenPriceAtBuy: tokenPrice,
+                        txHash: res.txHash,
+                        chainId: 84532 // Base Sepolia por ahora
+                    });
                 } catch (_) {
                     // Non-critical — Supabase sync failure doesn't block the user
-                    console.warn('[BE4T] Supabase supply sync failed (non-critical)');
+                    console.warn('[BE4T] Supabase sync failed (non-critical)', _);
                 }
             }
         } catch (err) {
